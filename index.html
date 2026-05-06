@@ -3408,14 +3408,13 @@ const USE_LIVE_API = true;   // baked-in for Sensing Local's deployment
 // instant the page loads so the server is warm by the time anyone logs in.
 // This is fire-and-forget — we don't need or wait for the response.
 if (USE_LIVE_API) {
+  // Define the warmup callback before injecting the script tag
+  window.__rbps_warmup = function() {};
   (function warmUp() {
     try {
       const s = document.createElement('script');
-      // Use a throwaway callback name — Apps Script will call it, it won't
-      // exist, but that silent error is fine. The goal is just to wake the server.
       s.src = APPS_SCRIPT_URL + '?action=ping&payload={}&auth={}&callback=__rbps_warmup';
       s.onerror = function() { s.remove(); };
-      // Remove after 60s regardless
       setTimeout(function() { try { s.remove(); } catch(e){} }, 60000);
       document.head.appendChild(s);
     } catch(e) {}
