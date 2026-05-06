@@ -1380,7 +1380,7 @@ a:hover { text-decoration:underline; }
 .ov-vbar-outer::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:2px; }
 .ov-vbar-wrap {
   display:flex; align-items:flex-end; justify-content:flex-start;
-  gap:20px; height:220px; padding-top:30px;
+  gap:20px; height:198px; padding-top:48px;
   border-bottom:1.5px solid #C8C0B0;
   box-sizing:border-box;
 }
@@ -2657,7 +2657,7 @@ a:hover { text-decoration:underline; }
                  @click="ovDrillClick(bar)">
               <div class="ov-vbar-val">{{ fmtCost(bar.value) }}</div>
               <div class="ov-vbar-fill"
-                   :style="{height: (bar.pct * 2.1) + 'px', background: bar.color}"></div>
+                   :style="{height: (bar.pct * 1.4) + 'px', background: bar.color}"></div>
             </div>
           </div>
           <!-- labels below x-axis, same flex settings as bar row -->
