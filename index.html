@@ -777,8 +777,8 @@ a:hover { text-decoration:underline; }
 }
 .tb-nav button:hover { color:#fff; background:rgba(255,255,255,.08); }
 .tb-nav button.active { color:var(--ink); background:var(--accent); }
-.tb-user { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:var(--r); background:rgba(255,255,255,.06); font-size:11px; position:relative; }
-.tb-user .who { color:#fff; font-weight:600; }
+.tb-user { display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:var(--r); background:rgba(255,255,255,.06); font-size:11px; position:relative; min-width:180px; }
+.tb-user .who { color:#fff; font-weight:600; white-space:nowrap; }
 .tb-user .role { color:rgba(241,236,226,.6); font-size:10px; text-transform:uppercase; letter-spacing:.5px; }
 .tb-user button.logout { padding:2px 8px; border-radius:4px; background:rgba(255,255,255,.08); color:#fff; font-size:10px; }
 .tb-user button.logout:hover { background:rgba(255,255,255,.15); }
@@ -1328,6 +1328,7 @@ a:hover { text-decoration:underline; }
   display:flex; flex-direction:column;
   max-height:calc(100vh - 224px);
   overflow-y:auto;
+  overflow-x:visible;
 }
 /* Panel 3: project table (right) */
 .ov-right {
@@ -1338,8 +1339,10 @@ a:hover { text-decoration:underline; }
 }
 .ov-chart-card {
   padding:20px;
+  padding-top:14px;
   border-bottom:1px solid var(--line);
   flex-shrink:0;
+  overflow:visible;
 }
 .ov-chart-card:last-child { border-bottom:none; }
 .ov-chart-card.donut {}
@@ -1380,24 +1383,22 @@ a:hover { text-decoration:underline; }
 .ov-vbar-outer::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:2px; }
 .ov-vbar-wrap {
   display:flex; align-items:flex-end; justify-content:flex-start;
-  gap:20px; height:198px; padding-top:48px;
+  gap:20px; height:200px; padding-top:0;
   border-bottom:1.5px solid #C8C0B0;
   box-sizing:border-box;
 }
-/* each column: position:relative so value can sit just above fill */
+/* each column: flex column, bar anchored to bottom */
 .ov-vbar-col {
   flex:0 0 56px;
-  display:flex; align-items:flex-end;
-  position:relative;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
   cursor:pointer; transition:opacity .12s;
 }
 .ov-vbar-col:hover { opacity:.75; }
-/* value label — absolutely positioned just above the bar top */
+/* value label — in normal flex flow above the bar fill */
 .ov-vbar-val {
-  position:absolute; bottom:100%; margin-bottom:5px;
-  left:50%; transform:translateX(-50%);
   font-size:11px; font-weight:600; color:var(--muted);
   white-space:nowrap; text-align:center;
+  width:70px; margin-bottom:5px; flex-shrink:0;
 }
 /* bar fill — sits on x-axis, grows upward */
 .ov-vbar-fill {
@@ -2544,7 +2545,6 @@ a:hover { text-decoration:underline; }
       <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
     </select>
     <span class="ov-filter-count">{{ ovFiltered.length }} of {{ allProjects.length }} projects</span>
-    <button v-if="auth.mode === 'admin'" class="btn-save-list" @click="debugAdminListSave" title="Debug" style="background:#888;border-color:#888;margin-right:4px">Debug</button>
     <button v-if="auth.mode === 'admin'" class="btn-save-list" @click="openSaveAsListModal" title="Save current selection as a list">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
       Save as list
