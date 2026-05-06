@@ -4766,6 +4766,7 @@ const app = createApp({
     }
 
     // ── Overview save as list — choose existing or new ────────────────────
+    async function openSaveAsListModal() {
       const codes = ovFiltered.value
         .filter(p => ovSelected.value.has(p.project_code))
         .map(p => p.project_code);
