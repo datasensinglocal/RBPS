@@ -2544,6 +2544,7 @@ a:hover { text-decoration:underline; }
       <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
     </select>
     <span class="ov-filter-count">{{ ovFiltered.length }} of {{ allProjects.length }} projects</span>
+    <button v-if="auth.mode === 'admin'" class="btn-save-list" @click="debugAdminListSave" title="Debug" style="background:#888;border-color:#888;margin-right:4px">Debug</button>
     <button v-if="auth.mode === 'admin'" class="btn-save-list" @click="openSaveAsListModal" title="Save current selection as a list">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
       Save as list
@@ -3754,6 +3755,7 @@ const api = (() => {
     addProjectIntv: (p,a)=>call('add_project_intv', p, a),
     updateProjectIntv:(p,a)=>call('update_project_intv', p, a),
     getAdminLists:   (p,a)=>call('get_admin_lists', p, a),
+    debugAdminList:  (p,a)=>call('debug_admin_list', p, a),
     saveAdminList:   (p,a)=>call('save_admin_list', p, a),
     deleteAdminList: (p,a)=>call('delete_admin_list', p, a),
     removeProjectIntv:(p,a)=>call('remove_project_intv', p, a),
@@ -4765,6 +4767,13 @@ const app = createApp({
     }
 
     // ── Overview save as list — choose existing or new ────────────────────
+    async function debugAdminListSave() {
+      try {
+        const result = await api.debugAdminList({}, authPayload());
+        alert(JSON.stringify(result, null, 2));
+      } catch(e) { alert('Error: ' + e.message); }
+    }
+
     async function openSaveAsListModal() {
       const codes = ovFiltered.value
         .filter(p => ovSelected.value.has(p.project_code))
@@ -5379,7 +5388,7 @@ const app = createApp({
       adminListsOpen, adminLists, adminListsLoaded, activeListName, adminListActiveCodes,
       openAdminLists, applyAdminList, clearAdminList, openNewList, openEditList, deleteAdminList,
       listModalOpen, listModalName, listModalOrigName, listModalSelected, listModalSearch,
-      openSaveAsListModal, panelListDropdownOpen, togglePanelListDropdown,
+      openSaveAsListModal, debugAdminListSave, panelListDropdownOpen, togglePanelListDropdown,
       listsContaining, projectInAnyList, toggleProjectInList, createListFromPanel,
       listModalSaving, listModalProjects, saveListModal,
       ovQ, ovZone, ovConstituency, ovBucket, ovDonutBy, ovDonutHover,
