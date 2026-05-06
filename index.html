@@ -1501,8 +1501,14 @@ a:hover { text-decoration:underline; }
   transition:all .15s; cursor:pointer;
 }
 .pp-close:hover { background:#fff; }
-.pp-edit { color:var(--accent); margin-left:auto; }
-.pp-edit:hover, .pp-edit.active { background:var(--accent); color:#fff; }
+/* Pencil — 25% larger, prominent white border */
+.pp-edit {
+  width:40px; height:40px;
+  color:var(--accent); margin-left:auto;
+  border:3px solid #fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.30);
+}
+.pp-edit:hover, .pp-edit.active { background:var(--accent); color:#fff; border-color:var(--accent); }
 
 /* Code bubble */
 .pp-code-bubble {
@@ -1625,6 +1631,17 @@ a:hover { text-decoration:underline; }
   color:var(--accent-2); margin-top:6px; font-weight:600;
 }
 
+.btn-add-intv {
+  display:flex; align-items:center; gap:7px; justify-content:center;
+  width:100%; padding:9px 16px; border-radius:8px;
+  background:var(--accent); color:#fff;
+  font-size:12px; font-weight:600; letter-spacing:.2px;
+  border:2px solid var(--accent); cursor:pointer;
+  transition:all .15s;
+}
+.btn-add-intv:hover {
+  background:#fff; color:var(--accent);
+}
 .pp-section-title { font-size:12px; font-weight:700; letter-spacing:.8px; color:var(--ink); text-transform:uppercase; margin-bottom:10px; }
 
 /* Cascading interventions: Category → Sub-category → row */
@@ -2044,6 +2061,13 @@ a:hover { text-decoration:underline; }
 }
 /* Non-typology rows are de-emphasised but still pickable */
 .am-row:not(.am-typology):not(.am-selected) .am-row-name { color:var(--muted); font-weight:500; }
+.am-qty-wrap { display:flex; align-items:center; gap:4px; margin-top:4px; }
+.am-qty-lbl { font-size:10px; color:var(--muted); }
+.am-qty-input {
+  width:64px; padding:3px 6px; border:1.5px solid var(--line);
+  border-radius:5px; font-size:11px; text-align:right; outline:none;
+}
+.am-qty-input:focus { border-color:var(--accent); }
 
 /* ═════════════════════════════════════════════════════════════════════════
    §8 — TOASTS / STATUS
@@ -2413,7 +2437,12 @@ a:hover { text-decoration:underline; }
               </template>
               <template v-if="ovDrillLevel >= 3">
                 <span class="ov-breadcrumb-sep">›</span>
-                <span class="ov-breadcrumb-current">{{ ovDrillSubCat }} · Map</span>
+                <span v-if="ovDrillIntv" class="ov-breadcrumb-item" @click="ovDrillToIntv">{{ ovDrillSubCat }}</span>
+                <span v-else class="ov-breadcrumb-current">{{ ovDrillSubCat }}</span>
+              </template>
+              <template v-if="ovDrillLevel === 3 && ovDrillIntv">
+                <span class="ov-breadcrumb-sep">›</span>
+                <span class="ov-breadcrumb-current">{{ ovDrillIntv }}</span>
               </template>
             </div>
           </div>
@@ -2432,11 +2461,11 @@ a:hover { text-decoration:underline; }
             <div class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
           </div>
         </div>
-        <!-- Map filter band shown when drilling into sub-category -->
-        <div v-if="ovDrillLevel === 3" class="ov-map-filter-band">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-          Map filtered to: <strong>{{ ovDrillSubCat }}</strong> interventions
-          <button @click="ovDrillReset">Clear map filter</button>
+        <!-- Filter band shown when an intervention is selected -->
+        <div v-if="ovDrillLevel === 3 && ovDrillIntv" class="ov-map-filter-band">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2V12.46L22 3z"/></svg>
+          Projects filtered to: <strong>{{ ovDrillIntv }}</strong>
+          <button @click="ovDrillIntv = ''">Clear</button>
         </div>
       </div>
 
@@ -2646,9 +2675,6 @@ a:hover { text-decoration:underline; }
 
         <!-- Controls overlaid on image -->
         <div class="pp-overlay">
-          <button class="pp-close" @click="closeProject" title="Close">
-            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3 L11 11 M11 3 L3 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          </button>
           <span class="pp-code-bubble">{{ selectedProject.project_code }}</span>
           <button v-if="canEdit(selectedProject)" class="pp-edit" :class="{active: editMode}" @click="toggleEdit" :title="editMode?'Exit edit mode':'Edit'">
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 11.5 L2 12 L2.5 12 L11 3.5 L9.5 2 L1 10.5 L1 11 Z M9.5 2 L11 3.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
@@ -2744,10 +2770,13 @@ a:hover { text-decoration:underline; }
       <div class="pp-section">
         <div class="pp-section-title">Interventions ({{ projectInterventions.length }})</div>
 
-        <!-- "Add interventions" button -->
-        <div v-if="editMode" style="margin: 8px 0 14px">
-          <button class="btn btn-primary" style="width:100%" @click="openAddModal">
-            + Add or remove interventions
+        <!-- "Add interventions" button — shown in edit mode -->
+        <div v-if="editMode" style="margin:8px 0 14px">
+          <button class="btn-add-intv" @click="openAddModal">
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Add / Edit Interventions
           </button>
         </div>
 
@@ -2969,7 +2998,7 @@ a:hover { text-decoration:underline; }
   <div class="modal modal-wide">
     <div class="modal-hdr" style="display:flex;align-items:flex-start;gap:12px">
       <div style="flex:1">
-        <h2 class="modal-title">Add or remove interventions</h2>
+        <h2 class="modal-title">Interventions — set quantities</h2>
         <p class="modal-sub" v-if="selectedProject">
           {{ selectedProject.name }} · {{ selectedProject.project_code }}
           <span v-if="projectTypologies.size">· typology: {{ [...projectTypologies].join(', ') }}</span>
@@ -2998,9 +3027,17 @@ a:hover { text-decoration:underline; }
               <div v-if="row.explainer" class="am-row-explainer">{{ row.explainer }}</div>
             </div>
             <div class="am-row-meta">
-              {{ row.unit_label }}<br>
-              <span v-if="row.rate">{{ fmtCost(Number(row.rate)) }}</span>
-              <span v-else style="color:var(--muted);font-style:italic">no rate</span>
+              <div class="am-qty-wrap" @click.stop>
+                <input class="am-qty-input"
+                       type="number" min="0" step="1"
+                       :value="addModalQtys[row.intervention_id] ?? 0"
+                       @change="setModalQty(row.intervention_id, $event.target.value, row.selected)"
+                       :placeholder="row.unit_label || 'qty'" />
+                <span class="am-qty-lbl">{{ row.unit_label }}</span>
+              </div>
+              <div style="font-size:10px;color:var(--muted);text-align:right;margin-top:2px">
+                <span v-if="row.rate">{{ fmtCost(Number(row.rate)) }}/unit</span>
+              </div>
             </div>
           </div>
         </div>
@@ -3550,6 +3587,7 @@ const app = createApp({
     const addIvId = ref('');
     const addModalOpen = ref(false);                 // "Add interventions" picker modal
     const addModalSelected = ref(new Set());         // staging set of intervention_ids the user has ticked
+    const addModalQtys = reactive({});               // intervention_id → quantity (staging)
     const saving = ref(false);
 
     const rateCardOpen = ref(false);
@@ -4054,6 +4092,13 @@ const app = createApp({
             intvMatch
           )) return false;
         }
+        // Drill-down intervention filter — show only projects with this intervention
+        if (ovDrillIntv.value) {
+          const hasIntv = projectIntvs.value
+            .filter(r => r.project_code === p.project_code)
+            .some(r => (fwMap[r.intervention_id]?.intervention || '') === ovDrillIntv.value);
+          if (!hasIntv) return false;
+        }
         return true;
       });
     });
@@ -4122,10 +4167,11 @@ const app = createApp({
 
     // Vertical bar chart — sub-category spend
     // ── Drill-down state ─────────────────────────────────────────────────
-    const ovDrillLevel   = ref(0);   // 0=bucket, 1=category, 2=subcategory, 3=map
+    const ovDrillLevel   = ref(0);   // 0=bucket, 1=category, 2=subcategory, 3=interventions
     const ovDrillBucket  = ref('');
     const ovDrillCategory= ref('');
     const ovDrillSubCat  = ref('');
+    const ovDrillIntv    = ref('');
 
     // Helper: get filtered intv rows for selected+filtered projects
     function ovIntvRows() {
@@ -4157,25 +4203,31 @@ const app = createApp({
     // The bars shown depend on drill level
     const ovDrillBars = computed(() => {
       const rows = ovIntvRows();
+      const fwMap = fwById.value;
       if (ovDrillLevel.value === 0) {
-        // Level 0: group by budget_bucket
         return ovBuildBars(rows, fw => fw.budget_bucket);
       } else if (ovDrillLevel.value === 1) {
-        // Level 1: filter to selected bucket, group by category
         const bucket = ovDrillBucket.value;
         return ovBuildBars(rows.filter(r => {
-          const fw = fwById.value[r.intervention_id];
+          const fw = fwMap[r.intervention_id];
           return fw && fw.budget_bucket === bucket;
         }), fw => fw.category);
-      } else if (ovDrillLevel.value === 2 || ovDrillLevel.value === 3) {
-        // Level 2+3: filter to bucket+category, group by sub_category
-        // At level 3 (map filter active), keep showing the same sub-category bars
+      } else if (ovDrillLevel.value === 2) {
         const bucket = ovDrillBucket.value;
         const cat    = ovDrillCategory.value;
         return ovBuildBars(rows.filter(r => {
-          const fw = fwById.value[r.intervention_id];
+          const fw = fwMap[r.intervention_id];
           return fw && fw.budget_bucket === bucket && fw.category === cat;
         }), fw => fw.sub_category);
+      } else if (ovDrillLevel.value === 3) {
+        // Level 3: interventions within selected sub-category (map filters automatically)
+        const bucket = ovDrillBucket.value;
+        const cat    = ovDrillCategory.value;
+        const sub    = ovDrillSubCat.value;
+        return ovBuildBars(rows.filter(r => {
+          const fw = fwMap[r.intervention_id];
+          return fw && fw.budget_bucket === bucket && fw.category === cat && fw.sub_category === sub;
+        }), fw => fw.intervention);
       }
       return [];
     });
@@ -4191,8 +4243,9 @@ const app = createApp({
       } else if (ovDrillLevel.value === 2) {
         ovDrillSubCat.value = bar.name;
         ovDrillLevel.value = 3;
-        // Filter map to show interventions of this sub-category
-        ovApplyMapFilter(bar.name);
+      } else if (ovDrillLevel.value === 3) {
+        // Click an intervention bar — toggle filter on project table, stay at level 3
+        ovDrillIntv.value = ovDrillIntv.value === bar.name ? '' : bar.name;
       }
     }
 
@@ -4202,36 +4255,52 @@ const app = createApp({
       ovDrillBucket.value = '';
       ovDrillCategory.value = '';
       ovDrillSubCat.value = '';
+      ovDrillIntv.value = '';
       ovClearMapFilter();
     }
     function ovDrillToCat() {
       ovDrillLevel.value = 1;
       ovDrillCategory.value = '';
       ovDrillSubCat.value = '';
+      ovDrillIntv.value = '';
       ovClearMapFilter();
     }
     function ovDrillToSub() {
       ovDrillLevel.value = 2;
       ovDrillSubCat.value = '';
+      ovDrillIntv.value = '';
       ovClearMapFilter();
     }
 
-    // Map filter: highlight projects that have interventions in the selected sub-category
+    // ovDrillToIntv — breadcrumb back to intervention level
+    function ovDrillToIntv() {
+      ovDrillLevel.value = 3;
+      ovDrillIntv.value = '';
+      ovClearMapFilter();
+    }
+
+    // Map filter by sub-category (kept for compatibility)
     function ovApplyMapFilter(subCat) {
       const fwMap = fwById.value;
       const matchingIds = new Set(
         projectIntvs.value
-          .filter(r => {
-            const fw = fwMap[r.intervention_id];
-            return fw && fw.sub_category === subCat;
-          })
+          .filter(r => { const fw = fwMap[r.intervention_id]; return fw && fw.sub_category === subCat; })
           .map(r => r.project_code)
       );
-      // Use the existing map filter mechanism if available, otherwise store for map to read
       window._ovMapFilter = matchingIds;
-      if (window._mapCtrl && window._mapCtrl.setHighlight) {
-        window._mapCtrl.setHighlight(matchingIds);
-      }
+      if (window._mapCtrl && window._mapCtrl.setHighlight) window._mapCtrl.setHighlight(matchingIds);
+    }
+
+    // Map filter by specific intervention name
+    function ovApplyMapFilterByIntv(intvName) {
+      const fwMap = fwById.value;
+      const matchingIds = new Set(
+        projectIntvs.value
+          .filter(r => { const fw = fwMap[r.intervention_id]; return fw && fw.intervention === intvName; })
+          .map(r => r.project_code)
+      );
+      window._ovMapFilter = matchingIds;
+      if (window._mapCtrl && window._mapCtrl.setHighlight) window._mapCtrl.setHighlight(matchingIds);
     }
     function ovClearMapFilter() {
       window._ovMapFilter = null;
@@ -4447,8 +4516,27 @@ const app = createApp({
      * Unticking a pre-checked one removes it.
      */
     function openAddModal() {
+      // Pre-select all currently added interventions
       addModalSelected.value = new Set(projectInterventions.value.map(r => r.intervention_id));
+      // Pre-populate quantities from existing project_interventions
+      Object.keys(addModalQtys).forEach(k => delete addModalQtys[k]);
+      for (const r of rawProjectIntvs.value) {
+        if (r.project_code === selectedProject.value?.project_code) {
+          addModalQtys[r.intervention_id] = Number(r.quantity) || 0;
+        }
+      }
       addModalOpen.value = true;
+    }
+    function setModalQty(ivId, raw, isSelected) {
+      const qty = raw === '' ? 0 : Number(raw);
+      if (!isFinite(qty) || qty < 0) return;
+      addModalQtys[ivId] = qty;
+      // Auto-select if qty > 0
+      if (qty > 0 && !addModalSelected.value.has(ivId)) {
+        const next = new Set(addModalSelected.value);
+        next.add(ivId);
+        addModalSelected.value = next;
+      }
     }
     function closeAddModal() { addModalOpen.value = false; }
     function toggleAddModalIntv(ivId) {
@@ -4458,43 +4546,68 @@ const app = createApp({
     }
 
     /**
-     * Apply the modal's selections: diff against current project_interventions
-     * and call add/remove for the changes.
+     * Save modal: add/remove interventions AND save all quantities in one batch.
      */
     async function saveAddModal() {
       const p = selectedProject.value;
       if (!p) return;
       const current = new Set(projectInterventions.value.map(r => r.intervention_id));
       const wanted = addModalSelected.value;
-      const toAdd = [...wanted].filter(iv => !current.has(iv));
+      const toAdd    = [...wanted].filter(iv => !current.has(iv));
       const toRemove = [...current].filter(iv => !wanted.has(iv));
-      if (!toAdd.length && !toRemove.length) { addModalOpen.value = false; return; }
+      // Qty updates: all interventions that are selected and have a qty set
+      const toUpdateQty = [...wanted].filter(iv => addModalQtys[iv] !== undefined);
 
       saving.value = true; busy.value = true;
       try {
-        // Fire all calls in parallel; failures collected so partial success
-        // doesn't leave the UI in a confusing state.
+        // 1. Add new interventions with their qty
         const adds = toAdd.map(iv =>
-          api.addProjectIntv({ project_code: p.project_code, intervention_id: iv, quantity: 0 }, authPayload()));
+          api.addProjectIntv({
+            project_code: p.project_code,
+            intervention_id: iv,
+            quantity: addModalQtys[iv] ?? 0,
+          }, authPayload()));
+
+        // 2. Remove deselected interventions
         const removes = toRemove.map(iv =>
           api.removeProjectIntv({ project_code: p.project_code, intervention_id: iv }, authPayload()));
-        await Promise.all([...adds, ...removes]);
+
+        // 3. Update quantities for existing interventions
+        const qtyUpdates = toUpdateQty
+          .filter(iv => current.has(iv)) // only already-existing ones
+          .map(iv =>
+            api.updateProjectIntv({
+              project_code: p.project_code,
+              intervention_id: iv,
+              quantity: addModalQtys[iv] ?? 0,
+            }, authPayload()));
+
+        await Promise.all([...adds, ...removes, ...qtyUpdates]);
 
         // Mirror locally
         let next = projectIntvs.value.filter(r =>
           !(r.project_code === p.project_code && toRemove.includes(r.intervention_id)));
+        // Update qty for existing
+        next = next.map(r => {
+          if (r.project_code === p.project_code && addModalQtys[r.intervention_id] !== undefined) {
+            return { ...r, quantity: addModalQtys[r.intervention_id] };
+          }
+          return r;
+        });
+        // Add new
         for (const iv of toAdd) {
-          next.push({ project_code: p.project_code, intervention_id: iv, quantity: 0, cost: 0 });
+          next.push({ project_code: p.project_code, intervention_id: iv, quantity: addModalQtys[iv] ?? 0, cost: 0 });
         }
         projectIntvs.value = next;
 
-        // Open the categories of newly-added interventions
+        // Open categories of newly-added interventions
         for (const iv of toAdd) {
           const fw = framework.value.find(f => f.intervention_id === iv);
           if (fw) openCats.add(fw.category || 'Other');
         }
+        const nAdd = toAdd.length, nRm = toRemove.length, nQty = qtyUpdates.length;
         addModalOpen.value = false;
-        toast(`Added ${toAdd.length}, removed ${toRemove.length}`, 'ok');
+        toast(`Saved — added ${nAdd}, removed ${nRm}, updated ${nQty} quantities`, 'ok');
       } catch (e) {
         toast('Save failed: ' + e.message, 'err');
       } finally { saving.value = false; busy.value = false; }
@@ -4755,7 +4868,7 @@ const app = createApp({
       view, allProjects, framework, projectIntvs, typology,
       search, filters, ddOpen, accordions, sidebarCollapsed,
       selectedCode, editMode, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
-      addModalOpen, addModalSelected, colorMode, activeLegendFilter,
+      addModalOpen, addModalSelected, addModalQtys, setModalQty, colorMode, activeLegendFilter,
       rateCardOpen, rcSearch, openBuckets,
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
       auth, toasts, busy, siteTypeMap,
@@ -4777,7 +4890,7 @@ const app = createApp({
       ovSelected, ovFiltered, ovBuckets, ovDonutSegs, ovSubCatBars,
       ovTotalBudget, ovFundedCount, ovSelectedCount, ovSelectedBudget,
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
-      ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat,
+      ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
