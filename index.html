@@ -2266,7 +2266,7 @@ a:hover { text-decoration:underline; }
     <div v-else-if="auth.mode === 'admin'" style="position:relative">
       <button class="admin-lists-btn" @click="openAdminLists">
         <div class="who">{{ auth.name }} ▾</div>
-        <div class="role">Admin</div>
+        <div class="role">Admin{{ adminListsLoaded && adminLists.length ? ' · ' + adminLists.length + ' list' + (adminLists.length !== 1 ? 's' : '') : '' }}</div>
       </button>
       <!-- Active list badge -->
       <span v-if="activeListName" class="al-active-badge" @click="clearAdminList" title="Clear list filter">
