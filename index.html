@@ -2118,7 +2118,6 @@ a:hover { text-decoration:underline; }
   <nav class="tb-nav">
     <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
     <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
-    <button :class="{active: view==='summary'}" @click="view='summary'">Summary</button>
     <button :class="{active: view==='ratecard'}" @click="openRateCard">Rate Card</button>
     <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
   </nav>
@@ -4168,8 +4167,9 @@ const app = createApp({
           const fw = fwById.value[r.intervention_id];
           return fw && fw.budget_bucket === bucket;
         }), fw => fw.category);
-      } else if (ovDrillLevel.value === 2) {
-        // Level 2: filter to bucket+category, group by sub_category
+      } else if (ovDrillLevel.value === 2 || ovDrillLevel.value === 3) {
+        // Level 2+3: filter to bucket+category, group by sub_category
+        // At level 3 (map filter active), keep showing the same sub-category bars
         const bucket = ovDrillBucket.value;
         const cat    = ovDrillCategory.value;
         return ovBuildBars(rows.filter(r => {
