@@ -1251,6 +1251,53 @@ a:hover { text-decoration:underline; }
 }
 .ov-select:focus { border-color:var(--accent); }
 .ov-filter-count { font-size:11px; color:var(--muted); margin-left:auto; white-space:nowrap; }
+/* Add to list — project panel */
+.pp-list-band {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:8px 16px; border-bottom:1px solid var(--line);
+  background:#FAFAF8; position:relative;
+}
+.pp-list-pills { display:flex; gap:5px; flex-wrap:wrap; flex:1; min-width:0; }
+.pp-list-pill {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:2px 8px; border-radius:20px;
+  background:#F0EDE8; color:var(--muted);
+  font-size:10px; font-weight:600; border:1px solid var(--line);
+}
+.pp-list-pill.active { background:#FFF3EE; color:var(--accent); border-color:#F0D5C8; }
+.pp-add-list-btn {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 10px; border-radius:20px; flex-shrink:0;
+  border:1.5px solid var(--accent); color:var(--accent);
+  font-size:10.5px; font-weight:600; cursor:pointer;
+  background:#fff; transition:all .12s; white-space:nowrap;
+}
+.pp-add-list-btn:hover { background:var(--accent); color:#fff; }
+.pp-list-dropdown {
+  position:absolute; top:calc(100% + 4px); right:16px;
+  background:#fff; border-radius:10px; min-width:220px;
+  box-shadow:0 6px 24px rgba(0,0,0,.15); z-index:20;
+  overflow:hidden;
+}
+.pp-list-dd-item {
+  display:flex; align-items:center; gap:8px;
+  padding:9px 14px; cursor:pointer; transition:background .1s;
+  font-size:12px; border-bottom:1px solid var(--line);
+}
+.pp-list-dd-item:last-child { border-bottom:none; }
+.pp-list-dd-item:hover { background:var(--soft); }
+.pp-list-dd-item .dd-check { width:16px; height:16px; flex-shrink:0; accent-color:var(--accent); }
+.pp-list-dd-item.new-list { color:var(--accent); font-weight:600; }
+
+.btn-save-list {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 14px; border-radius:20px;
+  background:var(--accent); color:#fff;
+  font-size:11px; font-weight:600;
+  border:2px solid var(--accent); cursor:pointer;
+  transition:all .15s; white-space:nowrap; flex-shrink:0;
+}
+.btn-save-list:hover { background:#fff; color:var(--accent); }
 /* Metrics row */
 .ov-metrics {
   display:flex; gap:0; flex-shrink:0;
@@ -2265,32 +2312,38 @@ a:hover { text-decoration:underline; }
     <!-- Admin: clickable "My Lists" button -->
     <div v-else-if="auth.mode === 'admin'" style="position:relative">
       <button class="admin-lists-btn" @click="openAdminLists">
-        <div class="who">{{ auth.name }} ▾</div>
-        <div class="role">Admin{{ adminListsLoaded && adminLists.length ? ' · ' + adminLists.length + ' list' + (adminLists.length !== 1 ? 's' : '') : '' }}</div>
+        <div class="who">
+          {{ auth.name }}
+          <span style="font-size:18px;vertical-align:middle;margin-left:3px">▾</span>
+          <span style="font-size:12px;font-weight:400;opacity:.75;margin-left:4px">
+            ({{ adminListsLoaded ? adminLists.length : '…' }} {{ adminListsLoaded && adminLists.length === 1 ? 'list' : 'lists' }})
+          </span>
+        </div>
+        <div class="role">Admin</div>
       </button>
       <!-- Active list badge -->
       <span v-if="activeListName" class="al-active-badge" @click="clearAdminList" title="Clear list filter">
         📋 {{ activeListName }} ×
       </span>
-      <!-- My Lists popup -->
+      <!-- My Lists popup — just names, click to apply -->
       <div v-if="adminListsOpen" class="admin-lists-popup">
         <div class="al-popup-hdr">
           <span class="al-title">My Lists</span>
-          <button class="al-new-btn" @click="openNewList">+ New list</button>
+          <button v-if="activeListName" class="al-new-btn" @click="clearAdminList(); adminListsOpen=false">Clear filter</button>
         </div>
         <div class="al-list">
           <div v-if="!adminListsLoaded" style="padding:16px;text-align:center;color:var(--muted);font-size:12px">Loading…</div>
-          <div v-else-if="!adminLists.length" style="padding:16px;text-align:center;color:var(--muted);font-size:12px">No lists yet. Create one!</div>
-          <div v-for="list in adminLists" :key="list.list_name" class="al-list-item">
-            <div class="al-list-icon">📋</div>
-            <div class="al-list-body" @click="applyAdminList(list)">
+          <div v-else-if="!adminLists.length" style="padding:16px;text-align:center;color:var(--muted);font-size:12px">No lists yet — use "Save as list" in the Overview page.</div>
+          <div v-for="list in adminLists" :key="list.list_name"
+               class="al-list-item"
+               :style="activeListName===list.list_name ? 'background:var(--soft)' : ''"
+               @click="applyAdminList(list)">
+            <div class="al-list-icon">{{ activeListName===list.list_name ? '✓' : '📋' }}</div>
+            <div class="al-list-body">
               <div class="al-list-name">{{ list.list_name }}</div>
               <div class="al-list-count">{{ list.project_codes.length }} project{{ list.project_codes.length !== 1 ? 's' : '' }}</div>
             </div>
-            <div class="al-list-actions">
-              <button class="al-list-action" @click.stop="openEditList(list)" title="Edit">✎</button>
-              <button class="al-list-action del" @click.stop="deleteAdminList(list.list_name)" title="Delete">✕</button>
-            </div>
+            <button class="al-list-action del" @click.stop="deleteAdminList(list.list_name)" title="Delete">✕</button>
           </div>
         </div>
       </div>
@@ -2491,6 +2544,10 @@ a:hover { text-decoration:underline; }
       <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
     </select>
     <span class="ov-filter-count">{{ ovFiltered.length }} of {{ allProjects.length }} projects</span>
+    <button v-if="auth.mode === 'admin'" class="btn-save-list" @click="openSaveAsListModal" title="Save current selection as a list">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+      Save as list
+    </button>
   </div>
 
   <!-- Metrics -->
@@ -2860,6 +2917,49 @@ a:hover { text-decoration:underline; }
         <div v-if="!editMode && selectedProject.nominee_entity" class="pp-nominee-entity">{{ selectedProject.nominee_entity }}</div>
 
         <hr class="pp-divider" />
+
+        <!-- List membership band — admin only -->
+        <div v-if="auth.mode === 'admin'" class="pp-list-band">
+          <div class="pp-list-pills">
+            <span v-if="!projectInAnyList(selectedProject.project_code)"
+                  style="font-size:10.5px;color:var(--muted)">Not in any list</span>
+            <span v-for="list in listsContaining(selectedProject.project_code)"
+                  :key="list.list_name" class="pp-list-pill active">
+              📋 {{ list.list_name }}
+            </span>
+          </div>
+          <button class="pp-add-list-btn" @click.stop="togglePanelListDropdown">
+            <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+            Add to list
+          </button>
+          <!-- Dropdown -->
+          <div v-if="panelListDropdownOpen" class="pp-list-dropdown">
+            <div v-if="!adminListsLoaded" style="padding:12px 14px;font-size:11px;color:var(--muted)">Loading…</div>
+            <template v-else>
+              <div v-if="!adminLists.length"
+                   style="padding:10px 14px;font-size:11px;color:var(--muted)">No lists yet</div>
+              <div v-for="list in adminLists" :key="list.list_name"
+                   class="pp-list-dd-item"
+                   @click.stop="toggleProjectInList(selectedProject.project_code, list)">
+                <input type="checkbox" class="dd-check"
+                       :checked="list.project_codes.includes(selectedProject.project_code)"
+                       @click.stop />
+                <span>{{ list.list_name }}</span>
+                <span style="margin-left:auto;font-size:10px;color:var(--muted)">
+                  {{ list.project_codes.length }} projects
+                </span>
+              </div>
+              <div class="pp-list-dd-item new-list" @click.stop="createListFromPanel(selectedProject.project_code)">
+                <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
+                  <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+                New list with this project
+              </div>
+            </template>
+          </div>
+        </div>
 
         <!-- Info row: zone · constituency · area/length · cost -->
         <div class="pp-infobar">
@@ -3833,6 +3933,7 @@ const app = createApp({
       // Close nominee popup when clicking outside the tb-user area
       document.addEventListener('click', (e) => {
         if (!e.target.closest('.tb-user')) { nomineePopupOpen.value = false; adminListsOpen.value = false; }
+        if (!e.target.closest('.pp-list-band')) panelListDropdownOpen.value = false;
       });
 
       if (!USE_LIVE_API) {
@@ -4621,6 +4722,94 @@ const app = createApp({
       adminListActiveCodes.value = null;
     }
 
+    // ── Panel list management ─────────────────────────────────────────────
+    const panelListDropdownOpen = ref(false);
+
+    function togglePanelListDropdown() {
+      panelListDropdownOpen.value = !panelListDropdownOpen.value;
+      if (panelListDropdownOpen.value && !adminListsLoaded.value) loadAdminLists();
+    }
+
+    function listsContaining(code) {
+      return adminLists.value.filter(l => l.project_codes.includes(code));
+    }
+
+    function projectInAnyList(code) {
+      return adminLists.value.some(l => l.project_codes.includes(code));
+    }
+
+    async function toggleProjectInList(code, list) {
+      const codes = new Set(list.project_codes);
+      if (codes.has(code)) codes.delete(code); else codes.add(code);
+      try {
+        await api.saveAdminList({
+          list_name: list.list_name,
+          project_codes: [...codes],
+        }, authPayload());
+        await loadAdminLists();
+        toast((codes.has(code) ? 'Added to ' : 'Removed from ') + list.list_name, 'ok');
+      } catch(e) { toast('Failed: ' + e.message, 'err'); }
+    }
+
+    async function createListFromPanel(code) {
+      panelListDropdownOpen.value = false;
+      const name = prompt('Name this new list:');
+      if (!name || !name.trim()) return;
+      try {
+        await api.saveAdminList({
+          list_name: name.trim(),
+          project_codes: [code],
+        }, authPayload());
+        await loadAdminLists();
+        toast('List created: ' + name.trim(), 'ok');
+      } catch(e) { toast('Failed: ' + e.message, 'err'); }
+    }
+
+    // ── Overview save as list — choose existing or new ────────────────────
+      const codes = ovFiltered.value
+        .filter(p => ovSelected.value.has(p.project_code))
+        .map(p => p.project_code);
+      if (!codes.length) { toast('No projects selected', 'err'); return; }
+
+      // Build choice: existing lists + new
+      if (!adminListsLoaded.value) await loadAdminLists();
+      const existingNames = adminLists.value.map(l => l.list_name);
+      let chosen = '';
+      if (existingNames.length) {
+        const options = existingNames.map((n,i) => (i+1) + '. ' + n).join('\n');
+        const answer = prompt(
+          'Save ' + codes.length + ' projects to:\n\n' + options +
+          '\n' + (existingNames.length+1) + '. + Create new list\n\nEnter number or type a new name:'
+        );
+        if (!answer) return;
+        const idx = parseInt(answer) - 1;
+        if (!isNaN(idx) && idx >= 0 && idx < existingNames.length) {
+          chosen = existingNames[idx];
+        } else if (!isNaN(idx) && idx === existingNames.length) {
+          chosen = prompt('New list name:');
+          if (!chosen || !chosen.trim()) return;
+          chosen = chosen.trim();
+        } else {
+          chosen = answer.trim();
+        }
+      } else {
+        chosen = prompt('Name this list:');
+        if (!chosen || !chosen.trim()) return;
+        chosen = chosen.trim();
+      }
+
+      try {
+        // If appending to existing, merge codes
+        const existing = adminLists.value.find(l => l.list_name === chosen);
+        const finalCodes = existing
+          ? [...new Set([...existing.project_codes, ...codes])]
+          : codes;
+        await api.saveAdminList({ list_name: chosen, project_codes: finalCodes }, authPayload());
+        await loadAdminLists();
+        toast('Saved to "' + chosen + '" (' + finalCodes.length + ' projects)', 'ok');
+      } catch(e) { toast('Save failed: ' + e.message, 'err'); }
+    }
+
     function openNewList() {
       listModalName.value = '';
       listModalOrigName.value = '';
@@ -5190,6 +5379,8 @@ const app = createApp({
       adminListsOpen, adminLists, adminListsLoaded, activeListName, adminListActiveCodes,
       openAdminLists, applyAdminList, clearAdminList, openNewList, openEditList, deleteAdminList,
       listModalOpen, listModalName, listModalOrigName, listModalSelected, listModalSearch,
+      openSaveAsListModal, panelListDropdownOpen, togglePanelListDropdown,
+      listsContaining, projectInAnyList, toggleProjectInList, createListFromPanel,
       listModalSaving, listModalProjects, saveListModal,
       ovQ, ovZone, ovConstituency, ovBucket, ovDonutBy, ovDonutHover,
       ovSelected, ovFiltered, ovBuckets, ovDonutSegs, ovSubCatBars,
