@@ -1300,29 +1300,42 @@ a:hover { text-decoration:underline; }
 .ov-list-body {
   flex:1; overflow-y:auto;
 }
-.ov-table-hdr {
-  display:grid;
-  grid-template-columns:90px 1fr 110px 120px 1fr 50px;
-  padding:10px 16px;
+/* Overview project table */
+.ov-table {
+  width:100%; border-collapse:collapse; table-layout:fixed;
+}
+.ov-table thead tr {
   background:#F5F2EE; border-bottom:2px solid var(--line);
+}
+.ov-table thead th {
+  padding:10px 12px; text-align:left;
   font-size:10px; font-weight:700; text-transform:uppercase;
-  letter-spacing:.5px; color:var(--muted); gap:8px; align-items:center;
+  letter-spacing:.5px; color:var(--muted); white-space:nowrap;
 }
-.ov-table-row {
-  display:grid;
-  grid-template-columns:90px 1fr 110px 120px 1fr 50px;
-  padding:10px 16px; border-bottom:1px solid var(--line);
-  gap:8px; align-items:center; cursor:pointer; transition:background .1s;
+.ov-table thead th.th-right { text-align:right; }
+.ov-table thead th.th-center { text-align:center; }
+.ov-table tbody tr {
+  border-bottom:1px solid var(--line); transition:background .1s;
 }
-.ov-table-row:hover { background:#FFF8F4; }
-.ov-table-row:last-child { border-bottom:none; }
-.ov-table-row.ov-deselected { opacity:.4; }
-.ov-t-code { font-size:10.5px; font-weight:700; color:var(--accent); font-family:monospace; }
+.ov-table tbody tr:hover { background:#FFF8F4; }
+.ov-table tbody tr:last-child { border-bottom:none; }
+.ov-table tbody tr.ov-deselected { opacity:.4; }
+.ov-table td {
+  padding:10px 12px; vertical-align:middle;
+  word-wrap:break-word; overflow-wrap:break-word;
+}
+/* Column widths — proportional, all flex */
+.ov-table .col-code   { width:14%; }
+.ov-table .col-name   { width:30%; }
+.ov-table .col-budget { width:14%; text-align:right; }
+.ov-table .col-impact { width:14%; }
+.ov-table .col-funded { width:20%; }
+.ov-table .col-select { width:8%; text-align:center; }
+.ov-t-code { font-size:15px; font-weight:700; color:var(--accent); font-family:monospace; display:block; }
 .ov-t-link { cursor:pointer; }
 .ov-t-link:hover { text-decoration:underline; text-underline-offset:2px; }
-.ov-table-row { cursor:default; }
-.ov-t-name { font-size:12px; color:var(--ink); line-height:1.3; }
-.ov-t-budget { font-size:12px; font-weight:700; color:var(--ink); text-align:right; }
+.ov-t-name { font-size:14px; color:var(--ink); line-height:1.4; display:block; }
+.ov-t-budget { font-size:12px; font-weight:700; color:var(--ink); }
 .ov-impact {
   display:inline-flex; align-items:center; padding:2px 8px;
   border-radius:10px; font-size:10px; font-weight:600;
@@ -2474,34 +2487,47 @@ a:hover { text-decoration:underline; }
     <!-- Panel 3: Project table -->
     <div class="ov-panel-card ov-right">
       <div class="ov-panel2">
-      <div class="ov-table-hdr">
-        <div>Code</div>
-        <div>Project Name</div>
-        <div style="text-align:right">Total Budget</div>
-        <div>Impact</div>
-        <div>Funded Under</div>
-        <div style="text-align:center">Select</div>
-      </div>
       <div class="ov-list-body">
-      <div v-for="p in ovFiltered" :key="p.project_code"
-           class="ov-table-row"
-           :class="{'ov-deselected': !ovSelected.has(p.project_code)}">
-        <div class="ov-t-code ov-t-link" @click="openProject(p.project_code); view='projects'">{{ p.project_code }}</div>
-        <div class="ov-t-name ov-t-link" @click="openProject(p.project_code); view='projects'">{{ p.name }}</div>
-        <div class="ov-t-budget">{{ fmtCost(ovProjectTotal(p.project_code)) }}</div>
-        <div>
-          <span class="ov-impact"
-                :class="{high: p.impact==='High Impact', easy: p.impact==='Easy win'}">
-            {{ p.impact || '—' }}
-          </span>
-        </div>
-        <div class="ov-t-funded">{{ p.budget_range || '—' }}</div>
-        <div class="ov-t-check" @click.stop>
-          <input type="checkbox"
-                 :checked="ovSelected.has(p.project_code)"
-                 @change="ovToggle(p.project_code)" />
-        </div>
-      </div>
+      <table class="ov-table">
+        <colgroup>
+          <col class="col-code">
+          <col class="col-name">
+          <col class="col-budget">
+          <col class="col-impact">
+          <col class="col-funded">
+          <col class="col-select">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Project Name</th>
+            <th class="th-right">Total Budget</th>
+            <th>Impact</th>
+            <th>Funded Under</th>
+            <th class="th-center">Select</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="p in ovFiltered" :key="p.project_code"
+              :class="{'ov-deselected': !ovSelected.has(p.project_code)}">
+            <td><span class="ov-t-code ov-t-link" @click="openProject(p.project_code); view='projects'">{{ p.project_code }}</span></td>
+            <td><span class="ov-t-name ov-t-link" @click="openProject(p.project_code); view='projects'">{{ p.name }}</span></td>
+            <td class="ov-t-budget">{{ fmtCost(ovProjectTotal(p.project_code)) }}</td>
+            <td>
+              <span class="ov-impact"
+                    :class="{high: p.impact==='High Impact', easy: p.impact==='Easy win'}">
+                {{ p.impact || '—' }}
+              </span>
+            </td>
+            <td class="ov-t-funded">{{ p.budget_range || '—' }}</td>
+            <td class="ov-t-check" @click.stop>
+              <input type="checkbox"
+                     :checked="ovSelected.has(p.project_code)"
+                     @change="ovToggle(p.project_code)" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
       </div><!-- /ov-list-body -->
       <!-- Table footer -->
       <div class="ov-table-foot">
