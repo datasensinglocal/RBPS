@@ -1632,12 +1632,12 @@ a:hover { text-decoration:underline; }
 }
 
 .btn-add-intv {
-  display:flex; align-items:center; gap:7px; justify-content:center;
-  width:100%; padding:9px 16px; border-radius:8px;
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 12px; border-radius:20px;
   background:var(--accent); color:#fff;
-  font-size:12px; font-weight:600; letter-spacing:.2px;
+  font-size:11px; font-weight:600; letter-spacing:.2px;
   border:2px solid var(--accent); cursor:pointer;
-  transition:all .15s;
+  transition:all .15s; white-space:nowrap;
 }
 .btn-add-intv:hover {
   background:#fff; color:var(--accent);
@@ -2768,17 +2768,17 @@ a:hover { text-decoration:underline; }
 
       <!-- Interventions -->
       <div class="pp-section">
-        <div class="pp-section-title">Interventions ({{ projectInterventions.length }})</div>
-
-        <!-- "Add interventions" button — shown in edit mode -->
-        <div v-if="editMode" style="margin:8px 0 14px">
-          <button class="btn-add-intv" @click="openAddModal">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <div class="pp-section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Interventions ({{ projectInterventions.length }})</span>
+          <button v-if="editMode" class="btn-add-intv" @click="openAddModal">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
             </svg>
-            Add / Edit Interventions
+            Add / Edit
           </button>
         </div>
+
+
 
         <div v-if="!projectInterventions.length && !editMode" class="pp-empty">
           No interventions added yet.
@@ -4681,6 +4681,13 @@ const app = createApp({
           site_details: p['Site details and surroundings']||'',
           issues:       p['Issues']||'',
         });
+        // Expand all categories and sub-categories so all rows are visible
+        for (const cat of groupedInterventions.value) {
+          openCats.add(cat.name);
+          for (const sub of cat.subs) {
+            openSubs.add(cat.name + '§' + sub.name);
+          }
+        }
         editMode.value = true;
       } else {
         saveEdit();
