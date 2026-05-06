@@ -4646,9 +4646,11 @@ const app = createApp({
       return false;
     }
     function authPayload() {
-      return auth.mode === 'admin'
-        ? { adminEmail: auth.email }
-        : { nomineeName: auth.name, nomineeEmail: auth.email };
+      console.log('authPayload called: mode=' + auth.mode + ' email=' + auth.email);
+      if (auth.mode === 'admin') {
+        return { adminEmail: auth.email || '' };
+      }
+      return { nomineeName: auth.name, nomineeEmail: auth.email };
     }
     function openLogin(mode='nominee') { loginMode.value = mode; loginOpen.value = true; loginErr.value = ''; }
     async function doNomineeLogin(retryCount = 0) {
@@ -4696,7 +4698,7 @@ const app = createApp({
     }
     // ── Admin Lists functions ────────────────────────────────────────────
     async function loadAdminLists() {
-      if (!auth.adminUserId) return;
+      if (!auth.email || auth.mode !== 'admin') return;
       try {
         const data = await api.getAdminLists({}, authPayload());
         adminLists.value = data.lists || [];
@@ -4775,6 +4777,7 @@ const app = createApp({
     }
 
     async function openSaveAsListModal() {
+      if (!auth.email || auth.mode !== 'admin') { toast('Please log in as admin', 'err'); return; }
       const codes = ovFiltered.value
         .filter(p => ovSelected.value.has(p.project_code))
         .map(p => p.project_code);
