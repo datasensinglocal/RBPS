@@ -5130,11 +5130,11 @@ const app = createApp({
       try {
         // 1. Add new interventions with their qty
         const adds = toAdd.map(iv =>
-          api.addProjectIntv({
+          api.addProjectIntv(withAuth({
             project_code: p.project_code,
             intervention_id: iv,
             quantity: addModalQtys[iv] ?? 0,
-          }), {}))
+          }), {}));
 
         // 2. Remove deselected interventions
         const removes = toRemove.map(iv =>
