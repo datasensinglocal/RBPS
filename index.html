@@ -1289,6 +1289,48 @@ a:hover { text-decoration:underline; }
 .pp-list-dd-item .dd-check { width:16px; height:16px; flex-shrink:0; accent-color:var(--accent); }
 .pp-list-dd-item.new-list { color:var(--accent); font-weight:600; }
 
+/* Save-as-list modal */
+.sl-modal {
+  position:fixed; inset:0; background:rgba(0,0,0,.35);
+  display:flex; align-items:center; justify-content:center; z-index:800;
+}
+.sl-modal-box {
+  background:#fff; border-radius:14px; width:360px; max-width:94vw;
+  box-shadow:0 12px 48px rgba(0,0,0,.2); overflow:hidden;
+}
+.sl-modal-hdr {
+  padding:16px 20px 12px; border-bottom:1px solid var(--line);
+}
+.sl-modal-title { font-size:14px; font-weight:700; color:var(--ink); }
+.sl-modal-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.sl-modal-body { padding:12px 20px; }
+.sl-list-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:8px; cursor:pointer;
+  transition:background .1s; margin-bottom:4px;
+  border:1px solid var(--line);
+}
+.sl-list-item:hover { background:var(--soft); border-color:var(--accent); }
+.sl-list-name { font-size:12px; font-weight:600; color:var(--ink); flex:1; }
+.sl-list-count { font-size:10.5px; color:var(--muted); }
+.sl-divider { 
+  display:flex; align-items:center; gap:8px; margin:12px 0;
+  font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+}
+.sl-divider::before, .sl-divider::after {
+  content:''; flex:1; height:1px; background:var(--line);
+}
+.sl-new-row { display:flex; gap:8px; align-items:center; }
+.sl-new-input {
+  flex:1; padding:8px 12px; border:1.5px solid var(--line);
+  border-radius:8px; font-size:12px; outline:none;
+}
+.sl-new-input:focus { border-color:var(--accent); }
+.sl-modal-foot {
+  padding:12px 20px; border-top:1px solid var(--line);
+  display:flex; justify-content:flex-end;
+}
+
 .btn-save-list {
   display:inline-flex; align-items:center; gap:6px;
   padding:5px 14px; border-radius:20px;
@@ -2313,6 +2355,7 @@ a:hover { text-decoration:underline; }
     <!-- Admin: clickable "My Lists" button -->
     <div v-else-if="auth.mode === 'admin'" style="position:relative">
       <button class="admin-lists-btn" @click="openAdminLists">
+        <div class="role">Admin</div>
         <div class="who">
           {{ auth.name }}
           <span style="font-size:18px;vertical-align:middle;margin-left:3px">▾</span>
@@ -2320,7 +2363,6 @@ a:hover { text-decoration:underline; }
             ({{ adminListsLoaded ? adminLists.length : '…' }} {{ adminListsLoaded && adminLists.length === 1 ? 'list' : 'lists' }})
           </span>
         </div>
-        <div class="role">Admin</div>
       </button>
       <!-- Active list badge -->
       <span v-if="activeListName" class="al-active-badge" @click="clearAdminList" title="Clear list filter">
@@ -2919,49 +2961,6 @@ a:hover { text-decoration:underline; }
 
         <hr class="pp-divider" />
 
-        <!-- List membership band — admin only -->
-        <div v-if="auth.mode === 'admin'" class="pp-list-band">
-          <div class="pp-list-pills">
-            <span v-if="!projectInAnyList(selectedProject.project_code)"
-                  style="font-size:10.5px;color:var(--muted)">Not in any list</span>
-            <span v-for="list in listsContaining(selectedProject.project_code)"
-                  :key="list.list_name" class="pp-list-pill active">
-              📋 {{ list.list_name }}
-            </span>
-          </div>
-          <button class="pp-add-list-btn" @click.stop="togglePanelListDropdown">
-            <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
-              <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-            </svg>
-            Add to list
-          </button>
-          <!-- Dropdown -->
-          <div v-if="panelListDropdownOpen" class="pp-list-dropdown">
-            <div v-if="!adminListsLoaded" style="padding:12px 14px;font-size:11px;color:var(--muted)">Loading…</div>
-            <template v-else>
-              <div v-if="!adminLists.length"
-                   style="padding:10px 14px;font-size:11px;color:var(--muted)">No lists yet</div>
-              <div v-for="list in adminLists" :key="list.list_name"
-                   class="pp-list-dd-item"
-                   @click.stop="toggleProjectInList(selectedProject.project_code, list)">
-                <input type="checkbox" class="dd-check"
-                       :checked="list.project_codes.includes(selectedProject.project_code)"
-                       @click.stop />
-                <span>{{ list.list_name }}</span>
-                <span style="margin-left:auto;font-size:10px;color:var(--muted)">
-                  {{ list.project_codes.length }} projects
-                </span>
-              </div>
-              <div class="pp-list-dd-item new-list" @click.stop="createListFromPanel(selectedProject.project_code)">
-                <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
-                  <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-                </svg>
-                New list with this project
-              </div>
-            </template>
-          </div>
-        </div>
-
         <!-- Info row: zone · constituency · area/length · cost -->
         <div class="pp-infobar">
           <div class="pp-infobar-item" v-if="selectedProject.zone">
@@ -2985,6 +2984,39 @@ a:hover { text-decoration:underline; }
           <div class="pp-infobar-item pp-infobar-cost-wrap">
             <span class="pp-infobar-lbl">Est. Cost</span>
             <span class="pp-infobar-val pp-infobar-cost">{{ fmtCost(projectTotal(selectedProject.project_code)) || '—' }}</span>
+          </div>
+          <!-- Add to list — admin only, sits after Est. Cost -->
+          <div v-if="auth.mode === 'admin'" style="position:relative;margin-left:auto;flex-shrink:0;">
+            <button class="pp-add-list-btn" @click.stop="togglePanelListDropdown">
+              <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+              Add to list
+            </button>
+            <div v-if="panelListDropdownOpen" class="pp-list-dropdown">
+              <div v-if="!adminListsLoaded" style="padding:12px 14px;font-size:11px;color:var(--muted)">Loading…</div>
+              <template v-else>
+                <div v-if="!adminLists.length"
+                     style="padding:10px 14px;font-size:11px;color:var(--muted)">No lists yet</div>
+                <div v-for="list in adminLists" :key="list.list_name"
+                     class="pp-list-dd-item"
+                     @click.stop="toggleProjectInList(selectedProject.project_code, list)">
+                  <input type="checkbox" class="dd-check"
+                         :checked="list.project_codes.includes(selectedProject.project_code)"
+                         @click.stop />
+                  <span>{{ list.list_name }}</span>
+                  <span style="margin-left:auto;font-size:10px;color:var(--muted)">
+                    {{ list.project_codes.length }} projects
+                  </span>
+                </div>
+                <div class="pp-list-dd-item new-list" @click.stop="createListFromPanel(selectedProject.project_code)">
+                  <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
+                  New list with this project
+                </div>
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -3232,6 +3264,40 @@ a:hover { text-decoration:underline; }
           {{ listModalSaving ? 'Saving…' : 'Save list' }}
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Save-as-list modal -->
+<div v-if="saveListModalOpen" class="sl-modal" @click.self="saveListModalOpen=false">
+  <div class="sl-modal-box">
+    <div class="sl-modal-hdr">
+      <div class="sl-modal-title">Save as list</div>
+      <div class="sl-modal-sub">{{ saveListPendingCodes.length }} projects selected</div>
+    </div>
+    <div class="sl-modal-body">
+      <!-- Existing lists -->
+      <div v-if="adminLists.length">
+        <div v-for="list in adminLists" :key="list.list_name"
+             class="sl-list-item" @click="saveToExistingList(list)">
+          <span style="font-size:16px">📋</span>
+          <span class="sl-list-name">{{ list.list_name }}</span>
+          <span class="sl-list-count">{{ list.project_codes.length }} projects</span>
+        </div>
+        <div class="sl-divider">or create new</div>
+      </div>
+      <!-- New list -->
+      <div class="sl-new-row">
+        <input class="sl-new-input" v-model="saveListNewName"
+               placeholder="New list name…"
+               @keydown.enter="saveAsNewList" />
+        <button class="btn btn-primary" :disabled="saveListSaving" @click="saveAsNewList">
+          {{ saveListSaving ? '…' : 'Create' }}
+        </button>
+      </div>
+    </div>
+    <div class="sl-modal-foot">
+      <button class="btn btn-secondary" @click="saveListModalOpen=false">Cancel</button>
     </div>
   </div>
 </div>
@@ -4652,6 +4718,15 @@ const app = createApp({
       }
       return { nomineeName: auth.name, nomineeEmail: auth.email };
     }
+
+    // Inject auth fields into payload so Apps Script can read them
+    // regardless of JSONP URL encoding issues
+    function withAuth(payload) {
+      if (auth.mode === 'admin') {
+        return { ...payload, adminEmail: String(auth.email || '') };
+      }
+      return { ...payload, nomineeEmail: String(auth.email || ''), nomineeName: String(auth.name || '') };
+    }
     function openLogin(mode='nominee') { loginMode.value = mode; loginOpen.value = true; loginErr.value = ''; }
     async function doNomineeLogin(retryCount = 0) {
       loginErr.value = ''; loginBusy.value = true;
@@ -4747,8 +4822,8 @@ const app = createApp({
       try {
         await api.saveAdminList({
           list_name: list.list_name,
-          project_codes: [...codes],
-        }, authPayload());
+          project_codes: [...codes], adminEmail: auth.email,
+        }, {});
         await loadAdminLists();
         toast((codes.has(code) ? 'Added to ' : 'Removed from ') + list.list_name, 'ok');
       } catch(e) { toast('Failed: ' + e.message, 'err'); }
@@ -4771,10 +4846,16 @@ const app = createApp({
     // ── Overview save as list — choose existing or new ────────────────────
     async function debugAdminListSave() {
       try {
-        const result = await api.debugAdminList({}, authPayload());
+        const result = await api.debugAdminList(withAuth({}), {});
         alert(JSON.stringify(result, null, 2));
       } catch(e) { alert('Error: ' + e.message); }
     }
+
+    // Save-as-list modal state
+    const saveListModalOpen  = ref(false);
+    const saveListPendingCodes = ref([]);
+    const saveListNewName    = ref('');
+    const saveListSaving     = ref(false);
 
     async function openSaveAsListModal() {
       if (!auth.email || auth.mode !== 'admin') { toast('Please log in as admin', 'err'); return; }
@@ -4782,44 +4863,36 @@ const app = createApp({
         .filter(p => ovSelected.value.has(p.project_code))
         .map(p => p.project_code);
       if (!codes.length) { toast('No projects selected', 'err'); return; }
-
-      // Build choice: existing lists + new
       if (!adminListsLoaded.value) await loadAdminLists();
-      const existingNames = adminLists.value.map(l => l.list_name);
-      let chosen = '';
-      if (existingNames.length) {
-        const options = existingNames.map((n,i) => (i+1) + '. ' + n).join('\n');
-        const answer = prompt(
-          'Save ' + codes.length + ' projects to:\n\n' + options +
-          '\n' + (existingNames.length+1) + '. + Create new list\n\nEnter number or type a new name:'
-        );
-        if (!answer) return;
-        const idx = parseInt(answer) - 1;
-        if (!isNaN(idx) && idx >= 0 && idx < existingNames.length) {
-          chosen = existingNames[idx];
-        } else if (!isNaN(idx) && idx === existingNames.length) {
-          chosen = prompt('New list name:');
-          if (!chosen || !chosen.trim()) return;
-          chosen = chosen.trim();
-        } else {
-          chosen = answer.trim();
-        }
-      } else {
-        chosen = prompt('Name this list:');
-        if (!chosen || !chosen.trim()) return;
-        chosen = chosen.trim();
-      }
+      saveListPendingCodes.value = codes;
+      saveListNewName.value = '';
+      saveListSaving.value = false;
+      saveListModalOpen.value = true;
+    }
 
+    async function saveToExistingList(list) {
+      saveListSaving.value = true;
       try {
-        // If appending to existing, merge codes
-        const existing = adminLists.value.find(l => l.list_name === chosen);
-        const finalCodes = existing
-          ? [...new Set([...existing.project_codes, ...codes])]
-          : codes;
-        await api.saveAdminList({ list_name: chosen, project_codes: finalCodes, adminEmail: auth.email }, {});
+        const finalCodes = [...new Set([...list.project_codes, ...saveListPendingCodes.value])];
+        await api.saveAdminList({ list_name: list.list_name, project_codes: finalCodes, adminEmail: auth.email }, {});
         await loadAdminLists();
-        toast('Saved to "' + chosen + '" (' + finalCodes.length + ' projects)', 'ok');
+        saveListModalOpen.value = false;
+        toast('Added to "' + list.list_name + '" (' + finalCodes.length + ' projects)', 'ok');
       } catch(e) { toast('Save failed: ' + e.message, 'err'); }
+      saveListSaving.value = false;
+    }
+
+    async function saveAsNewList() {
+      const name = saveListNewName.value.trim();
+      if (!name) { toast('Please enter a list name', 'err'); return; }
+      saveListSaving.value = true;
+      try {
+        await api.saveAdminList({ list_name: name, project_codes: saveListPendingCodes.value, adminEmail: auth.email }, {});
+        await loadAdminLists();
+        saveListModalOpen.value = false;
+        toast('Created "' + name + '" (' + saveListPendingCodes.value.length + ' projects)', 'ok');
+      } catch(e) { toast('Save failed: ' + e.message, 'err'); }
+      saveListSaving.value = false;
     }
 
     function openNewList() {
@@ -4849,7 +4922,7 @@ const app = createApp({
         await api.saveAdminList({
           list_name: name,
           project_codes: [...listModalSelected.value],
-        }, authPayload());
+        }, {});
         await loadAdminLists();
         listModalOpen.value = false;
         toast('List saved: ' + name, 'ok');
@@ -4985,11 +5058,11 @@ const app = createApp({
       }
       try {
         // Only save quantity — project_cost sheet recalculates cost via its own formulas
-        await api.updateProjectIntv({
+        await api.updateProjectIntv(withAuth({
           project_code: row.project_code,
           intervention_id: row.intervention_id,
           quantity: qty,
-        }, authPayload());
+        }), {});
         // Update local quantity only; cost display stays as-is until next data refresh
         const idx = projectIntvs.value.findIndex(x =>
           x.project_code===row.project_code && x.intervention_id===row.intervention_id);
@@ -5061,21 +5134,21 @@ const app = createApp({
             project_code: p.project_code,
             intervention_id: iv,
             quantity: addModalQtys[iv] ?? 0,
-          }, authPayload()));
+          }), {}))
 
         // 2. Remove deselected interventions
         const removes = toRemove.map(iv =>
-          api.removeProjectIntv({ project_code: p.project_code, intervention_id: iv }, authPayload()));
+          api.removeProjectIntv(withAuth({ project_code: p.project_code, intervention_id: iv }), {}));
 
         // 3. Update quantities for existing interventions
         const qtyUpdates = toUpdateQty
           .filter(iv => current.has(iv)) // only already-existing ones
           .map(iv =>
-            api.updateProjectIntv({
+            api.updateProjectIntv(withAuth({
               project_code: p.project_code,
               intervention_id: iv,
               quantity: addModalQtys[iv] ?? 0,
-            }, authPayload()));
+            }), {}));
 
         await Promise.all([...adds, ...removes, ...qtyUpdates]);
 
@@ -5154,7 +5227,7 @@ const app = createApp({
         await api.addProjectIntv({
           project_code: p.project_code, intervention_id: addIvId.value,
           quantity: 0, cost: 0,
-        }, authPayload());
+        }, {});
         projectIntvs.value = [...projectIntvs.value, {
           project_code: p.project_code, intervention_id: addIvId.value,
           quantity: 0, cost: 0,
@@ -5218,7 +5291,7 @@ const app = createApp({
           'Site details and surroundings': draft.site_details.trim(),
           'Issues': draft.issues.trim(),
         };
-        await api.updateProject({ project_code: p.project_code, fields }, authPayload());
+        await api.updateProject(withAuth({ project_code: p.project_code, fields }), {});
         // Update local project object so UI reflects saved values immediately
         p['Site details and surroundings'] = fields['Site details and surroundings'];
         p['Issues'] = fields['Issues'];
@@ -5230,7 +5303,7 @@ const app = createApp({
         await api.saveProjectTotal({
           project_code: p.project_code,
           total_cost: projectTotal(p.project_code),
-        }, authPayload());
+        }, {});
         editMode.value = false; toast('Saved', 'ok');
       } catch (e) { toast('Save failed: ' + e.message, 'err'); }
       finally { saving.value = false; busy.value = false; }
@@ -5241,7 +5314,7 @@ const app = createApp({
       try {
         await api.removeProjectIntv({
           project_code: row.project_code, intervention_id: row.intervention_id,
-        }, authPayload());
+        }, {});
         projectIntvs.value = projectIntvs.value.filter(r => !(r.project_code===row.project_code && r.intervention_id===row.intervention_id));
       } catch (e) { toast('Remove failed: '+e.message, 'err'); }
     }
@@ -5287,7 +5360,7 @@ const app = createApp({
       const NUMERIC_FIELDS = ['rate'];
       const value = NUMERIC_FIELDS.includes(field) ? Number(raw) : raw;
       try {
-        await api.upsertFramework({ intervention_id: row.intervention_id, [field]: value }, authPayload());
+        await api.upsertFramework(withAuth({ intervention_id: row.intervention_id, [field]: value }), {});
         const idx = framework.value.findIndex(f => f.intervention_id === row.intervention_id);
         if (idx >= 0) {
           framework.value[idx] = { ...framework.value[idx], [field]: value };
@@ -5301,7 +5374,7 @@ const app = createApp({
     async function deactivateFw(row) {
       if (!confirm(`Deactivate "${row.intervention}"? It will be removed from all dropdowns.`)) return;
       try {
-        await api.deactivateFramework({ intervention_id: row.intervention_id }, authPayload());
+        await api.deactivateFramework(withAuth({ intervention_id: row.intervention_id }), {});
         const r = framework.value.find(f => f.intervention_id === row.intervention_id);
         if (r) r.active = 'N';
       } catch (e) { toast('Deactivate failed: '+e.message, 'err'); }
@@ -5315,7 +5388,7 @@ const app = createApp({
           budget_bucket: 'General', category: 'General', sub_category: 'General',
           intervention: name.trim(),
           explainer: '', unit_label: 'Per item', rate: 0, active: 'Y',
-        }, authPayload());
+        }, {});
         framework.value.push({
           intervention_id: r.intervention_id,
           budget_bucket:'General', category:'General', sub_category:'General',
@@ -5328,7 +5401,7 @@ const app = createApp({
     async function recomputeAllTotals() {
       busy.value = true;
       try {
-        const r = await api.recomputeAllTotals({}, authPayload());
+        const r = await api.recomputeAllTotals(withAuth({}), {});
         toast(`Recomputed ${r.recomputed} project totals`, 'ok');
       } catch (e) { toast('Failed: '+e.message, 'err'); }
       finally { busy.value = false; }
@@ -5391,7 +5464,8 @@ const app = createApp({
       adminListsOpen, adminLists, adminListsLoaded, activeListName, adminListActiveCodes,
       openAdminLists, applyAdminList, clearAdminList, openNewList, openEditList, deleteAdminList,
       listModalOpen, listModalName, listModalOrigName, listModalSelected, listModalSearch,
-      openSaveAsListModal, debugAdminListSave, panelListDropdownOpen, togglePanelListDropdown,
+      withAuth, openSaveAsListModal, saveListModalOpen, saveListPendingCodes, saveListNewName, saveListSaving,
+      saveToExistingList, saveAsNewList, debugAdminListSave, panelListDropdownOpen, togglePanelListDropdown,
       listsContaining, projectInAnyList, toggleProjectInList, createListFromPanel,
       listModalSaving, listModalProjects, saveListModal,
       ovQ, ovZone, ovConstituency, ovBucket, ovDonutBy, ovDonutHover,
