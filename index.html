@@ -1468,6 +1468,93 @@ a:hover { text-decoration:underline; }
 }
 .ov-map-filter-band button {
   margin-left:auto; font-size:10px; color:var(--muted);
+
+/* ── Expand button ── */
+.ov-expand-btn {
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:7px;
+  border:1.5px solid var(--line); background:#fff;
+  cursor:pointer; color:var(--muted); transition:all .12s;
+  flex-shrink:0;
+}
+.ov-expand-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--soft); }
+
+/* ── Intervention scroll ── */
+.ov-vbar-scroll { overflow-x:auto; overflow-y:visible; }
+.ov-vbar-scroll::-webkit-scrollbar { height:5px; }
+.ov-vbar-scroll::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:3px; }
+
+/* ── Grid modal overlay ── */
+.ov-grid-overlay {
+  position:fixed; inset:0; z-index:9000;
+  background:rgba(30,24,18,.45); backdrop-filter:blur(2px);
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+}
+.ov-grid-modal {
+  background:#fff; border-radius:14px;
+  width:min(900px, 96vw); max-height:88vh;
+  display:flex; flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.22);
+  overflow:hidden;
+}
+.ov-grid-modal-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 24px; border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
+.ov-grid-modal-title {
+  font-size:13px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.6px; color:var(--muted);
+}
+.ov-grid-close {
+  display:flex; align-items:center; justify-content:center;
+  width:30px; height:30px; border-radius:7px;
+  border:1.5px solid var(--line); background:#fff;
+  cursor:pointer; color:var(--muted); transition:all .12s;
+}
+.ov-grid-close:hover { border-color:var(--accent); color:var(--accent); }
+.ov-grid-body {
+  overflow-y:auto; padding:20px 24px 28px;
+  flex:1;
+}
+.ov-grid-subcat-hdr {
+  font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.7px; color:var(--muted);
+  margin:20px 0 10px; padding-bottom:6px;
+  border-bottom:1.5px solid var(--line);
+}
+.ov-grid-subcat-hdr:first-child { margin-top:0; }
+.ov-grid-cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+  gap:10px;
+}
+.ov-grid-card {
+  border:1.5px solid var(--line); border-radius:10px;
+  padding:12px 12px 10px; background:#FAFAF8;
+  display:flex; flex-direction:column; gap:6px;
+  transition:border-color .12s, box-shadow .12s;
+}
+.ov-grid-card:hover { border-color:var(--accent); box-shadow:0 2px 8px rgba(198,97,63,.1); }
+.ov-grid-icon-img {
+  width:28px; height:28px;
+  opacity:.55;
+  filter: invert(30%) sepia(20%) saturate(600%) hue-rotate(340deg);
+}
+.ov-grid-intv-name {
+  font-size:11px; font-weight:600; color:var(--ink);
+  line-height:1.3;
+}
+.ov-grid-stats {
+  display:flex; flex-direction:column; gap:2px; margin-top:auto;
+}
+.ov-grid-count {
+  font-size:10px; color:var(--muted);
+}
+.ov-grid-cost {
+  font-size:11px; font-weight:700; color:var(--accent);
+}
   text-decoration:underline; cursor:pointer; background:none; border:none;
 }
 
@@ -2680,61 +2767,69 @@ a:hover { text-decoration:underline; }
         </div>
       </div>
 
-      <!-- Drill-down bar chart: Bucket → Category → Sub-category → Map -->
+      <!-- Budget by Interventions — toggle view -->
       <div class="ov-chart-card bars">
         <div class="ov-chart-hdr">
-          <div>
-            <div class="ov-chart-title">Budget by Interventions</div>
-            <!-- Breadcrumb trail -->
-            <div class="ov-breadcrumb" style="margin-top:6px">
-              <span class="ov-breadcrumb-item" @click="ovDrillReset">Budget Buckets</span>
-              <template v-if="ovDrillLevel >= 1">
-                <span class="ov-breadcrumb-sep">›</span>
-                <span v-if="ovDrillLevel > 1" class="ov-breadcrumb-item" @click="ovDrillToCat">{{ ovDrillBucket }}</span>
-                <span v-else class="ov-breadcrumb-current">{{ ovDrillBucket }}</span>
-              </template>
-              <template v-if="ovDrillLevel >= 2">
-                <span class="ov-breadcrumb-sep">›</span>
-                <span v-if="ovDrillLevel > 2" class="ov-breadcrumb-item" @click="ovDrillToSub">{{ ovDrillCategory }}</span>
-                <span v-else class="ov-breadcrumb-current">{{ ovDrillCategory }}</span>
-              </template>
-              <template v-if="ovDrillLevel >= 3">
-                <span class="ov-breadcrumb-sep">›</span>
-                <span v-if="ovDrillIntv" class="ov-breadcrumb-item" @click="ovDrillToIntv">{{ ovDrillSubCat }}</span>
-                <span v-else class="ov-breadcrumb-current">{{ ovDrillSubCat }}</span>
-              </template>
-              <template v-if="ovDrillLevel === 3 && ovDrillIntv">
-                <span class="ov-breadcrumb-sep">›</span>
-                <span class="ov-breadcrumb-current">{{ ovDrillIntv }}</span>
-              </template>
+          <div class="ov-chart-title">Budget by Interventions</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="ov-tabs">
+              <button class="ov-tab" :class="{active: ovBarToggle==='budget_bucket'}" @click="ovBarToggle='budget_bucket'">Bucket</button>
+              <button class="ov-tab" :class="{active: ovBarToggle==='sub_category'}" @click="ovBarToggle='sub_category'">Sub-category</button>
+              <button class="ov-tab" :class="{active: ovBarToggle==='intervention'}" @click="ovBarToggle='intervention'">Intervention</button>
             </div>
+            <!-- Expand button -->
+            <button class="ov-expand-btn" @click="ovGridOpen=true" title="Expand intervention grid">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+              </svg>
+            </button>
           </div>
         </div>
-        <div class="ov-vbar-outer">
-          <!-- bars: all bottom-aligned on x-axis, value floats above each bar -->
-          <div class="ov-vbar-wrap">
-            <div v-for="bar in ovDrillBars" :key="bar.name"
-                 class="ov-vbar-col"
-                 @click="ovDrillClick(bar)">
+        <div class="ov-vbar-outer" :class="{'ov-vbar-scroll': ovBarToggle==='intervention'}">
+          <div class="ov-vbar-wrap" :style="ovBarToggle==='intervention' ? {width: Math.max(ovBarBars.length * 76, 400)+'px'} : {}">
+            <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-col">
               <div class="ov-vbar-val">{{ fmtCost(bar.value) }}</div>
-              <div class="ov-vbar-fill"
-                   :style="{height: (bar.pct * 1.4) + 'px', background: bar.color}"></div>
+              <div class="ov-vbar-fill" :style="{height: (bar.pct * 1.4) + 'px', background: bar.color}"></div>
             </div>
           </div>
-          <!-- labels below x-axis, same flex settings as bar row -->
-          <div style="display:flex;align-items:flex-start;gap:20px;padding-top:6px;">
-            <div v-for="bar in ovDrillBars" :key="bar.name"
-                 class="ov-vbar-lbl" :title="bar.name"
-                 @click="ovDrillClick(bar)">{{ bar.name }}</div>
+          <div :style="ovBarToggle==='intervention' ? {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px',width: Math.max(ovBarBars.length * 76, 400)+'px'} : {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px'}">
+            <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
           </div>
-        </div>
-        <!-- Filter band shown when an intervention is selected -->
-        <div v-if="ovDrillLevel === 3 && ovDrillIntv" class="ov-map-filter-band">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2V12.46L22 3z"/></svg>
-          Projects filtered to: <strong>{{ ovDrillIntv }}</strong>
-          <button @click="ovDrillIntv = ''">Clear</button>
         </div>
       </div>
+
+      <!-- Intervention Grid Modal -->
+      <teleport to="body">
+        <div v-if="ovGridOpen" class="ov-grid-overlay" @click.self="ovGridOpen=false">
+          <div class="ov-grid-modal">
+            <div class="ov-grid-modal-hdr">
+              <div class="ov-grid-modal-title">Interventions by Sub-category</div>
+              <button class="ov-grid-close" @click="ovGridOpen=false">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="ov-grid-body">
+              <template v-for="group in ovGridGroups" :key="group.sub_category">
+                <div class="ov-grid-subcat-hdr">{{ group.sub_category }}</div>
+                <div class="ov-grid-cards">
+                  <div v-for="item in group.items" :key="item.intervention_id" class="ov-grid-card">
+                    <img :src="lucideUrl(item.icon)" class="ov-grid-icon-img" alt="" />
+                    <div class="ov-grid-intv-name">{{ item.intervention }}</div>
+                    <div class="ov-grid-stats">
+                      <span class="ov-grid-count">{{ item.count }} project{{ item.count !== 1 ? 's' : '' }}</span>
+                      <span class="ov-grid-cost">{{ fmtCost(item.cost) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <div v-if="ovGridGroups.length === 0" style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">
+                No interventions in selected projects.
+              </div>
+            </div>
+          </div>
+        </div>
+      </teleport>
 
     </div><!-- /ov-left -->
 
@@ -4567,13 +4662,9 @@ const app = createApp({
       });
     });
 
-    // Vertical bar chart — sub-category spend
-    // ── Drill-down state ─────────────────────────────────────────────────
-    const ovDrillLevel   = ref(0);   // 0=bucket, 1=category, 2=subcategory, 3=interventions
-    const ovDrillBucket  = ref('');
-    const ovDrillCategory= ref('');
-    const ovDrillSubCat  = ref('');
-    const ovDrillIntv    = ref('');
+    // ── Bar chart toggle state ────────────────────────────────────────────
+    const ovBarToggle = ref('budget_bucket'); // 'budget_bucket' | 'sub_category' | 'intervention'
+    const ovGridOpen  = ref(false);
 
     // Helper: get filtered intv rows for selected+filtered projects
     function ovIntvRows() {
@@ -4602,86 +4693,139 @@ const app = createApp({
       }));
     }
 
-    // The bars shown depend on drill level
-    const ovDrillBars = computed(() => {
+    // Toggle-driven bars (no drill-down)
+    const ovBarBars = computed(() => {
       const rows = ovIntvRows();
-      const fwMap = fwById.value;
-      if (ovDrillLevel.value === 0) {
+      if (ovBarToggle.value === 'budget_bucket') {
         return ovBuildBars(rows, fw => fw.budget_bucket);
-      } else if (ovDrillLevel.value === 1) {
-        const bucket = ovDrillBucket.value;
-        return ovBuildBars(rows.filter(r => {
-          const fw = fwMap[r.intervention_id];
-          return fw && fw.budget_bucket === bucket;
-        }), fw => fw.category);
-      } else if (ovDrillLevel.value === 2) {
-        const bucket = ovDrillBucket.value;
-        const cat    = ovDrillCategory.value;
-        return ovBuildBars(rows.filter(r => {
-          const fw = fwMap[r.intervention_id];
-          return fw && fw.budget_bucket === bucket && fw.category === cat;
-        }), fw => fw.sub_category);
-      } else if (ovDrillLevel.value === 3) {
-        // Level 3: interventions within selected sub-category (map filters automatically)
-        const bucket = ovDrillBucket.value;
-        const cat    = ovDrillCategory.value;
-        const sub    = ovDrillSubCat.value;
-        return ovBuildBars(rows.filter(r => {
-          const fw = fwMap[r.intervention_id];
-          return fw && fw.budget_bucket === bucket && fw.category === cat && fw.sub_category === sub;
-        }), fw => fw.intervention);
+      } else if (ovBarToggle.value === 'sub_category') {
+        return ovBuildBars(rows, fw => fw.sub_category);
+      } else {
+        return ovBuildBars(rows, fw => fw.intervention);
       }
-      return [];
     });
 
-    // Click handler — advance drill level
-    function ovDrillClick(bar) {
-      if (ovDrillLevel.value === 0) {
-        ovDrillBucket.value = bar.name;
-        ovDrillLevel.value = 1;
-      } else if (ovDrillLevel.value === 1) {
-        ovDrillCategory.value = bar.name;
-        ovDrillLevel.value = 2;
-      } else if (ovDrillLevel.value === 2) {
-        ovDrillSubCat.value = bar.name;
-        ovDrillLevel.value = 3;
-      } else if (ovDrillLevel.value === 3) {
-        // Click an intervention bar — toggle filter on project table, stay at level 3
-        ovDrillIntv.value = ovDrillIntv.value === bar.name ? '' : bar.name;
+    // Keep ovDrillBars alias for summary page compatibility
+    const ovDrillBars    = ovBarBars;
+    const ovDrillLevel   = ref(0);
+    const ovDrillBucket  = ref('');
+    const ovDrillCategory= ref('');
+    const ovDrillSubCat  = ref('');
+    const ovDrillIntv    = ref('');
+    function ovDrillReset()  {}
+    function ovDrillToCat()  {}
+    function ovDrillToSub()  {}
+    function ovDrillToIntv() {}
+    function ovDrillClick()  {}
+
+    // Lucide icon map — one icon per intervention_id (via unpkg CDN)
+    const INTV_ICONS = {
+      'IV-001': 'waypoints',           // Multi-modal hub
+      'IV-002': 'bus',                 // New bus shelter
+      'IV-003': 'bus',                 // Retrofit existing bus stop
+      'IV-004': 'signpost',            // Navigation signage
+      'IV-005': 'bike',                // Segregated cycling lanes
+      'IV-006': 'bike',                // Cycle stands
+      'IV-007': 'crosshair',           // Pedestrian crossings at junction
+      'IV-008': 'traffic-cone',        // Pedestrian signal at junction
+      'IV-009': 'minus',               // Table top crossing at junction
+      'IV-010': 'footprints',          // Footpath improvement (junction)
+      'IV-011': 'circle-dot',          // Refuge island at junction
+      'IV-012': 'gauge',               // Traffic calming at junction
+      'IV-013': 'footprints',          // New footpath
+      'IV-014': 'wrench',              // Footpath Maintenance/repair
+      'IV-015': 'move-right',          // Footpath Extension
+      'IV-016': 'accessibility',       // Ramp
+      'IV-017': 'grip-horizontal',     // Tactile tile
+      'IV-018': 'fence',               // Guard railings
+      'IV-019': 'square-arrow-right',  // Mid block pedestrian crossings
+      'IV-020': 'car',                 // Drop off/Pick Up Zones
+      'IV-021': 'cylinder',            // Bollards
+      'IV-022': 'bridge',              // Pedestrian overpass / underpass
+      'IV-023': 'road',                // Road Development
+      'IV-024': 'scan-eye',            // Convex mirrors
+      'IV-025': 'speed',               // Traffic calming measures
+      'IV-026': 'signpost-big',        // Road signage
+      'IV-027': 'minus-square',        // Road markings
+      'IV-028': 'parking-square',      // Parking and no parking zones
+      'IV-029': 'store',               // Vendor zones
+      'IV-030': 'bath',                // Public Toilet
+      'IV-031': 'armchair',            // Benches
+      'IV-032': 'umbrella',            // Rest zone (shaded, water, etc.)
+      'IV-033': 'building-2',          // Community Centre
+      'IV-034': 'trees',               // Park space
+      'IV-035': 'heart-pulse',         // Senior citizen zone / reflexology
+      'IV-036': 'layout-panel-top',    // Plaza area
+      'IV-037': 'ferris-wheel',        // Children's play area
+      'IV-038': 'dumbbell',            // Exercise equipment
+      'IV-039': 'palette',             // Public Art
+      'IV-040': 'fence',               // Fences
+      'IV-041': 'landmark',            // Conservation of History
+      'IV-042': 'info',                // Information signage
+      'IV-043': 'package',             // Waste holding space
+      'IV-044': 'trash-2',             // Waste kiosk
+      'IV-045': 'recycle',             // Leaf composter
+      'IV-046': 'truck',               // Transfer point relocation
+      'IV-047': 'refresh-cw',          // Improving collection service
+      'IV-048': 'droplets',            // Percolation surfaces
+      'IV-049': 'waves',               // Bioswales
+      'IV-050': 'cloud-drizzle',       // Sponge landscape
+      'IV-051': 'tree-pine',           // Mini forest
+      'IV-052': 'tree-deciduous',      // Tree conservation
+      'IV-053': 'leaf',                // Landscaping with native plants
+      'IV-054': 'sprout',              // Community garden
+      'IV-055': 'tree-palm',           // Tree plantation
+      'IV-056': 'workflow',            // Redesigning of drainage
+      'IV-057': 'cctv',                // CCTV
+      'IV-058': 'bell-ring',           // Safety alarms
+      'IV-059': 'shield-check',        // Guards
+      'IV-060': 'lamp-street',         // Street lighting
+      'IV-061': 'lightbulb',           // Public zone lighting
+      'IV-062': 'car-front',           // Removal of abandoned cars
+      'IV-063': 'x-square',            // Removal of all encroachments
+      'IV-064': 'zap',                 // Re-allocation of electrical utilities
+      'IV-065': 'hammer',              // Removal of obstructing structures
+      'IV-066': 'trash',               // Removal of legacy waste
+    };
+    function iconForSubCat(sub) { return 'wrench'; } // kept for safety, unused
+    function iconForIntv(id) {
+      return INTV_ICONS[id] || 'wrench';
+    }
+    function lucideUrl(iconName) {
+      return `https://unpkg.com/lucide-static@latest/icons/${iconName}.svg`;
+    }
+
+    // Grid data — grouped by sub_category, with count + cost per intervention
+    const ovGridGroups = computed(() => {
+      const rows = ovIntvRows();
+      const fwMap = fwById.value;
+      // Aggregate cost + count per intervention_id
+      const agg = {};
+      for (const r of rows) {
+        const fw = fwMap[r.intervention_id];
+        if (!fw) continue;
+        if (!agg[r.intervention_id]) {
+          agg[r.intervention_id] = { ...fw, count: 0, cost: 0 };
+        }
+        agg[r.intervention_id].count += 1;
+        agg[r.intervention_id].cost  += Number(r.cost) || 0;
       }
-    }
+      // Group by sub_category preserving framework order
+      const grouped = {};
+      for (const fw of framework.value) {
+        const entry = agg[fw.intervention_id];
+        if (!entry || entry.count === 0) continue;
+        const sub = fw.sub_category || 'General';
+        if (!grouped[sub]) grouped[sub] = { sub_category: sub, items: [] };
+        grouped[sub].items.push({
+          ...entry,
+          icon: iconForIntv(fw.intervention_id),
+        });
+      }
+      return Object.values(grouped);
+    });
 
-    // Breadcrumb navigation
-    function ovDrillReset() {
-      ovDrillLevel.value = 0;
-      ovDrillBucket.value = '';
-      ovDrillCategory.value = '';
-      ovDrillSubCat.value = '';
-      ovDrillIntv.value = '';
-      ovClearMapFilter();
-    }
-    function ovDrillToCat() {
-      ovDrillLevel.value = 1;
-      ovDrillCategory.value = '';
-      ovDrillSubCat.value = '';
-      ovDrillIntv.value = '';
-      ovClearMapFilter();
-    }
-    function ovDrillToSub() {
-      ovDrillLevel.value = 2;
-      ovDrillSubCat.value = '';
-      ovDrillIntv.value = '';
-      ovClearMapFilter();
-    }
-
-    // ovDrillToIntv — breadcrumb back to intervention level
-    function ovDrillToIntv() {
-      ovDrillLevel.value = 3;
-      ovDrillIntv.value = '';
-      ovClearMapFilter();
-    }
-
-    // Map filter by sub-category (kept for compatibility)
+    // Map filter helpers (kept for compatibility)
     function ovApplyMapFilter(subCat) {
       const fwMap = fwById.value;
       const matchingIds = new Set(
@@ -4693,7 +4837,6 @@ const app = createApp({
       if (window._mapCtrl && window._mapCtrl.setHighlight) window._mapCtrl.setHighlight(matchingIds);
     }
 
-    // Map filter by specific intervention name
     function ovApplyMapFilterByIntv(intvName) {
       const fwMap = fwById.value;
       const matchingIds = new Set(
@@ -5500,6 +5643,7 @@ const app = createApp({
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
       ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
+      ovBarToggle, ovBarBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
       openRateCard, toggleBucket, updateFw, deactivateFw, addFwRow, recomputeAllTotals,
