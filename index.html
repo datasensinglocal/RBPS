@@ -3193,17 +3193,11 @@ a:hover { text-decoration:underline; }
 
           <!-- Category rows -->
           <div v-for="(cat, catIdx) in groupedInterventions" :key="cat.name"
-               class="iv-cat" :class="{open: isCatOpen(cat.name)}">
+               class="iv-cat open">
 
-            <!-- Category header row: shows cost only when CLOSED -->
-            <div class="iv-cat-hdr" @click="toggleCat(cat.name)">
-              <div class="iv-cat-label">{{ String.fromCharCode(65 + catIdx) }}</div>
-              <div class="iv-cat-name">{{ cat.name }}</div>
-              <div class="iv-cat-cost">{{ isCatOpen(cat.name) ? '' : fmtCost(cat.total) }}</div>
-              <div class="iv-cat-arrow">{{ isCatOpen(cat.name) ? '▼' : '▶' }}</div>
-            </div>
+            <!-- Category header row — hidden via CSS, categories always expanded -->
 
-            <!-- Sub-category rows (only when cat is open) -->
+            <!-- Sub-category rows — always visible -->
             <div class="iv-cat-body">
               <div v-for="sub in cat.subs" :key="sub.name" class="iv-sub-wrap">
 
