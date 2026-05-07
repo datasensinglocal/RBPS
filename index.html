@@ -1977,46 +1977,13 @@ a:hover { text-decoration:underline; }
 .iv-hdr-cell:last-child { border-right:none; }
 .iv-hdr-qty, .iv-hdr-rate, .iv-hdr-cost { text-align:right; }
 
-.iv-cat {
-  border-bottom:none;
-  margin-bottom:0;
-}
+/* Category header row — hidden (categories always expanded, sub-category rows are the top level) */
+.iv-cat { border-bottom:none; margin-bottom:0; }
 .iv-cat:last-child { border-bottom:1px solid #D0D0D0; }
 
-/* Category header row */
-.iv-cat-hdr {
-  display:grid;
-  grid-template-columns:32px 1fr auto 16px;
-  align-items:center;
-  padding:0;
-  background:#C6613F;
-  color:#fff;
-  cursor:pointer;
-  user-select:none;
-  border-bottom:1px solid #a84f32;
-  min-height:36px;
-}
-.iv-cat-hdr:hover { background:#b05636; }
-.iv-cat-label {
-  display:flex; align-items:center; justify-content:center;
-  font-size:13px; font-weight:700;
-  padding:8px 0;
-  border-right:1px solid rgba(255,255,255,.2);
-}
-.iv-cat-name {
-  font-size:12px; font-weight:700;
-  padding:8px 12px;
-}
-.iv-cat-cost {
-  font-size:12px; font-weight:700;
-  padding:8px 12px;
-  text-align:right;
-}
-.iv-cat-arrow {
-  font-size:9px; padding:0 6px;
-  transition:transform .2s;
-}
-.iv-cat-body { display:none; }
+/* Category header row — hidden, categories always expanded */
+.iv-cat-hdr { display:none; }
+.iv-cat-body { display:block; }
 .iv-cat.open .iv-cat-body { display:block; }
 
 /* Sub-category row */
@@ -2026,31 +1993,33 @@ a:hover { text-decoration:underline; }
   grid-template-columns:32px 1fr auto 16px;
   align-items:center;
   padding:0;
-  background:#E8E8E8;
+  background:rgba(175,97,67,.20);
   cursor:pointer;
   user-select:none;
   min-height:32px;
 }
-.iv-sub-hdr:hover { background:#F0F0F0; }
+.iv-sub-hdr:hover { background:rgba(175,97,67,.28); }
 .iv-sub-label {
   padding:6px 12px;
   font-size:11px;
-  color:#666;
-  border-right:1px solid #D0D0D0;
+  color:#af6143;
+  border-right:1px solid rgba(175,97,67,.25);
 }
 .iv-sub-name {
   font-size:11px; font-weight:600;
   padding:6px 12px;
+  color:#af6143;
 }
 .iv-sub-cost {
   font-size:11px; font-weight:700;
   padding:6px 12px;
   text-align:right;
+  color:#af6143;
 }
 .iv-sub-arrow {
   font-size:8px;
   padding:0 6px;
-  color:#888;
+  color:#af6143;
   transition:transform .2s;
 }
 
