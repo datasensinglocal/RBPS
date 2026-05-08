@@ -1434,20 +1434,18 @@ a:hover { text-decoration:underline; }
 .ov-vbar-outer::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:2px; }
 .ov-vbar-wrap {
   display:flex; align-items:flex-end; justify-content:flex-start;
-  gap:14px; height:200px; padding-top:0;
+  gap:20px; height:200px; padding-top:0;
   border-bottom:1.5px solid #C8C0B0;
   box-sizing:border-box;
-  overflow:visible;
 }
-/* each column: bar + label stacked, bar anchored to bottom */
+/* each column: flex column, bar anchored to bottom */
 .ov-vbar-col {
-  flex:0 0 34px;
+  flex:0 0 56px;
   display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
   cursor:pointer; transition:opacity .12s;
-  overflow:visible;
 }
 .ov-vbar-col:hover { opacity:.75; }
-/* value label — above bar fill */
+/* value label — in normal flex flow above the bar fill */
 .ov-vbar-val {
   font-size:11px; font-weight:600; color:var(--muted);
   white-space:nowrap; text-align:center;
@@ -1455,7 +1453,7 @@ a:hover { text-decoration:underline; }
 }
 /* bar fill — sits on x-axis, grows upward */
 .ov-vbar-fill {
-  width:34px; border-radius:5px 5px 0 0;
+  width:56px; border-radius:5px 5px 0 0;
   min-height:3px;
 }
 .ov-vbar-track { display:none; }
@@ -1572,11 +1570,9 @@ a:hover { text-decoration:underline; }
 .ov-vbar-lbl {
   font-size:10px; color:var(--muted); text-align:center;
   line-height:1.3; word-break:break-word; hyphens:none;
-  width:60px; margin-left:-13px;
-  margin-top:6px;
+  flex:0 0 56px; width:56px; margin-top:6px;
   display:-webkit-box;
   -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
-  flex-shrink:0;
 }
 /* Panel 3 — project table */
 .ov-panel2 {
@@ -2450,7 +2446,7 @@ a:hover { text-decoration:underline; }
           {{ auth.name }}
           <span style="font-size:18px;vertical-align:middle;margin-left:3px">▾</span>
           <span style="font-size:12px;font-weight:400;opacity:.75;margin-left:4px">
-            <span class="tb-lists-badge">{{ adminListsLoaded ? adminLists.length : '…' }} {{ adminListsLoaded ? (adminLists.length === 1 ? 'list' : 'lists') : '' }}</span>
+            <span class="tb-lists-badge">{{ adminListsLoaded ? adminLists.length : '…' }}</span>
           </span>
         </div>
       </button>
@@ -2762,7 +2758,7 @@ a:hover { text-decoration:underline; }
               <button class="ov-tab" :class="{active: ovBarToggle==='intervention'}" @click="ovBarToggle='intervention'">Intervention</button>
             </div>
             <!-- Expand button -->
-            <button class="ov-expand-btn" @click="ovGridOpen = true" title="Expand intervention grid">
+            <button class="ov-expand-btn" @click="ovGridOpen=true" title="Expand intervention grid">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
                 <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
@@ -2770,13 +2766,15 @@ a:hover { text-decoration:underline; }
             </button>
           </div>
         </div>
-          <div class="ov-vbar-outer" :class="{'ov-vbar-scroll': ovBarToggle==='intervention'}">
-          <div class="ov-vbar-wrap" :style="ovBarToggle==='intervention' ? {width: Math.max(ovBarBars.length * 54, 400)+'px'} : {}">
+        <div class="ov-vbar-outer" :class="{'ov-vbar-scroll': ovBarToggle==='intervention'}">
+          <div class="ov-vbar-wrap" :style="ovBarToggle==='intervention' ? {width: Math.max(ovBarBars.length * 76, 400)+'px'} : {}">
             <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-col">
               <div class="ov-vbar-val">{{ fmtCost(bar.value) }}</div>
               <div class="ov-vbar-fill" :style="{height: (bar.pct * 1.4) + 'px', background: bar.color}"></div>
-              <div class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
             </div>
+          </div>
+          <div :style="ovBarToggle==='intervention' ? {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px',width: Math.max(ovBarBars.length * 76, 400)+'px'} : {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px'}">
+            <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
           </div>
         </div>
       </div>
@@ -2806,12 +2804,14 @@ a:hover { text-decoration:underline; }
                 </div>
               </template>
               <div v-if="ovGridGroups.length === 0" style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">
-                No interventions found. Apply filters or load a list in the Overview page.
+                No interventions in selected projects.
               </div>
             </div>
           </div>
         </div>
       </teleport>
+
+    </div><!-- /ov-left -->
 
     <!-- Panel 3: Project table -->
     <div class="ov-panel-card ov-right">
@@ -2878,38 +2878,6 @@ a:hover { text-decoration:underline; }
 
   </div><!-- /ov-body -->
 </div>
-
-<!-- Grid modal teleport — at top level outside overview page -->
-<teleport to="body">
-  <div v-if="ovGridOpen" class="ov-grid-overlay" @click.self="ovGridOpen=false">
-    <div class="ov-grid-modal">
-      <div class="ov-grid-modal-hdr">
-        <div class="ov-grid-modal-title">Interventions by Sub-category</div>
-        <button class="ov-grid-close" @click="ovGridOpen=false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="ov-grid-body">
-        <template v-for="group in ovGridGroups" :key="group.sub_category">
-          <div class="ov-grid-subcat-hdr">{{ group.sub_category }}</div>
-          <div class="ov-grid-cards">
-            <div v-for="item in group.items" :key="item.intervention_id" class="ov-grid-card">
-              <img :src="lucideUrl(item.icon)" class="ov-grid-icon-img" alt="" />
-              <div class="ov-grid-intv-name">{{ item.intervention }}</div>
-              <div class="ov-grid-stats">
-                <span class="ov-grid-count">{{ item.count }} project{{ item.count !== 1 ? 's' : '' }}</span>
-                <span class="ov-grid-cost">{{ fmtCost(item.cost) }}</span>
-              </div>
-            </div>
-          </div>
-        </template>
-        <div v-if="ovGridGroups.length === 0" style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">
-          No interventions found. Apply filters or load a list in the Overview page.
-        </div>
-      </div>
-    </div>
-  </div>
-</teleport>
 
 <!-- §4b SUMMARY PAGE ───────────────────────────────────────────────────── -->
 <div id="summary-page" v-if="view === 'summary'">
@@ -4803,10 +4771,7 @@ const app = createApp({
 
     // Grid data — grouped by sub_category, with count + cost per intervention
     const ovGridGroups = computed(() => {
-      // Use ALL filtered projects (not just selected) so the popup
-      // shows interventions for everything currently in view / in a list
-      const filtered = new Set(ovFiltered.value.map(p => p.project_code));
-      const rows = projectIntvs.value.filter(r => filtered.has(r.project_code));
+      const rows = ovIntvRows();
       const fwMap = fwById.value;
       // Aggregate cost + count per intervention_id
       const agg = {};
@@ -4833,11 +4798,6 @@ const app = createApp({
       }
       return Object.values(grouped);
     });
-
-    // Open grid modal explicitly
-    function ovOpenGrid() {
-      ovGridOpen.value = true;
-    }
 
     // Map filter helpers (kept for compatibility)
     function ovApplyMapFilter(subCat) {
@@ -5657,7 +5617,7 @@ const app = createApp({
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
       ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
-      ovBarToggle, ovBarBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv, ovOpenGrid,
+      ovBarToggle, ovBarBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
       openRateCard, toggleBucket, updateFw, deactivateFw, addFwRow, recomputeAllTotals,
