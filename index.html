@@ -2813,8 +2813,6 @@ a:hover { text-decoration:underline; }
         </div>
       </teleport>
 
-    </div><!-- /ov-left -->
-
     <!-- Panel 3: Project table -->
     <div class="ov-panel-card ov-right">
       <div class="ov-panel2">
@@ -2880,6 +2878,38 @@ a:hover { text-decoration:underline; }
 
   </div><!-- /ov-body -->
 </div>
+
+<!-- Grid modal teleport — at top level outside overview page -->
+<teleport to="body">
+  <div v-if="ovGridOpen" class="ov-grid-overlay" @click.self="ovGridOpen=false">
+    <div class="ov-grid-modal">
+      <div class="ov-grid-modal-hdr">
+        <div class="ov-grid-modal-title">Interventions by Sub-category</div>
+        <button class="ov-grid-close" @click="ovGridOpen=false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="ov-grid-body">
+        <template v-for="group in ovGridGroups" :key="group.sub_category">
+          <div class="ov-grid-subcat-hdr">{{ group.sub_category }}</div>
+          <div class="ov-grid-cards">
+            <div v-for="item in group.items" :key="item.intervention_id" class="ov-grid-card">
+              <img :src="lucideUrl(item.icon)" class="ov-grid-icon-img" alt="" />
+              <div class="ov-grid-intv-name">{{ item.intervention }}</div>
+              <div class="ov-grid-stats">
+                <span class="ov-grid-count">{{ item.count }} project{{ item.count !== 1 ? 's' : '' }}</span>
+                <span class="ov-grid-cost">{{ fmtCost(item.cost) }}</span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <div v-if="ovGridGroups.length === 0" style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">
+          No interventions found. Apply filters or load a list in the Overview page.
+        </div>
+      </div>
+    </div>
+  </div>
+</teleport>
 
 <!-- §4b SUMMARY PAGE ───────────────────────────────────────────────────── -->
 <div id="summary-page" v-if="view === 'summary'">
