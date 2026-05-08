@@ -1434,18 +1434,20 @@ a:hover { text-decoration:underline; }
 .ov-vbar-outer::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:2px; }
 .ov-vbar-wrap {
   display:flex; align-items:flex-end; justify-content:flex-start;
-  gap:20px; height:200px; padding-top:0;
+  gap:14px; height:200px; padding-top:0;
   border-bottom:1.5px solid #C8C0B0;
   box-sizing:border-box;
+  overflow:visible;
 }
-/* each column: flex column, bar anchored to bottom */
+/* each column: bar + label stacked, bar anchored to bottom */
 .ov-vbar-col {
   flex:0 0 34px;
   display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
   cursor:pointer; transition:opacity .12s;
+  overflow:visible;
 }
 .ov-vbar-col:hover { opacity:.75; }
-/* value label — in normal flex flow above the bar fill */
+/* value label — above bar fill */
 .ov-vbar-val {
   font-size:11px; font-weight:600; color:var(--muted);
   white-space:nowrap; text-align:center;
@@ -1570,9 +1572,11 @@ a:hover { text-decoration:underline; }
 .ov-vbar-lbl {
   font-size:10px; color:var(--muted); text-align:center;
   line-height:1.3; word-break:break-word; hyphens:none;
-  flex:0 0 34px; width:34px; margin-top:6px;
+  width:60px; margin-left:-13px;
+  margin-top:6px;
   display:-webkit-box;
   -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  flex-shrink:0;
 }
 /* Panel 3 — project table */
 .ov-panel2 {
@@ -2758,7 +2762,7 @@ a:hover { text-decoration:underline; }
               <button class="ov-tab" :class="{active: ovBarToggle==='intervention'}" @click="ovBarToggle='intervention'">Intervention</button>
             </div>
             <!-- Expand button -->
-            <button class="ov-expand-btn" @click="ovGridOpen=true" title="Expand intervention grid">
+            <button class="ov-expand-btn" @click="ovOpenGrid" title="Expand intervention grid">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
                 <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
@@ -2771,10 +2775,8 @@ a:hover { text-decoration:underline; }
             <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-col">
               <div class="ov-vbar-val">{{ fmtCost(bar.value) }}</div>
               <div class="ov-vbar-fill" :style="{height: (bar.pct * 1.4) + 'px', background: bar.color}"></div>
+              <div class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
             </div>
-          </div>
-          <div :style="ovBarToggle==='intervention' ? {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px',width: Math.max(ovBarBars.length * 54, 400)+'px'} : {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px'}">
-            <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
           </div>
         </div>
       </div>
@@ -4802,6 +4804,11 @@ const app = createApp({
       return Object.values(grouped);
     });
 
+    // Open grid modal explicitly
+    function ovOpenGrid() {
+      ovGridOpen.value = true;
+    }
+
     // Map filter helpers (kept for compatibility)
     function ovApplyMapFilter(subCat) {
       const fwMap = fwById.value;
@@ -5620,7 +5627,7 @@ const app = createApp({
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
       ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
-      ovBarToggle, ovBarBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
+      ovBarToggle, ovBarBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv, ovOpenGrid,
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
       openRateCard, toggleBucket, updateFw, deactivateFw, addFwRow, recomputeAllTotals,
