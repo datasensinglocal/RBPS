@@ -2222,7 +2222,7 @@ a:hover { text-decoration:underline; }
 
 .rc-row {
   display:grid;
-  grid-template-columns: minmax(0,1fr) 90px 90px 28px;
+  grid-template-columns: minmax(0,1fr) 90px 90px 90px 28px;
   gap:8px; align-items:start; padding:10px 20px; border-top:1px solid var(--line);
   font-size:11.5px;
 }
@@ -2240,7 +2240,7 @@ a:hover { text-decoration:underline; }
 
 /* Header strip in rate card */
 .rc-row-hdr {
-  display:grid; grid-template-columns: minmax(0,1fr) 90px 90px 28px;
+  display:grid; grid-template-columns: minmax(0,1fr) 90px 90px 90px 28px;
   gap:8px; padding:8px 20px;
   font-size:9px; font-weight:700; letter-spacing:.6px; color:var(--muted);
   text-transform:uppercase; background:var(--paper); border-top:1px solid var(--line);
@@ -3192,9 +3192,15 @@ a:hover { text-decoration:underline; }
             <div v-if="editMode" class="iv-hdr-cell iv-hdr-actions"></div>
           </div>
 
-          <!-- Sub-category rows -->
-          <div v-for="cat in groupedInterventions" :key="cat.name">
-              <div v-for="sub in cat.subs" :key="cat.name + sub.name" class="iv-sub-wrap">
+          <!-- Category rows -->
+          <div v-for="(cat, catIdx) in groupedInterventions" :key="cat.name"
+               class="iv-cat open">
+
+            <!-- Category header row — hidden via CSS, categories always expanded -->
+
+            <!-- Sub-category rows — always visible -->
+            <div class="iv-cat-body">
+              <div v-for="sub in cat.subs" :key="sub.name" class="iv-sub-wrap">
 
                 <!-- Sub-category header: shows cost only when CLOSED -->
                 <div class="iv-sub-hdr" @click="toggleSub(cat.name, sub.name)"
@@ -3237,7 +3243,7 @@ a:hover { text-decoration:underline; }
               </div>
 
 
-            
+            </div>
           </div>
 
           <!-- TOTAL row — sum of all category totals already shown in the table -->
@@ -3245,7 +3251,8 @@ a:hover { text-decoration:underline; }
             <div class="iv-total-label">PROJECT TOTAL</div>
             <div class="iv-total-value">{{ fmtCost(groupedInterventions.reduce((s, c) => s + c.total, 0)) }}</div>
           </div>
-        </template>
+        </div>
+      </div>
 
       <!-- Save bar (edit mode) -->
       <div v-if="editMode" class="pp-save-bar">
@@ -3287,12 +3294,13 @@ a:hover { text-decoration:underline; }
           <div>Intervention</div>
           <div>Rate (₹)</div>
           <div>Unit</div>
+          <div>Category</div>
           <div></div>
         </div>
         <div v-for="r in bucket.rows" :key="r.intervention_id" class="rc-row">
           <div>
             <div class="rc-nm">{{ r.intervention }}</div>
-            <div class="rc-meta">{{ r.intervention_id }}</div>
+            <div class="rc-meta">{{ r.intervention_id }} · {{ r.sub_category }}</div>
             <div v-if="r.explainer" class="rc-explainer">{{ r.explainer }}</div>
           </div>
           <input class="rc-rate" type="number" min="0" :value="r.rate"
@@ -3303,7 +3311,8 @@ a:hover { text-decoration:underline; }
             <option value="Per m length">Per m length</option>
             <option value="Sqm">Sqm</option>
           </select>
-
+          <input class="rc-unit-input" :value="r.category"
+                 :disabled="!isAdmin" @change="updateFw(r, 'category', $event.target.value)" />
           <button v-if="isAdmin" class="iv-remove" @click="deactivateFw(r)" title="Deactivate">×</button>
         </div>
       </div>
@@ -5473,8 +5482,8 @@ const app = createApp({
       const buckets = {};
       framework.value.forEach(f => {
         if (f.active !== 'Y') return;
-        if (q && !(`${f.intervention} ${f.intervention_id} ${f.sub_category}`).toLowerCase().includes(q)) return;
-        const b = f.sub_category || 'Other';
+        if (q && !(`${f.intervention} ${f.intervention_id} ${f.budget_bucket}`).toLowerCase().includes(q)) return;
+        const b = f.budget_bucket || 'Other';
         if (!buckets[b]) buckets[b] = { name:b, rows:[] };
         buckets[b].rows.push(f);
       });
