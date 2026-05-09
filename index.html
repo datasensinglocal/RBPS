@@ -724,7 +724,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* Sizes */
   --sb-w:400px;             /* sidebar width */
   --tb-h:54px;              /* topbar height */
-  --panel-w:600px;          /* project panel width */
+  --panel-w:660px;          /* project panel width */
   --r:6px;                  /* base radius */
   --r-lg:10px;
   --sh:0 1px 3px rgba(28,59,47,.08), 0 4px 16px rgba(28,59,47,.04);
@@ -1005,6 +1005,7 @@ a:hover { text-decoration:underline; }
 /* Project panel — right drawer */
 #panel {
   position:fixed; top:var(--tb-h); right:0; bottom:0; width:var(--panel-w); max-width:96vw;
+  border:5mm solid white; box-sizing:border-box;
   background:var(--card); z-index:250;
   transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1);
   box-shadow:-6px 0 32px rgba(0,0,0,.16), -1px 0 0 rgba(0,0,0,.04);
@@ -1493,6 +1494,35 @@ a:hover { text-decoration:underline; }
 .ov-vbar-scroll::-webkit-scrollbar { height:5px; }
 .ov-vbar-scroll::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:3px; }
 
+/* ── Sub-category horizontal bar chart ── */
+.ov-hbar-list {
+  display:flex; flex-direction:column; gap:10px;
+  padding:4px 16px 12px;
+  overflow-y:auto; flex:1;
+}
+.ov-hbar-row {
+  display:grid;
+  grid-template-columns: 160px 1fr 72px;
+  align-items:center; gap:10px;
+}
+.ov-hbar-label {
+  font-size:11.5px; color:var(--ink);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ov-hbar-track {
+  background:var(--soft); border-radius:4px;
+  height:18px; overflow:hidden;
+}
+.ov-hbar-fill {
+  height:100%; border-radius:4px;
+  transition:width .3s ease;
+  min-width:3px;
+}
+.ov-hbar-val {
+  font-size:11px; font-weight:600; color:var(--muted);
+  text-align:right; white-space:nowrap;
+}
+
 /* ── Grid modal overlay ── */
 .ov-grid-overlay {
   position:fixed; inset:0; z-index:9000;
@@ -1769,7 +1799,7 @@ a:hover { text-decoration:underline; }
 .sm-total-val { font-size:15px; font-weight:700; color:var(--ink); }
 
 .pp-img {
-  width:100%; height:312px; background:var(--soft);
+  width:100%; height:343px; background:var(--soft);
   position:relative; flex-shrink:0;
 }
 .pp-img img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -1881,7 +1911,7 @@ a:hover { text-decoration:underline; }
 .pp-gallery img:hover:not(.on) { border-color:var(--line-2); }
 
 .pp-section { padding:14px 18px; border-bottom:1px solid var(--line); }
-.pp-name { font-family:var(--serif); font-size:22px; line-height:1.15; color:var(--ink); margin-bottom:6px; }
+.pp-name { font-family:var(--serif); font-size:26px; font-weight:400; line-height:1.15; color:var(--ink); margin-bottom:6px; }
 .pp-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
 .pp-meta-pill {
   font-size:10px; font-weight:600; padding:3px 9px; border-radius:10px;
@@ -2715,70 +2745,23 @@ a:hover { text-decoration:underline; }
     <!-- Panel 2: Charts -->
     <div class="ov-panel-card ov-left">
 
-      <!-- Donut: Budget Analysis -->
-      <div class="ov-chart-card donut">
+      <!-- Budget Analysis — horizontal bar chart with toggles -->
+      <div class="ov-chart-card bars" style="flex:1;display:flex;flex-direction:column;">
         <div class="ov-chart-hdr">
-          <div class="ov-chart-title">Budget Analysis</div>
+          <div class="ov-chart-title">Budget analysis</div>
           <div class="ov-tabs">
-            <button class="ov-tab" :class="{active: ovDonutBy==='corporation'}" @click="ovDonutBy='corporation'">Corp</button>
-            <button class="ov-tab" :class="{active: ovDonutBy==='zone'}" @click="ovDonutBy='zone'">Zone</button>
-            <button class="ov-tab" :class="{active: ovDonutBy==='budget_bucket'}" @click="ovDonutBy='budget_bucket'">Bucket</button>
+            <button class="ov-tab" :class="{active: ovBudgetToggle==='corporation'}" @click="ovBudgetToggle='corporation'">Corporation</button>
+            <button class="ov-tab" :class="{active: ovBudgetToggle==='zone'}" @click="ovBudgetToggle='zone'">Zone</button>
+            <button class="ov-tab" :class="{active: ovBudgetToggle==='intervention'}" @click="ovBudgetToggle='intervention'">Intervention</button>
           </div>
         </div>
-        <div class="ov-donut-wrap">
-          <svg width="150" height="150" viewBox="0 0 150 150">
-            <g transform="translate(75,75)">
-              <circle r="42" fill="#F5F2EE"/>
-              <path v-for="(seg,i) in ovDonutSegs" :key="i"
-                    :d="seg.d" :fill="seg.color"
-                    stroke="#fff" stroke-width="1.5"
-                    @mouseenter="ovDonutHover=i" @mouseleave="ovDonutHover=null"
-                    :opacity="ovDonutHover===null||ovDonutHover===i ? 1 : 0.45"
-                    style="cursor:pointer;transition:opacity .15s"/>
-              <text text-anchor="middle" dy="-7" font-size="10" fill="#6B7066" font-family="sans-serif">Total</text>
-              <text text-anchor="middle" dy="9" font-size="12" font-weight="700" fill="#2A3020" font-family="sans-serif">{{ fmtCost(ovTotalBudget) }}</text>
-            </g>
-          </svg>
-          <div class="ov-legend">
-            <div v-for="(seg,i) in ovDonutSegs" :key="i"
-                 class="ov-legend-row"
-                 @mouseenter="ovDonutHover=i" @mouseleave="ovDonutHover=null">
-              <div class="ov-legend-swatch" :style="{background:seg.color}"></div>
-              <div class="ov-legend-label">{{ seg.label }}</div>
-              <div class="ov-legend-val">{{ fmtCost(seg.value) }}</div>
+        <div class="ov-hbar-list">
+          <div v-for="bar in ovBudgetBars" :key="bar.name" class="ov-hbar-row">
+            <div class="ov-hbar-label" :title="bar.name">{{ bar.name }}</div>
+            <div class="ov-hbar-track">
+              <div class="ov-hbar-fill" :style="{width: bar.pct + '%', background: bar.color}"></div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Budget by Interventions — toggle view -->
-      <div class="ov-chart-card bars">
-        <div class="ov-chart-hdr">
-          <div class="ov-chart-title">Budget by Interventions</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="ov-tabs">
-              <button class="ov-tab" :class="{active: ovBarToggle==='budget_bucket'}" @click="ovBarToggle='budget_bucket'">Bucket</button>
-              <button class="ov-tab" :class="{active: ovBarToggle==='sub_category'}" @click="ovBarToggle='sub_category'">Sub-category</button>
-              <button class="ov-tab" :class="{active: ovBarToggle==='intervention'}" @click="ovBarToggle='intervention'">Intervention</button>
-            </div>
-            <!-- Expand button -->
-            <button class="ov-expand-btn" @click="ovGridOpen=true" title="Expand intervention grid">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-                <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="ov-vbar-outer" :class="{'ov-vbar-scroll': ovBarToggle==='intervention'}">
-          <div class="ov-vbar-wrap" :style="ovBarToggle==='intervention' ? {width: Math.max(ovBarBars.length * 76, 400)+'px'} : {}">
-            <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-col">
-              <div class="ov-vbar-val">{{ fmtCost(bar.value) }}</div>
-              <div class="ov-vbar-fill" :style="{height: (bar.pct * 1.4) + 'px', background: bar.color}"></div>
-            </div>
-          </div>
-          <div :style="ovBarToggle==='intervention' ? {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px',width: Math.max(ovBarBars.length * 76, 400)+'px'} : {display:'flex',alignItems:'flex-start',gap:'20px',paddingTop:'6px'}">
-            <div v-for="bar in ovBarBars" :key="bar.name" class="ov-vbar-lbl" :title="bar.name">{{ bar.name }}</div>
+            <div class="ov-hbar-val">{{ fmtCost(bar.value) }}</div>
           </div>
         </div>
       </div>
@@ -4683,6 +4666,54 @@ const app = createApp({
       }
     });
 
+    // Fixed sub-category bar chart (replaces donut + toggle on overview left panel)
+    const ovSubcatBars = computed(() => {
+      const rows = ovIntvRows();
+      return ovBuildBars(rows, fw => fw.sub_category);
+    });
+
+    // Budget Analysis panel — toggle between corporation, zone, intervention
+    const ovBudgetToggle = ref('corporation');
+    const ovBudgetBars = computed(() => {
+      const field = ovBudgetToggle.value;
+
+      if (field === 'intervention') {
+        // Group total intervention cost by intervention name
+        const rows = ovIntvRows();
+        const totals = {};
+        const fwMap = fwById.value;
+        for (const r of rows) {
+          const fw = fwMap[r.intervention_id];
+          if (!fw) continue;
+          const key = fw.intervention || 'Other';
+          totals[key] = (totals[key] || 0) + (Number(r.cost) || 0);
+        }
+        const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+        const max = entries[0]?.[1] || 1;
+        return entries.map(([name, value]) => ({
+          name, value,
+          pct: Math.round((value / max) * 100),
+          color: '#C6613F',
+        }));
+      }
+
+      // Corporation / Zone: sum ovProjectTotal per project, grouped by field
+      const totals = {};
+      for (const p of ovFiltered.value) {
+        if (!ovSelected.value.has(p.project_code)) continue;
+        const key = p[field] || 'Other';
+        const cost = ovProjectTotal(p.project_code);
+        totals[key] = (totals[key] || 0) + cost;
+      }
+      const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      const max = entries[0]?.[1] || 1;
+      return entries.map(([name, value]) => ({
+        name, value,
+        pct: Math.round((value / max) * 100),
+        color: '#C6613F',
+      }));
+    });
+
     // Keep ovDrillBars alias for summary page compatibility
     const ovDrillBars    = ovBarBars;
     const ovDrillLevel   = ref(0);
@@ -5203,18 +5234,21 @@ const app = createApp({
       if (!isFinite(qty) || qty < 0) {
         toast('Quantity must be 0 or greater.', 'err'); return;
       }
+      // Calculate cost on the fly: quantity × rate from framework
+      const rate = Number(fwById.value[row.intervention_id]?.rate) || 0;
+      const cost = qty * rate;
       try {
-        // Only save quantity — project_cost sheet recalculates cost via its own formulas
         await api.updateProjectIntv(withAuth({
           project_code: row.project_code,
           intervention_id: row.intervention_id,
           quantity: qty,
+          cost,
         }), {});
-        // Update local quantity only; cost display stays as-is until next data refresh
+        // Update quantity AND cost locally so the table reflects immediately
         const idx = projectIntvs.value.findIndex(x =>
           x.project_code===row.project_code && x.intervention_id===row.intervention_id);
         if (idx >= 0) {
-          projectIntvs.value[idx] = { ...projectIntvs.value[idx], quantity: qty };
+          projectIntvs.value[idx] = { ...projectIntvs.value[idx], quantity: qty, cost };
           projectIntvs.value = projectIntvs.value.slice();
         }
         toast('Quantity saved.', 'ok');
@@ -5631,7 +5665,7 @@ const app = createApp({
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
       ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
-      ovBarToggle, ovBarBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
+      ovBarToggle, ovBarBars, ovSubcatBars, ovBudgetToggle, ovBudgetBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
       openRateCard, toggleBucket, updateFw, deactivateFw, addFwRow, recomputeAllTotals,
