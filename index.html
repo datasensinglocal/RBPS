@@ -3193,7 +3193,7 @@ a:hover { text-decoration:underline; }
           </div>
 
           <!-- Sub-category rows -->
-          <template v-for="cat in groupedInterventions" :key="cat.name">
+          <div v-for="cat in groupedInterventions" :key="cat.name">
               <div v-for="sub in cat.subs" :key="cat.name + sub.name" class="iv-sub-wrap">
 
                 <!-- Sub-category header: shows cost only when CLOSED -->
@@ -3237,7 +3237,7 @@ a:hover { text-decoration:underline; }
               </div>
 
 
-            </div>
+            
           </div>
 
           <!-- TOTAL row — sum of all category totals already shown in the table -->
@@ -3292,7 +3292,7 @@ a:hover { text-decoration:underline; }
         <div v-for="r in bucket.rows" :key="r.intervention_id" class="rc-row">
           <div>
             <div class="rc-nm">{{ r.intervention }}</div>
-            <div class="rc-meta">{{ r.intervention_id }} · {{ r.sub_category }}</div>
+            <div class="rc-meta">{{ r.intervention_id }}</div>
             <div v-if="r.explainer" class="rc-explainer">{{ r.explainer }}</div>
           </div>
           <input class="rc-rate" type="number" min="0" :value="r.rate"
@@ -3759,38 +3759,7 @@ const api = (() => {
     return callJsonp(action, payload, auth);
   }
 
-  // fetch()-based path with retry: Apps Script /exec sets permissive CORS headers.
-  // Retries up to 3 times with exponential backoff (500ms, 1s, 2s).
-  function callFetch(action, payload, auth, attempt = 0) {
-    const qs = new URLSearchParams({
-      action,
-      payload: JSON.stringify(payload || {}),
-      auth:    JSON.stringify(auth    || {}),
-    });
-    return fetch(APPS_SCRIPT_URL + '?' + qs.toString(), {
-      method: 'GET',
-      mode: 'cors',
-      credentials: 'omit',
-    })
-      .then(r => {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(data => {
-        if (data && data.ok) return data.data;
-        throw new Error((data && data.error) || 'Request failed');
-      })
-      .catch(err => {
-        if (attempt < 3) {
-          const delay = (attempt + 1) * 500; // 500ms, 1s, 1.5s
-          return new Promise(r => setTimeout(r, delay))
-            .then(() => callFetch(action, payload, auth, attempt + 1));
-        }
-        throw err;
-      });
-  }
-
-  function callJsonp(action, payload, auth, attempt = 0) {
+  function callJsonp(action, payload, auth) {
     return new Promise((resolve, reject) => {
       const cbName = '__rbps_cb_' + (++_cbIdx);
       const cleanup = () => {
@@ -3820,9 +3789,7 @@ const api = (() => {
       script.onerror = () => {
         clearTimeout(timer);
         cleanup();
-        // JSONP script injection was blocked (CSP, redirect, or network issue).
-        // Fall back to fetch with retries — works when CORS headers are present.
-        callFetch(action, payload, auth).then(resolve, reject);
+        reject(new Error('Script load failed (' + action + ')'));
       };
       document.head.appendChild(script);
     });
@@ -5506,8 +5473,8 @@ const app = createApp({
       const buckets = {};
       framework.value.forEach(f => {
         if (f.active !== 'Y') return;
-        if (q && !(`${f.intervention} ${f.intervention_id} ${f.budget_bucket}`).toLowerCase().includes(q)) return;
-        const b = f.budget_bucket || 'Other';
+        if (q && !(`${f.intervention} ${f.intervention_id} ${f.sub_category}`).toLowerCase().includes(q)) return;
+        const b = f.sub_category || 'Other';
         if (!buckets[b]) buckets[b] = { name:b, rows:[] };
         buckets[b].rows.push(f);
       });
