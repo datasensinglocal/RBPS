@@ -1959,7 +1959,7 @@ a:hover { text-decoration:underline; }
 }
 .iv-table-hdr {
   display:grid;
-  grid-template-columns:1fr 100px;
+  grid-template-columns:1fr 90px 80px 100px;
   background:#F5F5F5;
   border-bottom:2px solid #D0D0D0;
   font-size:11px;
@@ -1967,8 +1967,8 @@ a:hover { text-decoration:underline; }
   text-transform:uppercase;
   letter-spacing:.3px;
 }
-.iv-table-hdr.with-actions { grid-template-columns:1fr 100px 32px; }
-.iv-table-hdr.with-edit   { grid-template-columns:1fr 72px 90px 32px; }
+.iv-table-hdr.with-actions { grid-template-columns:1fr 90px 80px 100px 32px; }
+.iv-table-hdr.with-edit   { grid-template-columns:1fr 90px 80px 72px 100px 32px; }
 .iv-hdr-cell {
   padding:8px 12px;
   text-align:left;
@@ -2028,14 +2028,14 @@ a:hover { text-decoration:underline; }
 .iv-sub-body { background:#fff; }
 .iv-row-grid {
   display:grid;
-  grid-template-columns:32px 1fr 100px;
+  grid-template-columns:32px 1fr 90px 80px 100px;
   align-items:center;
   border-bottom:1px solid #E0E0E0;
   min-height:32px;
   background:#fff;
 }
-.iv-row-grid.with-qty    { grid-template-columns:32px 1fr 72px 90px 32px; }
-.iv-row-grid.with-remove { grid-template-columns:32px 1fr 100px 32px; }
+.iv-row-grid.with-qty    { grid-template-columns:32px 1fr 90px 80px 72px 100px 32px; }
+.iv-row-grid.with-remove { grid-template-columns:32px 1fr 90px 80px 100px 32px; }
 .iv-row-grid:hover { background:#FAFAFA; }
 .iv-row-num {
   text-align:center;
@@ -3191,6 +3191,8 @@ a:hover { text-decoration:underline; }
           <!-- Table header -->
           <div class="iv-table-hdr" :class="editMode ? 'with-edit' : ''">
             <div class="iv-hdr-cell iv-hdr-name">Infrastructure elements</div>
+            <div class="iv-hdr-cell iv-hdr-rate">Rate</div>
+            <div class="iv-hdr-cell" style="text-align:center">Unit</div>
             <div v-if="editMode" class="iv-hdr-cell iv-hdr-qty">Qty</div>
             <div class="iv-hdr-cell iv-hdr-cost">Cost</div>
             <div v-if="editMode" class="iv-hdr-cell iv-hdr-actions"></div>
@@ -3222,6 +3224,8 @@ a:hover { text-decoration:underline; }
                        :class="editMode ? 'with-qty' : ''">
                     <div class="iv-row-num">{{ rowIdx + 1 }}</div>
                     <div class="iv-name-cell">{{ row.fw.intervention }}</div>
+                    <div class="iv-rate-cell">{{ row.fw.rate ? fmtCost(Number(row.fw.rate)) : '—' }}</div>
+                    <div class="iv-rate-cell" style="text-align:center;color:#666">{{ row.fw.unit_label || '—' }}</div>
 
                     <!-- Qty input — edit mode only -->
                     <div v-if="editMode" class="iv-qty-cell">
