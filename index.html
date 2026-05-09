@@ -1495,32 +1495,32 @@ a:hover { text-decoration:underline; }
 .ov-vbar-scroll::-webkit-scrollbar-thumb { background:var(--line-2); border-radius:3px; }
 
 /* ── Sub-category horizontal bar chart ── */
-.ov-hbar-list {
-  display:flex; flex-direction:column; gap:10px;
-  padding:4px 16px 12px;
-  overflow-y:auto; flex:1;
+.ov-hbar-chart {
+  display:flex; flex-direction:column; gap:14px;
+  padding:8px 20px 16px;
+  overflow-y:auto; max-height:440px;
 }
-.ov-hbar-row {
-  display:grid;
-  grid-template-columns: 160px 1fr 72px;
-  align-items:center; gap:10px;
+.ov-hbar-item {
+  display:flex; flex-direction:column; gap:4px;
 }
-.ov-hbar-label {
-  font-size:11.5px; color:var(--ink);
+.ov-hbar-name {
+  font-size:11px; font-weight:600; color:var(--ink);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.ov-hbar-track {
-  background:var(--soft); border-radius:4px;
-  height:18px; overflow:hidden;
+.ov-hbar-bar-row {
+  display:flex; align-items:center; gap:8px;
+  width:100%;
 }
-.ov-hbar-fill {
-  height:100%; border-radius:4px;
-  transition:width .3s ease;
-  min-width:3px;
+.ov-hbar-bar {
+  height:22px; border-radius:4px;
+  background:#C6613F;
+  min-width:4px;
+  flex-shrink:0;
+  transition:width .35s ease;
 }
-.ov-hbar-val {
+.ov-hbar-amount {
   font-size:11px; font-weight:600; color:var(--muted);
-  text-align:right; white-space:nowrap;
+  white-space:nowrap;
 }
 
 /* ── Grid modal overlay ── */
@@ -2755,13 +2755,13 @@ a:hover { text-decoration:underline; }
             <button class="ov-tab" :class="{active: ovBudgetToggle==='intervention'}" @click="ovBudgetToggle='intervention'">Intervention</button>
           </div>
         </div>
-        <div class="ov-hbar-list">
-          <div v-for="bar in ovBudgetBars" :key="bar.name" class="ov-hbar-row">
-            <div class="ov-hbar-label" :title="bar.name">{{ bar.name }}</div>
-            <div class="ov-hbar-track">
-              <div class="ov-hbar-fill" :style="{width: bar.pct + '%', background: bar.color}"></div>
+        <div class="ov-hbar-chart">
+          <div v-for="bar in ovBudgetBars" :key="bar.name" class="ov-hbar-item">
+            <div class="ov-hbar-name">{{ bar.name }}</div>
+            <div class="ov-hbar-bar-row">
+              <div class="ov-hbar-bar" :style="{width: bar.pct + '%'}"></div>
+              <div class="ov-hbar-amount">{{ fmtCost(bar.value) }}</div>
             </div>
-            <div class="ov-hbar-val">{{ fmtCost(bar.value) }}</div>
           </div>
         </div>
       </div>
