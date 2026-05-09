@@ -2191,7 +2191,7 @@ a:hover { text-decoration:underline; }
    §6 — RATE CARD DRAWER
    ═════════════════════════════════════════════════════════════════════════ */
 #rateCard {
-  position:fixed; top:var(--tb-h); right:0; bottom:0; width:560px; max-width:100vw;
+  position:fixed; top:var(--tb-h); right:0; bottom:0; width:672px; max-width:100vw;
   background:#fff; z-index:260;
   transform:translateX(100%); transition:transform .25s cubic-bezier(.4,0,.2,1);
   box-shadow:-2px 0 24px rgba(0,0,0,.12);
@@ -2222,7 +2222,7 @@ a:hover { text-decoration:underline; }
 
 .rc-row {
   display:grid;
-  grid-template-columns: minmax(0,1fr) 90px 90px 90px 28px;
+  grid-template-columns: minmax(0,1fr) 100px 130px 28px;
   gap:8px; align-items:start; padding:10px 20px; border-top:1px solid var(--line);
   font-size:11.5px;
 }
@@ -2240,7 +2240,7 @@ a:hover { text-decoration:underline; }
 
 /* Header strip in rate card */
 .rc-row-hdr {
-  display:grid; grid-template-columns: minmax(0,1fr) 90px 90px 90px 28px;
+  display:grid; grid-template-columns: minmax(0,1fr) 100px 130px 28px;
   gap:8px; padding:8px 20px;
   font-size:9px; font-weight:700; letter-spacing:.6px; color:var(--muted);
   text-transform:uppercase; background:var(--paper); border-top:1px solid var(--line);
@@ -2312,8 +2312,12 @@ a:hover { text-decoration:underline; }
 .am-table-hdr span.center { text-align:center; }
 
 /* Sub-category (cat) header — rust brown */
-.am-bucket { display:none; }
-.am-bucket-name { display:none; }
+.am-bucket { display:block; }
+.am-bucket-name {
+  padding:10px 20px 4px; font-size:9px; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; color:var(--muted); background:var(--soft);
+  border-top:2px solid var(--line); margin-top:4px;
+}
 .am-cat { }
 .am-cat-name {
   font-size:16px; font-weight:500; color:#c6613f;
@@ -3292,15 +3296,13 @@ a:hover { text-decoration:underline; }
       <div class="rc-bucket-body">
         <div class="rc-row-hdr">
           <div>Intervention</div>
-          <div>Rate (₹)</div>
+          <div style="text-align:right">Rate (₹)</div>
           <div>Unit</div>
-          <div>Category</div>
           <div></div>
         </div>
         <div v-for="r in bucket.rows" :key="r.intervention_id" class="rc-row">
           <div>
             <div class="rc-nm">{{ r.intervention }}</div>
-            <div class="rc-meta">{{ r.intervention_id }} · {{ r.sub_category }}</div>
             <div v-if="r.explainer" class="rc-explainer">{{ r.explainer }}</div>
           </div>
           <input class="rc-rate" type="number" min="0" :value="r.rate"
@@ -3311,8 +3313,6 @@ a:hover { text-decoration:underline; }
             <option value="Per m length">Per m length</option>
             <option value="Sqm">Sqm</option>
           </select>
-          <input class="rc-unit-input" :value="r.category"
-                 :disabled="!isAdmin" @change="updateFw(r, 'category', $event.target.value)" />
           <button v-if="isAdmin" class="iv-remove" @click="deactivateFw(r)" title="Deactivate">×</button>
         </div>
       </div>
@@ -5477,18 +5477,28 @@ const app = createApp({
 
     // ───────── Rate Card ─────────
     function openRateCard() { rateCardOpen.value = true; }
+
     const rateCardBuckets = computed(() => {
       const q = rcSearch.value.trim().toLowerCase();
       const buckets = {};
       framework.value.forEach(f => {
         if (f.active !== 'Y') return;
-        if (q && !(`${f.intervention} ${f.intervention_id} ${f.budget_bucket}`).toLowerCase().includes(q)) return;
-        const b = f.budget_bucket || 'Other';
+        if (q && !(f.intervention + ' ' + f.intervention_id + ' ' + f.sub_category + ' ' + f.budget_bucket).toLowerCase().includes(q)) return;
+        const b = f.sub_category || 'Other';
         if (!buckets[b]) buckets[b] = { name:b, rows:[] };
         buckets[b].rows.push(f);
       });
       return Object.values(buckets).map(b => ({ ...b, rows: b.rows.sort((a,c)=>a.intervention.localeCompare(c.intervention)) }));
     });
+
+
+
+
+
+
+
+
+
     function toggleBucket(name) { openBuckets.has(name) ? openBuckets.delete(name) : openBuckets.add(name); }
 
     /**
