@@ -3153,8 +3153,8 @@ a:hover { text-decoration:underline; }
         </div>
       </div>
 
-      <!-- Site details — shown when present, or in edit mode -->
-      <div v-if="selectedProject['Site details and surroundings'] || selectedProject.site_details_and_surroundings || editMode" class="pp-section">
+      <!-- Site details — always shown -->
+      <div class="pp-section">
         <div class="pp-section-title">Site details and surroundings</div>
         <p v-if="!editMode" class="pp-proposal">{{ selectedProject['Site details and surroundings'] || selectedProject.site_details_and_surroundings || '—' }}</p>
         <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.site_details"
@@ -3162,8 +3162,8 @@ a:hover { text-decoration:underline; }
         <p v-else class="pp-proposal">{{ selectedProject['Site details and surroundings'] || '—' }}</p>
       </div>
 
-      <!-- Issues — shown when present, or in edit mode -->
-      <div v-if="selectedProject['Issues'] || selectedProject.issues || editMode" class="pp-section">
+      <!-- Issues — always shown -->
+      <div class="pp-section">
         <div class="pp-section-title">Issues</div>
         <p v-if="!editMode" class="pp-proposal">{{ selectedProject['Issues'] || selectedProject.issues || '—' }}</p>
         <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.issues"
@@ -5181,7 +5181,7 @@ const app = createApp({
       const p = allProjects.value.find(x => x.project_code === code);
       if (!p || p._textLoaded) return;
       try {
-        const full = await api.call('get_project', { project_code: code }, {});
+        const full = await api.call('get_project', withAuth({ project_code: code }), {});
         if (full) {
           const idx = allProjects.value.findIndex(x => x.project_code === code);
           if (idx >= 0) {
@@ -5195,7 +5195,14 @@ const app = createApp({
             allProjects.value = allProjects.value.slice();
           }
         }
-      } catch (_) { /* silently ignore */ }
+      } catch (e) {
+        // Mark as loaded even on failure so we don't retry; fields will show as '—'
+        const idx = allProjects.value.findIndex(x => x.project_code === code);
+        if (idx >= 0) {
+          allProjects.value[idx] = { ...allProjects.value[idx], _textLoaded: true };
+          allProjects.value = allProjects.value.slice();
+        }
+      }
     }
 
     function expandAllSubs() {
