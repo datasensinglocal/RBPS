@@ -2766,8 +2766,11 @@ a:hover { text-decoration:underline; }
             <button class="ov-tab" :class="{active: ovBudgetToggle==='intervention'}" @click="ovBudgetToggle='intervention'">Intervention</button>
           </div>
         </div>
-        <div style="overflow-y:auto; flex:1; padding:4px 16px 12px;">
-          <svg :width="420" :height="Math.max(ovBudgetBars.length * 38 + 16, 80)" style="display:block; overflow:visible;">
+        <div style="overflow-y:auto; flex:1; padding:4px 16px 12px; overflow-x:hidden;">
+          <svg width="100%"
+               :viewBox="`0 0 400 ${Math.max(ovBudgetBars.length * 38 + 16, 80)}`"
+               :height="Math.max(ovBudgetBars.length * 38 + 16, 80)"
+               style="display:block; overflow:visible;" preserveAspectRatio="none">
             <g v-for="(bar, i) in ovBudgetBars" :key="bar.name" :transform="`translate(0, ${i * 38})`">
               <!-- Label -->
               <text x="0" :y="14" font-size="11" font-family="inherit" fill="#4A4A3A"
@@ -3129,9 +3132,10 @@ a:hover { text-decoration:underline; }
       <!-- Proposal -->
       <div class="pp-section">
         <div class="pp-section-title">Proposal</div>
-        <p v-if="!editMode && selectedProject._textLoaded === false" class="pp-proposal" style="color:var(--muted)">Loading…</p>
+        <p v-if="!editMode && !selectedProject._textLoaded && selectedProject._textLoaded !== undefined" class="pp-proposal" style="color:var(--muted)">Loading…</p>
         <p v-else-if="!editMode" class="pp-proposal">{{ selectedProject.proposal || '—' }}</p>
-        <textarea v-else class="edit-textarea" v-model="draft.proposal" placeholder="Project proposal…"></textarea>
+        <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.proposal" placeholder="Project proposal…"></textarea>
+        <p v-else class="pp-proposal">{{ selectedProject.proposal || '—' }}</p>
         <div v-if="!editMode && selectedProject.address" style="margin-top:20px">
           <div class="pp-grid-lbl" style="margin-bottom:3px">Address</div>
           <div style="font-size:12px;line-height:1.4">{{ selectedProject.address }}</div>
@@ -3153,16 +3157,18 @@ a:hover { text-decoration:underline; }
       <div v-if="selectedProject['Site details and surroundings'] || selectedProject.site_details_and_surroundings || editMode" class="pp-section">
         <div class="pp-section-title">Site details and surroundings</div>
         <p v-if="!editMode" class="pp-proposal">{{ selectedProject['Site details and surroundings'] || selectedProject.site_details_and_surroundings || '—' }}</p>
-        <textarea v-else class="edit-textarea" v-model="draft.site_details"
+        <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.site_details"
                   placeholder="Describe the site details and surroundings…"></textarea>
+        <p v-else class="pp-proposal">{{ selectedProject['Site details and surroundings'] || '—' }}</p>
       </div>
 
       <!-- Issues — shown when present, or in edit mode -->
       <div v-if="selectedProject['Issues'] || selectedProject.issues || editMode" class="pp-section">
         <div class="pp-section-title">Issues</div>
         <p v-if="!editMode" class="pp-proposal">{{ selectedProject['Issues'] || selectedProject.issues || '—' }}</p>
-        <textarea v-else class="edit-textarea" v-model="draft.issues"
+        <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.issues"
                   placeholder="Describe the issues…"></textarea>
+        <p v-else class="pp-proposal">{{ selectedProject['Issues'] || '—' }}</p>
       </div>
 
       <!-- Interventions -->
@@ -5481,7 +5487,7 @@ const app = createApp({
         }
         editMode.value = true;
       } else {
-        saveEdit();
+        cancelEdit();
       }
     }
     function cancelEdit() {
@@ -5505,14 +5511,18 @@ const app = createApp({
       if (!draft.name.trim()) { toast('Project name is required.', 'err'); return; }
       saving.value = true; busy.value = true;
       try {
+        // Nominees can only edit quantity — don't send restricted text fields
+        const isNominee = auth.mode === 'nominee';
         const fields = {
           name:     draft.name.trim(),
           address:  draft.address.trim(),
           length_m: draft.length_m || '',
           area_sqm: draft.area_sqm || '',
-          proposal: draft.proposal.trim(),
-          'Site details and surroundings': draft.site_details.trim(),
-          'Issues': draft.issues.trim(),
+          ...(isNominee ? {} : {
+            proposal: draft.proposal.trim(),
+            'Site details and surroundings': draft.site_details.trim(),
+            'Issues': draft.issues.trim(),
+          }),
         };
         await api.updateProject(withAuth({ project_code: p.project_code, fields }), {});
         // Update local project object so UI reflects saved values immediately
