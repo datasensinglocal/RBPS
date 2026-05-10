@@ -1489,6 +1489,27 @@ a:hover { text-decoration:underline; }
 }
 .ov-expand-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--soft); }
 
+/* ── Budget sort row ── */
+.ov-sort-row {
+  display:flex; align-items:center; gap:24px;
+  padding:0 16px 8px; flex-wrap:wrap;
+  justify-content:flex-end; width:100%;
+}
+.ov-sort-lbl {
+  font-size:10px; color:var(--muted); font-weight:600;
+  letter-spacing:.4px; text-transform:uppercase;
+  margin-right:0;
+}
+.ov-sort-pill {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:600; padding:4px 11px;
+  border-radius:20px; cursor:pointer;
+  border:1.5px solid var(--line); color:var(--muted);
+  background:transparent; transition:all .15s;
+}
+.ov-sort-pill.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+.ov-sort-pill:hover:not(.on) { background:var(--bg); color:var(--ink); }
+
 /* ── Intervention scroll ── */
 .ov-vbar-scroll { overflow-x:auto; overflow-y:visible; }
 .ov-vbar-scroll::-webkit-scrollbar { height:5px; }
@@ -2766,6 +2787,30 @@ a:hover { text-decoration:underline; }
             <button class="ov-tab" :class="{active: ovBudgetToggle==='intervention'}" @click="ovBudgetToggle='intervention'">Intervention</button>
           </div>
         </div>
+        <!-- Sort pills — only in intervention mode -->
+        <div v-if="ovBudgetToggle==='intervention'"
+             style="display:flex; align-items:center; justify-content:flex-end; width:100%; gap:24px; padding:0 0 10px; box-sizing:border-box;">
+          <span style="font-size:10px; color:var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase; white-space:nowrap;">Sort by</span>
+          <button class="ov-sort-pill" :class="{on: ovBudgetSort==='value'}" @click="ovBudgetSort='value'">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="2" y1="4" x2="14" y2="4"/>
+              <line x1="2" y1="8" x2="10" y2="8"/>
+              <line x1="2" y1="12" x2="6" y2="12"/>
+            </svg>
+            Highest value
+          </button>
+          <button class="ov-sort-pill" :class="{on: ovBudgetSort==='sub_category'}" @click="ovBudgetSort='sub_category'">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="4" cy="4" r="2" fill="currentColor" stroke="none"/>
+              <line x1="8" y1="4" x2="14" y2="4"/>
+              <circle cx="4" cy="9" r="2" fill="currentColor" stroke="none"/>
+              <line x1="8" y1="9" x2="14" y2="9"/>
+              <circle cx="4" cy="14" r="2" fill="currentColor" stroke="none"/>
+              <line x1="8" y1="14" x2="14" y2="14"/>
+            </svg>
+            Sub-category
+          </button>
+        </div>
         <div style="overflow-y:auto; flex:1; padding:4px 16px 12px; overflow-x:hidden;">
           <svg width="100%"
                :viewBox="`0 0 400 ${Math.max(ovBudgetBars.length * 38 + 16, 80)}`"
@@ -2773,13 +2818,13 @@ a:hover { text-decoration:underline; }
                style="display:block; overflow:visible;" preserveAspectRatio="none">
             <g v-for="(bar, i) in ovBudgetBars" :key="bar.name" :transform="`translate(0, ${i * 38})`">
               <!-- Label -->
-              <text x="0" :y="14" font-size="11" font-family="inherit" fill="#4A4A3A"
+              <text :x="0" :y="14" font-size="11" font-family="inherit" fill="#4A4A3A"
                     font-weight="600" dominant-baseline="auto"
                     style="text-anchor:start">{{ bar.name }}</text>
               <!-- Bar track (background) -->
               <rect x="0" :y="19" :width="380" height="16" rx="3" fill="#EDE8E0"/>
-              <!-- Bar fill -->
-              <rect x="0" :y="19" :width="Math.max(bar.pct / 100 * 380, 4)" height="16" rx="3" fill="#C6613F"/>
+              <!-- Bar fill — colour per sub-category in intervention mode -->
+              <rect x="0" :y="19" :width="Math.max(bar.pct / 100 * 380, 4)" height="16" rx="3" :fill="bar.color"/>
               <!-- Value label after bar -->
               <text :x="Math.max(bar.pct / 100 * 380, 4) + 8" :y="31"
                     font-size="10.5" font-family="inherit" fill="#7A7060"
@@ -4701,27 +4746,61 @@ const app = createApp({
 
     // Budget Analysis panel — toggle between corporation, zone, intervention
     const ovBudgetToggle = ref('corporation');
+    const ovBudgetSort   = ref('value'); // 'value' | 'sub_category'
+
+    // One distinct colour per sub-category (deterministic order)
+    const SUBCAT_PALETTE = [
+      '#C6613F','#4A6B9B','#4A7B6F','#7B5EA7','#C69B3F',
+      '#6BAA6B','#3A8A5A','#9B6B4A','#A74A6B','#B87800',
+      '#4A8FA7','#8A7060',
+    ];
+
     const ovBudgetBars = computed(() => {
       const field = ovBudgetToggle.value;
 
       if (field === 'intervention') {
-        // Group total intervention cost by intervention name
-        const rows = ovIntvRows();
+        // Aggregate cost per intervention name; track sub-category
+        const rows  = ovIntvRows();
         const totals = {};
-        const fwMap = fwById.value;
+        const subcats = {};
+        const fwMap  = fwById.value;
         for (const r of rows) {
           const fw = fwMap[r.intervention_id];
           if (!fw) continue;
           const key = fw.intervention || 'Other';
-          totals[key] = (totals[key] || 0) + (Number(r.cost) || 0);
+          totals[key]  = (totals[key]  || 0) + (Number(r.cost) || 0);
+          subcats[key] = fw.sub_category || 'Other';
         }
-        const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-        const max = entries[0]?.[1] || 1;
-        return entries.map(([name, value]) => ({
-          name, value,
-          pct: Math.round((value / max) * 100),
-          color: '#C6613F',
-        }));
+
+        // Assign one colour per sub-category (sorted alphabetically for stability)
+        const subcatList = [...new Set(Object.values(subcats))].sort();
+        const subcatColor = {};
+        subcatList.forEach((sc, i) => {
+          subcatColor[sc] = SUBCAT_PALETTE[i % SUBCAT_PALETTE.length];
+        });
+
+        let entries = Object.entries(totals);
+        if (ovBudgetSort.value === 'sub_category') {
+          entries.sort((a, b) => {
+            const scA = subcats[a[0]] || '';
+            const scB = subcats[b[0]] || '';
+            if (scA !== scB) return scA.localeCompare(scB);
+            return b[1] - a[1];   // within same sub-cat → descending value
+          });
+        } else {
+          entries.sort((a, b) => b[1] - a[1]);
+        }
+
+        const max = Math.max(...entries.map(e => e[1]), 1);
+        return entries.map(([name, value]) => {
+          const sc = subcats[name] || 'Other';
+          return {
+            name, value,
+            sub_category: sc,
+            pct:   Math.round((value / max) * 100),
+            color: subcatColor[sc] || '#C6613F',
+          };
+        });
       }
 
       // Corporation / Zone: sum ovProjectTotal per project, grouped by field
@@ -5165,7 +5244,6 @@ const app = createApp({
         selectedCode.value = code;
         // On mobile/small screens also switch to map view so panel is visible
         // stay on projects view so panel is visible
-        prefetchProjectText(code);
       }
     }
     function logout() {
@@ -5727,7 +5805,7 @@ const app = createApp({
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
       ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
-      ovBarToggle, ovBarBars, ovSubcatBars, ovBudgetToggle, ovBudgetBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
+      ovBarToggle, ovBarBars, ovSubcatBars, ovBudgetToggle, ovBudgetSort, ovBudgetBars, ovGridOpen, ovGridGroups, lucideUrl, iconForIntv,
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
       openRateCard, toggleBucket, updateFw, deactivateFw, addFwRow, recomputeAllTotals,
