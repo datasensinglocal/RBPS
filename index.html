@@ -786,6 +786,24 @@ a:hover { text-decoration:underline; }
 }
 .tb-nav button:hover { color:#fff; background:rgba(255,255,255,.08); }
 .tb-nav button.active { color:var(--ink); background:var(--accent); }
+
+/* List toggle — ALL PROJECTS / LIST VIEW */
+.tb-list-toggle {
+  display:flex; align-items:center;
+  background:rgba(255,255,255,.08); border-radius:20px;
+  padding:3px; gap:2px; margin:0 12px;
+}
+.tb-list-mode {
+  padding:4px 13px; border-radius:16px; font-size:11px; font-weight:600;
+  color:rgba(241,236,226,.7); cursor:pointer; transition:all .15s;
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+}
+.tb-list-mode:hover { color:#fff; background:rgba(255,255,255,.1); }
+.tb-list-mode.active { background:var(--accent); color:var(--ink); }
+.tb-list-count {
+  background:rgba(0,0,0,.15); border-radius:10px;
+  padding:1px 6px; font-size:10px; font-weight:700;
+}
 .tb-user { display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:var(--r); background:rgba(255,255,255,.06); font-size:11px; position:relative; min-width:180px; }
 .tb-user .who { color:#fff; font-weight:600; white-space:nowrap; }
 .tb-user .role { color:rgba(241,236,226,.6); font-size:10px; text-transform:uppercase; letter-spacing:.5px; }
@@ -1233,7 +1251,39 @@ a:hover { text-decoration:underline; }
   flex-shrink:0;
 }
 
-/* Panel 1: filters + metrics */
+/* Panel 1: unified top bar */
+.ov-topbar {
+  display:flex; align-items:center;
+  padding:12px 18px; gap:0;
+  flex-wrap:wrap;
+}
+.ov-topbar-filters {
+  display:flex; align-items:center; gap:8px;
+  flex-wrap:wrap; flex:1; min-width:0;
+}
+.ov-topbar-sep {
+  width:1px; height:36px; background:var(--line);
+  margin:0 20px; flex-shrink:0;
+}
+.ov-topbar-stats {
+  display:flex; align-items:center; gap:0; flex-shrink:0;
+}
+.ov-stat {
+  display:flex; flex-direction:column; gap:2px;
+  padding:0 18px; text-align:right;
+}
+.ov-stat:first-child { padding-left:0; }
+.ov-stat-val {
+  font-size:18px; font-weight:800; color:var(--ink); line-height:1;
+  white-space:nowrap;
+}
+.ov-stat-lbl {
+  font-size:10px; text-transform:uppercase; letter-spacing:.6px;
+  color:var(--muted); font-weight:600; white-space:nowrap;
+}
+.ov-stat-divider {
+  width:1px; height:28px; background:var(--line); flex-shrink:0;
+}
 .ov-panel1-wrap {
   display:flex; flex-direction:column;
 }
@@ -2498,6 +2548,16 @@ a:hover { text-decoration:underline; }
     <button :class="{active: view==='ratecard'}" @click="openRateCard">Rate Card</button>
     <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
   </nav>
+
+  <!-- Admin list toggle — sits between nav and user -->
+  <div v-if="auth.mode === 'admin'" class="tb-list-toggle">
+    <button class="tb-list-mode" :class="{active: !activeListName}" @click="clearAdminList()">All projects</button>
+    <button class="tb-list-mode tb-list-pick" :class="{active: !!activeListName}" @click="openAdminLists">
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="11" y2="8"/><line x1="2" y1="12" x2="8" y2="12"/></svg>
+      {{ activeListName || 'List view' }}
+      <span v-if="activeListName" class="tb-list-count">{{ adminListActiveCodes ? adminListActiveCodes.size : '' }}</span>
+    </button>
+  </div>
   <div v-if="auth.mode" class="tb-user">
     <!-- Nominee: clickable name opens project list popup -->
     <button v-if="auth.mode === 'nominee'" class="tb-nominee-btn" @click="nomineePopupOpen = !nomineePopupOpen">
@@ -2511,24 +2571,19 @@ a:hover { text-decoration:underline; }
         <div class="who">
           {{ auth.name }}
           <span style="font-size:18px;vertical-align:middle;margin-left:3px">▾</span>
-          <span style="font-size:12px;font-weight:400;opacity:.75;margin-left:4px">
-            <span class="tb-lists-badge">{{ adminListsLoaded ? adminLists.length : '…' }}</span>
-          </span>
         </div>
       </button>
-      <!-- Active list badge -->
-      <span v-if="activeListName" class="al-active-badge" @click="clearAdminList" title="Clear list filter">
-        📋 {{ activeListName }} ×
-      </span>
-      <!-- My Lists popup — just names, click to apply -->
+      <!-- My Lists popup -->
       <div v-if="adminListsOpen" class="admin-lists-popup">
         <div class="al-popup-hdr">
           <span class="al-title">My Lists</span>
-          <button v-if="activeListName" class="al-new-btn" @click="clearAdminList(); adminListsOpen=false">Clear filter</button>
+          <button class="al-new-btn" @click="openSaveAsListModal(); adminListsOpen=false">
+            + Save current as list
+          </button>
         </div>
         <div class="al-list">
           <div v-if="!adminListsLoaded" style="padding:16px;text-align:center;color:var(--muted);font-size:12px">Loading…</div>
-          <div v-else-if="!adminLists.length" style="padding:16px;text-align:center;color:var(--muted);font-size:12px">No lists yet — use "Save as list" in the Overview page.</div>
+          <div v-else-if="!adminLists.length" style="padding:16px;text-align:center;color:var(--muted);font-size:12px">No lists yet — save a selection to create one.</div>
           <div v-for="list in adminLists" :key="list.list_name"
                class="al-list-item"
                :style="activeListName===list.list_name ? 'background:var(--soft)' : ''"
@@ -2718,57 +2773,54 @@ a:hover { text-decoration:underline; }
 <!-- §4c OVERVIEW PAGE ──────────────────────────────────────────────────── -->
 <div id="overview-page" v-if="view === 'overview'">
 
-  <!-- Panel 1: Filters + Metrics -->
+  <!-- Panel 1: Filters + Metrics (unified bar) -->
   <div class="ov-panel-card ov-panel1-wrap">
-  <div class="ov-filters">
-    <input class="ov-search" v-model="ovQ" placeholder="Search project, code, intervention…" />
-    <select class="ov-select" v-model="ovZone">
-      <option value="">All zones</option>
-      <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
-    </select>
-    <select class="ov-select" v-model="ovConstituency">
-      <option value="">All constituencies</option>
-      <option v-for="c in constituencies" :key="c" :value="c">{{ c }}</option>
-    </select>
-    <select class="ov-select" v-model="ovBucket">
-      <option value="">All budget buckets</option>
-      <option v-for="b in ovBuckets" :key="b" :value="b">{{ b }}</option>
-    </select>
-    <select class="ov-select" v-model="ovImpact">
-      <option value="">All impact types</option>
-      <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
-    </select>
-    <span class="ov-filter-count">{{ ovFiltered.length }} of {{ allProjects.length }} projects</span>
-    <button v-if="auth.mode === 'admin'" class="btn-save-list" @click="openSaveAsListModal" title="Save current selection as a list">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
-      Save as list
-    </button>
-  </div>
+  <div class="ov-topbar">
 
-  <!-- Metrics -->
-  <div class="ov-metrics">
-    <div class="ov-metric">
-      <div class="ov-metric-lbl">Total Budget</div>
-      <div class="ov-metric-val">{{ fmtCost(ovTotalBudget) }}</div>
-      <div class="ov-metric-sub">selected projects</div>
+    <!-- Left: filters -->
+    <div class="ov-topbar-filters">
+      <input class="ov-search" v-model="ovQ" placeholder="Search project, code, intervention…" />
+      <select class="ov-select" v-model="ovZone">
+        <option value="">All zones</option>
+        <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
+      </select>
+      <select class="ov-select" v-model="ovConstituency">
+        <option value="">All constituencies</option>
+        <option v-for="c in constituencies" :key="c" :value="c">{{ c }}</option>
+      </select>
+      <select class="ov-select" v-model="ovBucket">
+        <option value="">All budget buckets</option>
+        <option v-for="b in ovBuckets" :key="b" :value="b">{{ b }}</option>
+      </select>
+      <select class="ov-select" v-model="ovImpact">
+        <option value="">All impact types</option>
+        <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
+      </select>
     </div>
-    <div class="ov-metric">
-      <div class="ov-metric-lbl">Total Projects</div>
-      <div class="ov-metric-val">{{ ovFiltered.length }}</div>
-      <div class="ov-metric-sub">matching filters</div>
-    </div>
-    <div class="ov-metric">
-      <div class="ov-metric-lbl">Funded</div>
-      <div class="ov-metric-val">{{ ovFundedCount }}</div>
-      <div class="ov-metric-sub">with budget range</div>
-    </div>
-    <div class="ov-metric">
-      <div class="ov-metric-lbl">Unfunded</div>
-      <div class="ov-metric-val">{{ ovFiltered.length - ovFundedCount }}</div>
-      <div class="ov-metric-sub">no budget range</div>
-    </div>
-  </div>
 
+    <!-- Vertical separator -->
+    <div class="ov-topbar-sep"></div>
+
+    <!-- Right: stats -->
+    <div class="ov-topbar-stats">
+      <div class="ov-stat">
+        <div class="ov-stat-val">{{ fmtCost(ovTotalBudget) }}</div>
+        <div class="ov-stat-lbl">Total budget</div>
+      </div>
+      <div class="ov-stat-divider"></div>
+      <div class="ov-stat">
+        <div class="ov-stat-val">{{ ovFiltered.length }}</div>
+        <div class="ov-stat-lbl">Projects</div>
+      </div>
+      <div class="ov-stat-divider"></div>
+      <div class="ov-stat">
+        <div class="ov-stat-val">{{ ovFundedCount }}</div>
+        <div class="ov-stat-lbl">With budget</div>
+      </div>
+
+    </div>
+
+  </div>
   </div><!-- /Panel 1 -->
 
   <!-- Panels 2 + 3 row -->
@@ -4247,6 +4299,8 @@ const app = createApp({
           ].join(' ').toLowerCase();
           if (!hay.includes(q)) return false;
         }
+        // List filter — same list applies across map and overview
+        if (adminListActiveCodes.value && !adminListActiveCodes.value.has(p.project_code)) return false;
         return true;
       });
     });
