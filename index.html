@@ -3132,7 +3132,7 @@ a:hover { text-decoration:underline; }
       <!-- Proposal -->
       <div class="pp-section">
         <div class="pp-section-title">Proposal</div>
-        <p v-if="!editMode && !selectedProject._textLoaded && selectedProject._textLoaded !== undefined" class="pp-proposal" style="color:var(--muted)">Loading…</p>
+        <p v-if="!editMode && selectedProject._textLoaded === false" class="pp-proposal" style="color:var(--muted)">Loading…</p>
         <p v-else-if="!editMode" class="pp-proposal">{{ selectedProject.proposal || '—' }}</p>
         <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.proposal" placeholder="Project proposal…"></textarea>
         <p v-else class="pp-proposal">{{ selectedProject.proposal || '—' }}</p>
@@ -4097,7 +4097,7 @@ const app = createApp({
       // ── Step 1: render seed data IMMEDIATELY (< 100ms) ──────────────────
       // The seed is embedded in the HTML so the map and list appear before
       // any network call completes. Users can interact right away.
-      allProjects.value  = SEED_PROJECTS.slice();
+      allProjects.value  = SEED_PROJECTS.map(p => ({ ...p, _textLoaded: false }));
       framework.value    = SEED_FRAMEWORK_NORMALIZED.slice();
       projectIntvs.value = SEED_PROJECT_INTVS.slice();
       typology.value     = SEED_TYPOLOGY || { typologies: [], pairs: [] };
@@ -4123,7 +4123,7 @@ const app = createApp({
         // Merge live data — replace seed values but keep proposals we already have
         // (live bootstrap strips proposals to keep payload small; we load them
         //  on-demand when a project panel opens via loadProjectDetail()).
-        allProjects.value  = data.projects;
+        allProjects.value  = data.projects.map(p => ({ ...p, _textLoaded: false }));
         framework.value    = data.framework;
         // ── SAFE MERGE: never overwrite a quantity that is already > 0 ──
         // If the panel is open and user has edited quantities, wholesale
@@ -5533,12 +5533,12 @@ const app = createApp({
           length_m: fields.length_m, area_sqm: fields.area_sqm,
           proposal: fields.proposal,
         });
-        await api.saveProjectTotal({
+        await api.saveProjectTotal(withAuth({
           project_code: p.project_code,
           total_cost: projectTotal(p.project_code),
           edited_by: auth.name || auth.email,
           timestamp: new Date().toISOString(),
-        }, {});
+        }), {});
         editMode.value = false; toast('Saved', 'ok');
       } catch (e) { toast('Save failed: ' + e.message, 'err'); }
       finally { saving.value = false; busy.value = false; }
