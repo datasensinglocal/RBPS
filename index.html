@@ -5253,6 +5253,8 @@ const app = createApp({
           intervention_id: row.intervention_id,
           quantity: qty,
           cost,
+          edited_by: auth.name || auth.email,
+          timestamp: new Date().toISOString(),
         }), {});
         // Update quantity AND cost locally so the table reflects immediately
         const idx = projectIntvs.value.findIndex(x =>
@@ -5339,6 +5341,8 @@ const app = createApp({
               project_code: p.project_code,
               intervention_id: iv,
               quantity: addModalQtys[iv] ?? 0,
+              edited_by: auth.name || auth.email,
+              timestamp: new Date().toISOString(),
             }), {}));
 
         await Promise.all([...adds, ...removes, ...qtyUpdates]);
@@ -5494,6 +5498,8 @@ const app = createApp({
         await api.saveProjectTotal({
           project_code: p.project_code,
           total_cost: projectTotal(p.project_code),
+          edited_by: auth.name || auth.email,
+          timestamp: new Date().toISOString(),
         }, {});
         editMode.value = false; toast('Saved', 'ok');
       } catch (e) { toast('Save failed: ' + e.message, 'err'); }
