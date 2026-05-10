@@ -2788,10 +2788,6 @@ a:hover { text-decoration:underline; }
         <option value="">All constituencies</option>
         <option v-for="c in constituencies" :key="c" :value="c">{{ c }}</option>
       </select>
-      <select class="ov-select" v-model="ovBucket">
-        <option value="">All budget buckets</option>
-        <option v-for="b in ovBuckets" :key="b" :value="b">{{ b }}</option>
-      </select>
       <select class="ov-select" v-model="ovImpact">
         <option value="">All impact types</option>
         <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
