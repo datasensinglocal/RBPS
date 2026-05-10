@@ -4255,20 +4255,21 @@ const app = createApp({
       if (window._mapCtrl && window._mapCtrl.refresh) window._mapCtrl.refresh();
     });
 
-    // Project totals: read directly from the last column of project_cost sheet.
-    // The sheet total is authoritative — never recalculate from intervention rows.
+    // Project totals: sheet value is authoritative once loaded.
+    // Before bootstrap completes, totals is empty — fall back to summing
+    // cost from SEED projectIntvs so PROJECT TOTAL shows immediately.
     const projectTotalMap = computed(() => {
-      const result = {};
-      // Primary: pre-computed totals from last column of project_cost sheet
+      // Always build a live sum from intervention rows (available from seed data)
+      const liveSum = {};
+      for (const r of projectIntvs.value) {
+        const cost = Number(r.cost) || 0;
+        if (cost > 0) liveSum[r.project_code] = (liveSum[r.project_code] || 0) + cost;
+      }
+      // Overlay with authoritative sheet totals once bootstrap has loaded them
+      const result = { ...liveSum };
       for (const t of totals.value) {
         const v = Number(t.total_cost) || 0;
         if (v > 0) result[t.project_code] = v;
-      }
-      // Fallback only for projects missing from totals: sum their cost column values
-      for (const r of projectIntvs.value) {
-        if (result[r.project_code] !== undefined) continue;
-        const cost = Number(r.cost) || 0;
-        if (cost > 0) result[r.project_code] = (result[r.project_code] || 0) + cost;
       }
       return result;
     });
