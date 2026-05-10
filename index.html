@@ -2637,7 +2637,7 @@ a:hover { text-decoration:underline; }
       </div>
       <div class="acc-body" style="padding:0">
         <div class="pl-list">
-          <div v-for="p in filteredProjects" :key="p.project_code" class="pl-card" :class="{sel: selectedCode===p.project_code}" @click="openProject(p.project_code)">
+          <div v-for="p in filteredProjects" :key="p.project_code" class="pl-card" :class="{sel: selectedCode===p.project_code}" @click="openProject(p.project_code)" @mouseenter="prefetchProjectText(p.project_code)">
             <div class="pl-body">
               <div class="pl-row1">
                 <div class="pl-code">{{ p.project_code }}</div>
@@ -5158,11 +5158,41 @@ const app = createApp({
     }
 
     // ───────── Selecting / opening / editing projects ─────────
+    // Prefetch text fields on hover so they're ready when panel opens
+    async function prefetchProjectText(code) {
+      if (!USE_LIVE_API) return;
+      const p = allProjects.value.find(x => x.project_code === code);
+      if (!p || p._textLoaded) return;
+      try {
+        const full = await api.call('get_project', { project_code: code }, {});
+        if (full) {
+          const idx = allProjects.value.findIndex(x => x.project_code === code);
+          if (idx >= 0) {
+            allProjects.value[idx] = {
+              ...allProjects.value[idx],
+              _textLoaded:                       true,
+              proposal:                          full.proposal || '',
+              'Site details and surroundings':   full.site_details_and_surroundings || full['Site details and surroundings'] || '',
+              'Issues':                          full.issues || full['Issues'] || '',
+            };
+            allProjects.value = allProjects.value.slice();
+          }
+        }
+      } catch (_) { /* silently ignore */ }
+    }
+
     async function openProject(code) {
       selectedCode.value = code; galleryIdx.value = 0; editMode.value = false;
+      // Open all categories and sub-categories by default
       openCats.clear();
       openSubs.clear();
-      // Categories start closed — user drills down
+      await Vue.nextTick();
+      for (const cat of groupedInterventions.value) {
+        openCats.add(cat.name);
+        for (const sub of cat.subs) {
+          openSubs.add(cat.name + '§' + sub.name);
+        }
+      }
       try { mapCtrl.flyTo(code); } catch(e) { /* map not ready or not visible */ }
       // Preload all gallery images for this project immediately
       const p = allProjects.value.find(x => x.project_code === code);
@@ -5182,29 +5212,8 @@ const app = createApp({
           }, 1500);
         }
       }
-
-      // Fetch full project text fields (stripped from bootstrap to keep payload small)
-      if (USE_LIVE_API) {
-        const p = allProjects.value.find(x => x.project_code === code);
-        if (p && !p._textLoaded) {
-          try {
-            const full = await api.call('get_project', { project_code: code }, {});
-            if (full) {
-              const idx = allProjects.value.findIndex(x => x.project_code === code);
-              if (idx >= 0) {
-                allProjects.value[idx] = {
-                  ...allProjects.value[idx],
-                  _textLoaded:                       true,
-                  proposal:                          full.proposal || '',
-                  'Site details and surroundings':   full.site_details_and_surroundings || full['Site details and surroundings'] || '',
-                  'Issues':                          full.issues || full['Issues'] || '',
-                };
-                allProjects.value = allProjects.value.slice();
-              }
-            }
-          } catch (_) { /* silently ignore */ }
-        }
-      }
+      // Fetch text if not already prefetched on hover
+      prefetchProjectText(code);
     }
     function closeProject() {
       if (editMode.value && hasDraftChanges()) {
@@ -5663,7 +5672,7 @@ const app = createApp({
       isAdmin, rateCardBuckets, mapLegend,
       // methods
       toggleZone, toggleSiteType, toggleBudgetFilter,
-      openProject, closeProject, toggleCat, toggleSub, isCatOpen, isSubOpen, anyCatSubOpen, anyCatOpenAndSubOpen,
+      openProject, closeProject, prefetchProjectText, toggleCat, toggleSub, isCatOpen, isSubOpen, anyCatSubOpen, anyCatOpenAndSubOpen,
       toggleEdit, cancelEdit, saveEdit,
       setQty, addIntervention, removeIntervention,
       openAddModal, closeAddModal, toggleAddModalIntv, saveAddModal,
