@@ -787,6 +787,29 @@ a:hover { text-decoration:underline; }
 .tb-nav button:hover { color:#fff; background:rgba(255,255,255,.08); }
 .tb-nav button.active { color:var(--ink); background:var(--accent); }
 
+/* ── Loading progress bar ── */
+.tb-load-bar {
+  position:absolute; top:0; left:0; right:0;
+  height:100%; display:flex; align-items:center;
+  justify-content:center; gap:14px; pointer-events:none;
+  z-index:10;
+}
+.tb-load-track {
+  width:220px; height:4px; background:rgba(255,255,255,.15);
+  border-radius:4px; overflow:hidden;
+}
+.tb-load-fill {
+  height:100%; border-radius:4px;
+  background:var(--accent);
+  transition:width .4s cubic-bezier(.4,0,.2,1);
+}
+.tb-load-label {
+  font-size:11px; font-weight:600; color:rgba(241,236,226,.75);
+  letter-spacing:.3px; white-space:nowrap;
+}
+.tb-load-fade-leave-active { transition:opacity .5s ease; }
+.tb-load-fade-leave-to     { opacity:0; }
+
 /* List toggle — ALL PROJECTS / LIST VIEW */
 .tb-list-toggle {
   display:flex; align-items:center;
@@ -2575,6 +2598,15 @@ a:hover { text-decoration:underline; }
 
 <!-- §2 TOPBAR ─────────────────────────────────────────────────────────── -->
 <header id="topbar">
+  <!-- Loading progress bar — shown until loadDone -->
+  <transition name="tb-load-fade">
+    <div v-if="!loadDone" class="tb-load-bar">
+      <div class="tb-load-track">
+        <div class="tb-load-fill" :style="{width: loadPct + '%'}"></div>
+      </div>
+      <span class="tb-load-label">{{ loadStage }}</span>
+    </div>
+  </transition>
   <div class="tb-brand">BLR <em>Public Space</em> Revival</div>
   <div class="tb-spacer"></div>
   <nav class="tb-nav">
@@ -4288,6 +4320,11 @@ const app = createApp({
 
     const toasts = ref([]);
     const busy = ref(false);
+
+    // ── Loading progress bar ──────────────────────────────────────────────
+    const loadStage  = ref('');   // current stage label
+    const loadPct    = ref(0);    // 0-100
+    const loadDone   = ref(false);
     let toastId = 0;
     function toast(msg, kind='') {
       const id = ++toastId; toasts.value.push({ id, msg, kind });
@@ -4296,18 +4333,20 @@ const app = createApp({
 
     // ───────── Bootstrap ─────────
     onMounted(async () => {
-      // ── Step 1: render seed data IMMEDIATELY (< 100ms) ──────────────────
-      // The seed is embedded in the HTML so the map and list appear before
-      // any network call completes. Users can interact right away.
+      // ── Step 1: seed data immediately ────────────────────────────────────
+      loadStage.value = 'Loading project information…';
+      loadPct.value   = 10;
       allProjects.value  = SEED_PROJECTS.map(p => ({ ...p, _textLoaded: false }));
       framework.value    = SEED_FRAMEWORK_NORMALIZED.slice();
       projectIntvs.value = SEED_PROJECT_INTVS.slice();
       typology.value     = SEED_TYPOLOGY || { typologies: [], pairs: [] };
       siteTypeMap.value  = SEED_SITE_TYPE_MAP || { typologies: [], site_type_to_typology: {} };
       busy.value         = false;
-      initMap();   // map renders with seed data immediately
 
-      // Close nominee popup when clicking outside the tb-user area
+      loadStage.value = 'Loading map…';
+      loadPct.value   = 30;
+      initMap();
+
       document.addEventListener('click', (e) => {
         if (!e.target.closest('.tb-user')) { nomineePopupOpen.value = false; adminListsOpen.value = false; }
         if (!e.target.closest('.tb-list-toggle')) { listPickerOpen.value = false; }
@@ -4315,28 +4354,26 @@ const app = createApp({
       });
 
       if (!USE_LIVE_API) {
+        loadPct.value  = 100;
+        loadDone.value = true;
         toast('Mock mode — edits are local.', '');
         return;
       }
 
-      // ── Step 2: silently sync with live sheet in background ──────────────
-      // Show a subtle "syncing" indicator rather than blocking the whole UI.
+      // ── Step 2: live sync ─────────────────────────────────────────────────
+      loadStage.value = 'Syncing live data…';
+      loadPct.value   = 50;
       try {
         const data = await api.bootstrap();
-        // Merge live data — replace seed values but keep proposals we already have
-        // (live bootstrap strips proposals to keep payload small; we load them
-        //  on-demand when a project panel opens via loadProjectDetail()).
+
+        loadStage.value = 'Loading budget & interventions…';
+        loadPct.value   = 75;
+
         allProjects.value  = data.projects.map(p => ({ ...p, _textLoaded: false }));
         framework.value    = data.framework;
-        // ── SAFE MERGE: never overwrite a quantity that is already > 0 ──
-        // If the panel is open and user has edited quantities, wholesale
-        // replacement wiped them. Instead: build a lookup of existing
-        // non-zero quantities, then merge incoming rows, keeping non-zero ones.
         const existingQtyMap = new Map();
         projectIntvs.value.forEach(r => {
-          if (r.quantity > 0) {
-            existingQtyMap.set(r.project_code + '|' + r.intervention_id, r);
-          }
+          if (r.quantity > 0) existingQtyMap.set(r.project_code + '|' + r.intervention_id, r);
         });
         const merged = (data.projectIntvs || []).map(r => {
           const key = r.project_code + '|' + r.intervention_id;
@@ -4344,14 +4381,25 @@ const app = createApp({
           return existing ? { ...r, quantity: existing.quantity, cost: existing.cost } : r;
         });
         projectIntvs.value = merged;
-        // ──────────────────────────────────────────────────────────────────
         totals.value       = data.totals || [];
         typology.value     = data.typology || { typologies: [], pairs: [] };
         siteTypeMap.value  = data.siteTypeMap || SEED_SITE_TYPE_MAP || { typologies: [], site_type_to_typology: {} };
-        // Refresh map markers in case live data has different projects
+
+        loadStage.value = 'Refreshing map…';
+        loadPct.value   = 90;
         if (window._mapCtrl && window._mapCtrl.refresh) window._mapCtrl.refresh();
+
+        await new Promise(r => setTimeout(r, 300));
+        loadStage.value = 'Ready';
+        loadPct.value   = 100;
+        await new Promise(r => setTimeout(r, 700));
+        loadDone.value  = true;
+
       } catch (e) {
-        // Live sync failed — seed data is still showing, app is still usable
+        loadStage.value = 'Using cached data';
+        loadPct.value   = 100;
+        await new Promise(r => setTimeout(r, 800));
+        loadDone.value  = true;
         toast('Live sync failed — showing cached data. ' + e.message, 'err');
       }
     });
@@ -6011,7 +6059,7 @@ const app = createApp({
       addModalOpen, addModalSelected, addModalQtys, setModalQty, colorMode, activeLegendFilter,
       rateCardOpen, rcSearch, openBuckets,
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
-      auth, toasts, busy, siteTypeMap,
+      auth, toasts, busy, loadStage, loadPct, loadDone, siteTypeMap,
       // computed
       zones, constituencies, budgetRanges, siteTypeOptions,
       filteredProjects, totalBudget, bucketBreakdown,
