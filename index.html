@@ -3885,7 +3885,7 @@ const api = (() => {
       const timer = setTimeout(() => {
         cleanup();
         reject(new Error('Request timed out (' + action + ')'));
-      }, 45000);
+      }, 30000);
       window[cbName] = (data) => {
         clearTimeout(timer);
         cleanup();
@@ -4211,8 +4211,9 @@ const app = createApp({
 
       // ── Step 2: silently sync with live sheet in background ──────────────
       // Show a subtle "syncing" indicator rather than blocking the whole UI.
-      try {
-        const data = await api.bootstrap();
+      const tryBootstrap = async (attempt) => {
+        try {
+          const data = await api.bootstrap();
         // Merge live data — replace seed values but keep proposals we already have
         // (live bootstrap strips proposals to keep payload small; we load them
         //  on-demand when a project panel opens via loadProjectDetail()).
@@ -4241,9 +4242,18 @@ const app = createApp({
         // Refresh map markers in case live data has different projects
         if (window._mapCtrl && window._mapCtrl.refresh) window._mapCtrl.refresh();
       } catch (e) {
+        // Retry once after 4 seconds on first failure (handles cold-start)
+        if (attempt === 0) {
+          await new Promise(r => setTimeout(r, 4000));
+          return tryBootstrap(1);
+        }
         // Live sync failed — seed data is still showing, app is still usable
-        toast('Live sync failed — showing cached data. ' + e.message, 'err');
+        const msg = e.message || String(e);
+        const hint = msg.includes('Script load') ? 'Network blocked or script URL unreachable.' : msg;
+        toast('Live sync failed — showing cached data. ' + hint, 'err');
       }
+      };
+      tryBootstrap(0);
     });
 
     // ───────── Computed: filters ─────────
@@ -5915,21 +5925,6 @@ function _initMap() {
     updateMarkers();
   };
 
-  // Patch updateMarkers to apply highlight dimming
-  // We'll store original and wrap it
-  const _origUpdateMarkers = updateMarkers;
-  function updateMarkers() {
-    _origUpdateMarkers && _origUpdateMarkers();
-    if (!_highlightSet) return;
-    // After markers are drawn, dim non-matching ones
-    Object.entries(markerLayer._layers || {}).forEach(([, layer]) => {
-      const el = layer.getElement && layer.getElement();
-      if (!el) return;
-      const code = el.dataset && el.dataset.code;
-      if (code) el.style.opacity = _highlightSet.has(code) ? '1' : '0.15';
-    });
-  }
-
   function boot() {
     map = L.map('map', {
       center: [12.9716, 77.5946],   // Bengaluru
@@ -6001,6 +5996,15 @@ function _initMap() {
     }
     // Re-apply selected state (DOM was wiped above)
     if (lastSelectedCode) setSelected(lastSelectedCode);
+    // Apply highlight dimming if active
+    if (_highlightSet) {
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.mp-pin').forEach(el => {
+          const code = el.dataset && el.dataset.code;
+          if (code) el.style.opacity = _highlightSet.has(code) ? '1' : '0.15';
+        });
+      });
+    }
   }
 
   /** Highlight the pin for a given code, clear previous selection. */
