@@ -1297,7 +1297,7 @@ a:hover { text-decoration:underline; }
   position:fixed; top:var(--tb-h); left:0; right:0; bottom:0;
   background:#F5F2EE; z-index:260;
   display:flex; flex-direction:column;
-  overflow-y:auto; padding:16px; gap:14px;
+  overflow:hidden; padding:16px; gap:14px;
   box-sizing:border-box;
 }
 /* Panel cards — shared style */
@@ -1307,6 +1307,12 @@ a:hover { text-decoration:underline; }
   border:1px solid var(--line);
   overflow:hidden;
   flex-shrink:0;
+}
+
+/* The left and right panels stretch to fill available height */
+.ov-left > .ov-panel-card,
+.ov-right > .ov-panel-card {
+  flex:1; min-height:0; overflow:hidden;
 }
 
 /* Panel 1: unified top bar */
@@ -1512,14 +1518,14 @@ a:hover { text-decoration:underline; }
 .ov-metric-sub { font-size:10.5px; color:var(--muted); }
 /* Panels 2+3 row */
 .ov-body {
-  display:flex; gap:14px; align-items:flex-start;
-  min-height:0;
+  display:flex; gap:14px; align-items:stretch;
+  flex:1; min-height:0;
 }
 /* Panel 2: charts (left) */
 .ov-left {
   width:480px; flex-shrink:0;
   display:flex; flex-direction:column;
-  max-height:calc(100vh - 224px);
+  min-height:0;
   overflow-y:auto;
   overflow-x:visible;
 }
@@ -1527,7 +1533,7 @@ a:hover { text-decoration:underline; }
 .ov-right {
   flex:1; min-width:0;
   display:flex; flex-direction:column;
-  max-height:calc(100vh - 224px);
+  min-height:0;
   overflow:hidden;
 }
 
@@ -1541,15 +1547,13 @@ a:hover { text-decoration:underline; }
     flex-direction:column;
     align-items:stretch;
     overflow:visible;
-    height:auto;
+    height:auto; flex:none;
   }
   .ov-left {
     width:100%;
-    max-height:none;
     overflow-y:visible;
   }
   .ov-right {
-    max-height:none;
     overflow:visible;
     min-height:400px;
   }
@@ -5493,9 +5497,6 @@ const app = createApp({
     function applyAdminList(list) {
       adminListsOpen.value = false;
       activeListName.value = list.list_name;
-      // Switch to overview and filter to list projects
-      view.value = 'overview';
-      // We'll use a computed to filter — store the active codes
       adminListActiveCodes.value = new Set(list.project_codes);
     }
 
