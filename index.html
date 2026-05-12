@@ -2317,6 +2317,20 @@ a:hover { text-decoration:underline; }
   border-right:1px solid #E0E0E0;
 }
 .iv-cost-cell {
+  display:flex; align-items:center; gap:5px; justify-content:flex-end;
+}
+.iv-cost-pending {
+  opacity:.45; color:var(--muted);
+  transition:opacity .2s;
+}
+.iv-cost-spinner {
+  flex-shrink:0; color:var(--muted);
+  animation: iv-spin 1s linear infinite;
+}
+@keyframes iv-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
   text-align:right;
   padding:6px 12px;
   font-size:11px;
@@ -3464,7 +3478,7 @@ a:hover { text-decoration:underline; }
         <div class="pp-section-title">Proposal</div>
         <p v-if="!editMode && selectedProject._textLoaded === false" class="pp-proposal" style="color:var(--muted)">Loading…</p>
         <p v-else-if="!editMode" class="pp-proposal">{{ selectedProject.proposal || '—' }}</p>
-        <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.proposal" placeholder="Project proposal…"></textarea>
+        <textarea v-else-if="editMode" class="edit-textarea" v-model="draft.proposal" placeholder="Project proposal…"></textarea>
         <p v-else class="pp-proposal">{{ selectedProject.proposal || '—' }}</p>
         <div v-if="!editMode && selectedProject.address" style="margin-top:20px">
           <div class="pp-grid-lbl" style="margin-bottom:3px">Address</div>
@@ -3487,7 +3501,7 @@ a:hover { text-decoration:underline; }
       <div class="pp-section">
         <div class="pp-section-title">Site details and surroundings</div>
         <p v-if="!editMode" class="pp-proposal">{{ selectedProject['Site details and surroundings'] || selectedProject.site_details_and_surroundings || '—' }}</p>
-        <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.site_details"
+        <textarea v-else-if="editMode" class="edit-textarea" v-model="draft.site_details"
                   placeholder="Describe the site details and surroundings…"></textarea>
         <p v-else class="pp-proposal">{{ selectedProject['Site details and surroundings'] || '—' }}</p>
       </div>
@@ -3496,7 +3510,7 @@ a:hover { text-decoration:underline; }
       <div class="pp-section">
         <div class="pp-section-title">Issues</div>
         <p v-if="!editMode" class="pp-proposal">{{ selectedProject['Issues'] || selectedProject.issues || '—' }}</p>
-        <textarea v-else-if="auth.mode !== 'nominee'" class="edit-textarea" v-model="draft.issues"
+        <textarea v-else-if="editMode" class="edit-textarea" v-model="draft.issues"
                   placeholder="Describe the issues…"></textarea>
         <p v-else class="pp-proposal">{{ selectedProject['Issues'] || '—' }}</p>
       </div>
@@ -3577,8 +3591,18 @@ a:hover { text-decoration:underline; }
                              @keydown.enter.prevent="$event.target.blur()" />
                     </div>
 
-                    <!-- Cost — always visible, live-updates when qty changes -->
-                    <div class="iv-cost-cell">{{ fmtCost(row.cost) }}</div>
+                    <!-- Cost — frozen while pending save, updates only on server confirm -->
+                    <div class="iv-cost-cell"
+                         :class="{
+                           'iv-cost-pending': pendingQtyRows.has(row.project_code + '|' + row.intervention_id)
+                         }">
+                      <span>{{ fmtCost(row.cost) }}</span>
+                      <svg v-if="pendingQtyRows.has(row.project_code + '|' + row.intervention_id)"
+                           class="iv-cost-spinner" width="10" height="10" viewBox="0 0 10 10">
+                        <circle cx="5" cy="5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.5"
+                                stroke-dasharray="6 16" stroke-linecap="round"/>
+                      </svg>
+                    </div>
 
                     <!-- Remove button -->
                     <div v-if="editMode" class="iv-remove-cell">
@@ -4402,6 +4426,7 @@ const app = createApp({
     const addModalSelected = ref(new Set());         // staging set of intervention_ids the user has ticked
     const addModalQtys = reactive({});               // intervention_id → quantity (staging)
     const saving = ref(false);
+    const pendingQtyRows = ref(new Set()); // keys: "project_code|intervention_id"
 
     const rateCardOpen = ref(false);
     const rcSearch = ref('');
@@ -5759,9 +5784,15 @@ const app = createApp({
       if (!isFinite(qty) || qty < 0) {
         toast('Quantity must be 0 or greater.', 'err'); return;
       }
-      // Calculate cost on the fly: quantity × rate from framework
       const rate = Number(fwById.value[row.intervention_id]?.rate) || 0;
       const cost = qty * rate;
+
+      // Mark this row as pending — cost cell freezes until confirmed
+      const key = row.project_code + '|' + row.intervention_id;
+      const next = new Set(pendingQtyRows.value);
+      next.add(key);
+      pendingQtyRows.value = next;
+
       try {
         await api.updateProjectIntv(withAuth({
           project_code: row.project_code,
@@ -5771,7 +5802,8 @@ const app = createApp({
           edited_by: auth.name || auth.email,
           timestamp: new Date().toISOString(),
         }), {});
-        // Update quantity AND cost locally so the table reflects immediately
+
+        // Only update local state AFTER confirmed by server
         const idx = projectIntvs.value.findIndex(x =>
           x.project_code===row.project_code && x.intervention_id===row.intervention_id);
         if (idx >= 0) {
@@ -5779,7 +5811,14 @@ const app = createApp({
           projectIntvs.value = projectIntvs.value.slice();
         }
         toast('Quantity saved.', 'ok');
-      } catch (e) { toast('Update failed: ' + e.message, 'err'); }
+      } catch (e) {
+        toast('Update failed: ' + e.message, 'err');
+      } finally {
+        // Unfreeze the cost cell regardless of outcome
+        const done = new Set(pendingQtyRows.value);
+        done.delete(key);
+        pendingQtyRows.value = done;
+      }
     }
 
     /**
@@ -5992,18 +6031,16 @@ const app = createApp({
       if (!draft.name.trim()) { toast('Project name is required.', 'err'); return; }
       saving.value = true; busy.value = true;
       try {
-        // Nominees can only edit quantity — don't send restricted text fields
-        const isNominee = auth.mode === 'nominee';
+        // Both nominees and admins can edit all project text fields.
+        // Nominees are already restricted to their own projects by the auth guard.
         const fields = {
           name:     draft.name.trim(),
           address:  draft.address.trim(),
           length_m: draft.length_m || '',
           area_sqm: draft.area_sqm || '',
-          ...(isNominee ? {} : {
-            proposal: draft.proposal.trim(),
-            'Site details and surroundings': draft.site_details.trim(),
-            'Issues': draft.issues.trim(),
-          }),
+          proposal: draft.proposal.trim(),
+          'Site details and surroundings': draft.site_details.trim(),
+          'Issues': draft.issues.trim(),
         };
         await api.updateProject(withAuth({ project_code: p.project_code, fields }), {});
         // Update local project object so UI reflects saved values immediately
@@ -6184,7 +6221,7 @@ const app = createApp({
       toggleZone, toggleSiteType, toggleBudgetFilter,
       openProject, closeProject, prefetchProjectText, expandAllSubs, toggleCat, toggleSub, isCatOpen, isSubOpen, anyCatSubOpen, anyCatOpenAndSubOpen,
       toggleEdit, cancelEdit, saveEdit,
-      setQty, addIntervention, removeIntervention,
+      setQty, addIntervention, removeIntervention, pendingQtyRows,
       openAddModal, closeAddModal, toggleAddModalIntv, saveAddModal,
       openLogin, doNomineeLogin, doAdminLogin, logout, nomineePopupOpen, openNomineeProject,
       adminListsOpen, adminLists, adminListsLoaded, activeListName, adminListActiveCodes,
