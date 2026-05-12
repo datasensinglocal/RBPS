@@ -787,28 +787,48 @@ a:hover { text-decoration:underline; }
 .tb-nav button:hover { color:#fff; background:rgba(255,255,255,.08); }
 .tb-nav button.active { color:var(--ink); background:var(--accent); }
 
-/* ── Loading progress bar ── */
-.tb-load-bar {
-  position:absolute; top:0; left:0; right:0;
-  height:100%; display:flex; align-items:center;
-  justify-content:center; gap:14px; pointer-events:none;
-  z-index:10;
+/* ── Unified load/refresh indicator ── */
+.tb-sync {
+  display:flex; align-items:center; gap:10px;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none;
 }
-.tb-load-track {
-  width:220px; height:4px; background:rgba(255,255,255,.15);
+.tb-sync.clickable { pointer-events:all; cursor:pointer; }
+.tb-sync-track {
+  width:140px; height:3px; background:rgba(255,255,255,.15);
   border-radius:4px; overflow:hidden;
 }
-.tb-load-fill {
-  height:100%; border-radius:4px;
-  background:var(--accent);
+.tb-sync-fill {
+  height:100%; border-radius:4px; background:var(--accent);
   transition:width .4s cubic-bezier(.4,0,.2,1);
 }
-.tb-load-label {
-  font-size:11px; font-weight:600; color:rgba(241,236,226,.75);
+.tb-sync-label {
+  font-size:11px; font-weight:600; color:rgba(241,236,226,.7);
   letter-spacing:.3px; white-space:nowrap;
 }
-.tb-load-fade-leave-active { transition:opacity .5s ease; }
-.tb-load-fade-leave-to     { opacity:0; }
+.tb-sync-pct {
+  font-size:11px; font-weight:700; color:rgba(241,236,226,.6);
+  white-space:nowrap; min-width:30px; text-align:right;
+}
+/* After load: just the refresh icon */
+.tb-sync-icon {
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(255,255,255,.07); color:rgba(241,236,226,.7);
+  transition:background .15s, color .15s;
+}
+.tb-sync.clickable:hover .tb-sync-icon {
+  background:rgba(255,255,255,.15); color:#fff;
+}
+.tb-sync-icon.spinning svg {
+  animation: tb-spin .7s linear infinite;
+}
+@keyframes tb-spin {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+.tb-sync-fade-enter-active, .tb-sync-fade-leave-active { transition:opacity .35s; }
+.tb-sync-fade-enter-from, .tb-sync-fade-leave-to { opacity:0; }
 
 /* List toggle — ALL PROJECTS / LIST VIEW */
 .tb-list-toggle {
@@ -2690,13 +2710,28 @@ a:hover { text-decoration:underline; }
 
 <!-- §2 TOPBAR ─────────────────────────────────────────────────────────── -->
 <header id="topbar">
-  <!-- Loading progress bar — shown until loadDone -->
-  <transition name="tb-load-fade">
-    <div v-if="!loadDone" class="tb-load-bar">
-      <div class="tb-load-track">
-        <div class="tb-load-fill" :style="{width: loadPct + '%'}"></div>
+  <!-- Unified sync indicator: progress on load, refresh icon after -->
+  <transition name="tb-sync-fade" mode="out-in">
+    <!-- Loading / refreshing: progress bar + label + % -->
+    <div v-if="!loadDone || refreshing" key="progress" class="tb-sync">
+      <span class="tb-sync-label">{{ loadStage }}</span>
+      <div class="tb-sync-track">
+        <div class="tb-sync-fill" :style="{width: loadPct + '%'}"></div>
       </div>
-      <span class="tb-load-label">{{ loadStage }}</span>
+      <span class="tb-sync-pct">{{ loadPct }}%</span>
+    </div>
+    <!-- Idle (admin only): just the refresh icon -->
+    <div v-else-if="auth.mode === 'admin'" key="idle"
+         class="tb-sync clickable" @click="refreshData" title="Refresh data from Sheets">
+      <div class="tb-sync-icon" :class="{spinning: refreshing}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 2v6h-6"/>
+          <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+          <path d="M3 22v-6h6"/>
+          <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+        </svg>
+      </div>
     </div>
   </transition>
   <div class="tb-brand">BLR <em>Public Space</em> Revival</div>
@@ -2743,6 +2778,7 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
   </div>
+
   <div v-if="auth.mode" class="tb-user">
     <!-- Nominee: clickable name opens project list popup -->
     <button v-if="auth.mode === 'nominee'" class="tb-nominee-btn" @click="nomineePopupOpen = !nomineePopupOpen">
@@ -5646,6 +5682,55 @@ const app = createApp({
     }
 
     const adminListActiveCodes = ref(null); // Set of project codes or null
+    const refreshing = ref(false);
+
+    async function refreshData() {
+      if (refreshing.value) return;
+      refreshing.value = true;
+      loadDone.value   = false;
+      loadStage.value  = 'Syncing live data…';
+      loadPct.value    = 20;
+      try {
+        const data = await api.bootstrap();
+
+        loadStage.value = 'Loading budget & interventions…';
+        loadPct.value   = 65;
+
+        allProjects.value  = data.projects.map(p => ({ ...p, _textLoaded: false }));
+        framework.value    = data.framework;
+        const existingQtyMap = new Map();
+        projectIntvs.value.forEach(r => {
+          if (r.quantity > 0) existingQtyMap.set(r.project_code + '|' + r.intervention_id, r);
+        });
+        const merged = (data.projectIntvs || []).map(r => {
+          const key = r.project_code + '|' + r.intervention_id;
+          const existing = existingQtyMap.get(key);
+          return existing ? { ...r, quantity: existing.quantity, cost: existing.cost } : r;
+        });
+        projectIntvs.value = merged;
+        totals.value       = data.totals || [];
+        typology.value     = data.typology || { typologies: [], pairs: [] };
+        siteTypeMap.value  = data.siteTypeMap || SEED_SITE_TYPE_MAP || { typologies: [], site_type_to_typology: {} };
+
+        loadStage.value = 'Refreshing map…';
+        loadPct.value   = 90;
+        if (window._mapCtrl && window._mapCtrl.refresh) window._mapCtrl.refresh();
+
+        await new Promise(r => setTimeout(r, 300));
+        loadStage.value = 'Ready';
+        loadPct.value   = 100;
+        await new Promise(r => setTimeout(r, 600));
+        toast('Data refreshed.', 'ok');
+      } catch (e) {
+        loadStage.value = 'Refresh failed';
+        loadPct.value   = 100;
+        await new Promise(r => setTimeout(r, 800));
+        toast('Refresh failed: ' + e.message, 'err');
+      } finally {
+        loadDone.value   = true;
+        refreshing.value = false;
+      }
+    }
 
     // Computed: projects filtered for list modal search
     const listModalProjects = computed(() => {
@@ -6227,7 +6312,7 @@ const app = createApp({
       openLogin, doNomineeLogin, doAdminLogin, logout, nomineePopupOpen, openNomineeProject,
       adminListsOpen, adminLists, adminListsLoaded, activeListName, adminListActiveCodes,
       openAdminLists, applyAdminList, clearAdminList, openNewList, openEditList, deleteAdminList,
-      listPickerOpen,
+      listPickerOpen, refreshing, refreshData,
       listModalOpen, listModalName, listModalOrigName, listModalSelected, listModalSearch,
       withAuth, openSaveAsListModal, saveListModalOpen, saveListPendingCodes, saveListNewName, saveListSaving,
       saveToExistingList, saveAsNewList, debugAdminListSave, panelListDropdownOpen, togglePanelListDropdown,
