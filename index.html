@@ -2931,8 +2931,51 @@ a:hover { text-decoration:underline; }
 
   .tb-brand .tb-sub { display:none; }
 }
-</style>
-</head>
+
+/* ── Hamburger menu ── */
+.tb-hamburger {
+  display:none;
+  flex-direction:column; justify-content:center; gap:5px;
+  width:34px; height:34px; padding:6px; cursor:pointer;
+  border-radius:6px; background:none; flex-shrink:0;
+  transition:background .15s;
+}
+.tb-hamburger:hover { background:rgba(255,255,255,.1); }
+.tb-hamburger span {
+  display:block; height:2px; border-radius:2px;
+  background:rgba(241,236,226,.85);
+  transition:all .2s;
+}
+.tb-hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+.tb-hamburger.open span:nth-child(2) { opacity:0; }
+.tb-hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+/* Dropdown nav for narrow screens */
+.tb-nav-dropdown {
+  display:none;
+  position:fixed;
+  top:var(--tb-h); right:0; left:0;
+  background:var(--forest);
+  border-top:1px solid rgba(255,255,255,.08);
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+  z-index:250;
+  flex-direction:column;
+  padding:8px 0;
+}
+.tb-nav-dropdown.open { display:flex; }
+.tb-nav-dropdown button {
+  display:block; width:100%; text-align:left;
+  padding:12px 20px; font-size:14px; font-weight:600;
+  color:rgba(241,236,226,.8); background:none; border:none; cursor:pointer;
+  transition:background .12s, color .12s;
+}
+.tb-nav-dropdown button:hover,
+.tb-nav-dropdown button.active { color:#fff; background:rgba(255,255,255,.08); }
+
+@media (max-width: 860px) {
+  .tb-nav { display:none; }
+  .tb-hamburger { display:flex; }
+}
 <body>
 
 <div id="app" v-cloak>
@@ -2971,6 +3014,22 @@ a:hover { text-decoration:underline; }
       + {{ auth.mode==='funder' ? 'Fund Projects' : 'Add / Fund a Project' }}
     </button>
   </nav>
+
+  <!-- Hamburger — visible only on narrow screens -->
+  <button class="tb-hamburger" :class="{open: menuOpen}" @click="menuOpen=!menuOpen" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Dropdown nav for narrow screens -->
+  <div class="tb-nav-dropdown" :class="{open: menuOpen}" @click="menuOpen=false">
+    <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
+    <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
+    <button @click="openRateCard">Rate Card</button>
+    <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
+    <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : auth.mode==='funder' ? null : openAuthModal('')">
+      + {{ auth.mode==='funder' ? 'Fund Projects' : 'Add / Fund a Project' }}
+    </button>
+  </div>
 
   <!-- Admin list toggle — sits between nav and user -->
   <div v-if="auth.mode === 'admin'" class="tb-list-toggle" style="position:relative">
@@ -5057,6 +5116,7 @@ const app = createApp({
     const rateCardOpen = ref(false);
     const rcSearch = ref('');
     const openBuckets = reactive(new Set());
+    const menuOpen = ref(false);
 
     const loginOpen = ref(false);
     const loginMode = ref('nominee');
@@ -5414,6 +5474,7 @@ const app = createApp({
         if (!e.target.closest('.tb-list-toggle')) { listPickerOpen.value = false; }
         if (!e.target.closest('.pp-list-band')) panelListDropdownOpen.value = false;
         if (!e.target.closest('.ov-multi')) { ovZoneOpen.value = false; ovCnstOpen.value = false; }
+        if (!e.target.closest('.tb-hamburger') && !e.target.closest('.tb-nav-dropdown')) { menuOpen.value = false; }
       });
 
       if (!USE_LIVE_API) {
@@ -7214,7 +7275,7 @@ const app = createApp({
       search, filters, ddOpen, accordions, sidebarCollapsed,
       selectedCode, editMode, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
       addModalOpen, addModalSelected, addModalQtys, setModalQty, colorMode, activeLegendFilter,
-      rateCardOpen, rcSearch, openBuckets,
+      rateCardOpen, rcSearch, openBuckets, menuOpen,
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
       auth, toasts, busy, loadStage, loadPct, loadDone, siteTypeMap,
       // computed
