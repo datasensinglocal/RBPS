@@ -3643,7 +3643,10 @@ a:hover { text-decoration:underline; }
 <!-- §5 PROJECT PANEL ─────────────────────────────────────────────────── -->
 <aside id="panel" :class="{open: !!selectedCode}">
   <template v-if="selectedProject">
-    <!-- Sticky close button -->
+    <!-- Floating close button — stays fixed while panel scrolls -->
+    <button class="pp-close-sticky" @click="closeProject" title="Close panel">
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3 L11 11 M11 3 L3 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
     <div class="pp-body scroll">
       <!-- Image — full bleed to the top edge of the panel -->
       <div class="pp-img">
