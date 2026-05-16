@@ -721,7 +721,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --danger:#B8442D;
   --ok:#3D7A4B;
 
-  /* Sizes */
+  /* Sizes — scaled ×1.1 */
   --sb-w:400px;             /* sidebar width */
   --tb-h:54px;              /* topbar height */
   --panel-w:693px;          /* project panel width */
@@ -731,7 +731,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --sh-lg:0 8px 32px rgba(28,59,47,.18);
 
   /* Typography */
-  --serif:'DM Serif Display', Georgia, serif;
+  --serif:'Public Sans', sans-serif;
   --sans:'Public Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -742,6 +742,7 @@ body {
   font-family: var(--sans); font-size:14px; color:var(--text);
   background:#D6D0C8;
   -webkit-font-smoothing:antialiased;
+  zoom:1.1;
 }
 button { font-family:inherit; font-size:inherit; cursor:pointer; border:none; background:none; color:inherit; }
 input, select, textarea { font-family:inherit; font-size:inherit; color:inherit; }
@@ -1225,8 +1226,8 @@ a:hover { text-decoration:underline; }
 .pl-img-empty { display:none; }
 .pl-body { padding:10px 12px 12px; }
 .pl-row1 { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:4px; }
-.pl-code { font-size:18px; font-weight:700; color:var(--ink); letter-spacing:.4px; flex-shrink:0; }
-.pl-name { font-size:12px; font-weight:600; line-height:1.25; flex:1; min-width:0; }
+.pl-code { font-size:14px; font-weight:400; color:var(--ink); letter-spacing:.4px; flex-shrink:0; }
+.pl-name { font-size:16px; font-weight:600; line-height:1.25; flex:1; min-width:0; }
 .pl-cost { font-size:11px; font-weight:700; color:var(--ink); white-space:nowrap; flex-shrink:0; }
 .pl-tags { display:flex; flex-wrap:wrap; gap:3px; }
 .pl-tag {
@@ -2086,7 +2087,7 @@ a:hover { text-decoration:underline; }
   background:rgba(255,255,255,.92); backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.6);
   box-shadow:0 1px 6px rgba(0,0,0,.25);
-  font-size:11px; font-weight:700; color:var(--ink); letter-spacing:.5px;
+  font-size:13px; font-weight:700; color:var(--ink); letter-spacing:.5px;
 }
 
 /* Sticky close — always fixed to top-left of the panel, never scrolls */
@@ -2142,14 +2143,14 @@ a:hover { text-decoration:underline; }
 }
 .pp-gallery img:hover:not(.on) { border-color:var(--line-2); }
 
-.pp-section { padding:14px 18px; border-bottom:1px solid var(--line); }
-.pp-name { font-family:var(--serif); font-size:26px; font-weight:400; line-height:1.15; color:var(--ink); margin-bottom:6px; }
-.pp-meta { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.pp-section { padding:17px 18px; border-bottom:1px solid var(--line); }
+.pp-name { font-family:var(--serif); font-size:30px; font-weight:400; line-height:1.15; color:var(--ink); margin-bottom:6px; }
+.pp-meta { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px; }
 .pp-meta-pill {
   font-size:10px; font-weight:600; padding:3px 9px; border-radius:10px;
   background:var(--soft); color:var(--ink); border:1px solid var(--line);
 }
-.pp-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin-top:10px; }
+.pp-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; margin-top:12px; }
 .pp-grid-item { display:flex; flex-direction:column; gap:2px; }
 .pp-grid-lbl { font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; }
 .pp-grid-val { font-size:14px; font-weight:600; color:var(--text); }
@@ -2158,7 +2159,7 @@ a:hover { text-decoration:underline; }
 /* Single-line info bar */
 .pp-infobar {
   display:flex; flex-wrap:wrap; align-items:baseline;
-  gap:4px 8px; margin:0; padding:10px 0 4px;
+  gap:4px 8px; margin:0; padding:12px 0 5px;
   background:#fff;
 }
 .pp-infobar-item { display:flex; flex-direction:column; gap:1px; }
@@ -2181,17 +2182,17 @@ a:hover { text-decoration:underline; }
   background:var(--soft);
   border-radius:4px;
   padding:3px 8px;
-  margin:10px 0 0;
-  font-style:italic;
+  margin:12px 0 0;
+  font-style:normal;
 }
 .pp-divider {
   border:none; border-top:1px solid var(--rule,#E0D8CC);
-  margin:14px 0 0;
+  margin:17px 0 0;
 }
 .pp-infobar {
   background:#fff;
   margin:0;
-  padding:10px 0 4px;
+  padding:12px 0 5px;
 }
 
 .pp-proposal { font-size:14px; line-height:1.6; color:var(--text); }
@@ -2211,7 +2212,7 @@ a:hover { text-decoration:underline; }
 .btn-add-intv:hover {
   background:#fff; color:#d35421;
 }
-.pp-section-title { font-size:12px; font-weight:700; letter-spacing:.8px; color:var(--ink); text-transform:uppercase; margin-bottom:10px; }
+.pp-section-title { font-size:12px; font-weight:900; letter-spacing:.8px; color:var(--ink); text-transform:uppercase; margin-bottom:12px; }
 
 /* Cascading interventions: Category → Sub-category → row */
 /* ── Intervention table — spreadsheet style ───────────────────────── */
@@ -2574,6 +2575,214 @@ a:hover { text-decoration:underline; }
 .modal-tab:hover { color:var(--ink); }
 
 /* ═════════════════════════════════════════════════════════════════════════
+   §7a — NEW AUTH MODAL + ADD PROJECT MODAL
+   ═════════════════════════════════════════════════════════════════════════ */
+
+/* Topbar Add/Fund button */
+.tb-add-fund-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 13px; border-radius:20px;
+  background:var(--accent); color:#fff;
+  font-size:11.5px; font-weight:700; letter-spacing:.2px;
+  border:2px solid var(--accent); cursor:pointer;
+  transition:all .15s; white-space:nowrap; flex-shrink:0;
+}
+.tb-add-fund-btn:hover { background:#fff; color:var(--accent); }
+
+/* Auth role buttons */
+.auth-role-btn {
+  display:flex; align-items:center; gap:14px;
+  width:100%; padding:14px 16px; border-radius:10px;
+  background:var(--paper); border:1.5px solid var(--line);
+  cursor:pointer; text-align:left; transition:all .15s;
+}
+.auth-role-btn:hover { border-color:var(--accent); background:#fff; }
+.arb-icon { font-size:22px; flex-shrink:0; }
+.arb-title { font-size:13px; font-weight:700; color:var(--ink); }
+.arb-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+.auth-login-link { font-size:12px; color:var(--muted); }
+.auth-login-link span { color:var(--accent); cursor:pointer; font-weight:600; }
+.auth-forgot-link { font-size:11px; color:var(--accent); cursor:pointer; text-align:right; margin-top:-4px; }
+.auth-back-btn {
+  background:none; border:none; cursor:pointer;
+  font-size:11px; color:var(--muted); padding:0; font-weight:600;
+}
+.auth-back-btn:hover { color:var(--ink); }
+.auth-q-display {
+  background:var(--soft); border-radius:6px; padding:9px 12px;
+  font-size:12px; color:var(--ink); border:1.5px solid var(--line);
+}
+.modal-select {
+  padding:9px 12px; border:1.5px solid var(--line); border-radius:var(--r);
+  font-size:13px; outline:none; background:#fff; width:100%;
+  transition:border-color .15s;
+}
+.modal-select:focus { border-color:var(--accent); }
+
+/* Nominee popup Add button */
+.np-add-btn {
+  display:flex; align-items:center; gap:6px;
+  width:calc(100% - 24px); margin:0 12px 8px;
+  padding:7px 12px; border-radius:8px;
+  background:var(--accent); color:#fff;
+  font-size:11px; font-weight:700; border:none; cursor:pointer;
+  transition:background .15s;
+}
+.np-add-btn:hover { background:#C6613F; }
+
+/* Add Project modal */
+.ap-modal-mask { align-items:stretch; padding:0; }
+.ap-modal {
+  width:780px; max-width:98vw;
+  max-height:96vh; height:96vh;
+  border-radius:var(--r-lg);
+  display:flex; flex-direction:column; overflow:hidden;
+  margin:auto;
+}
+.ap-hdr { border-bottom:1px solid var(--line); padding-bottom:12px; }
+.ap-close-btn {
+  background:none; border:none; cursor:pointer;
+  font-size:16px; color:var(--muted); padding:2px 6px;
+  border-radius:4px; transition:color .1s;
+}
+.ap-close-btn:hover { color:var(--ink); }
+
+.ap-choose-body { display:flex; flex-direction:column; gap:10px; }
+.ap-mode-btn {
+  display:flex; align-items:center; gap:14px;
+  padding:16px; border-radius:10px;
+  background:var(--paper); border:1.5px solid var(--line);
+  cursor:pointer; text-align:left; transition:all .15s;
+}
+.ap-mode-btn:hover { border-color:var(--accent); background:#fff; }
+.ap-mode-icon { font-size:24px; flex-shrink:0; }
+.ap-mode-title { font-size:13px; font-weight:700; color:var(--ink); }
+.ap-mode-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+
+/* View toggle */
+.ap-view-toggle {
+  display:flex; border-bottom:1px solid var(--line);
+  padding:0 22px; flex-shrink:0;
+}
+.ap-view-toggle button {
+  padding:8px 14px; font-size:12px; font-weight:600;
+  color:var(--muted); border:none; background:none;
+  border-bottom:2px solid transparent; cursor:pointer;
+  transition:all .15s; margin-bottom:-1px;
+}
+.ap-view-toggle button.active { color:var(--ink); border-bottom-color:var(--accent); }
+.ap-view-toggle button:hover { color:var(--ink); }
+
+/* Form scroll area */
+.ap-form-scroll {
+  flex:1; overflow-y:auto; padding:16px 22px;
+  display:flex; flex-direction:column; gap:0;
+}
+.ap-project-form {
+  border:1.5px solid var(--line); border-radius:10px;
+  padding:16px; margin-bottom:16px; background:#fff;
+}
+.ap-form-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px;
+}
+.ap-form-num { font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.6px; }
+.ap-remove-btn {
+  font-size:10.5px; color:var(--danger); background:none;
+  border:1px solid var(--danger); border-radius:4px;
+  padding:2px 8px; cursor:pointer; transition:all .12s;
+}
+.ap-remove-btn:hover { background:var(--danger); color:#fff; }
+
+/* Form fields grid */
+.ap-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.ap-field { display:flex; flex-direction:column; gap:4px; }
+.ap-field-full { grid-column:1/-1; }
+.ap-field label { font-size:10.5px; font-weight:600; color:var(--ink); text-transform:uppercase; letter-spacing:.5px; }
+.ap-field .req { color:var(--accent); }
+.ap-field input, .ap-field textarea, .ap-field select {
+  padding:8px 10px; border:1.5px solid var(--line); border-radius:var(--r);
+  font-size:12.5px; outline:none; transition:border-color .15s;
+  font-family:var(--sans); resize:vertical;
+}
+.ap-field input:focus, .ap-field textarea:focus, .ap-field select:focus { border-color:var(--accent); }
+.ap-field input.err, .ap-field textarea.err { border-color:var(--danger); }
+.ap-err { font-size:10px; color:var(--danger); }
+
+.ap-add-another-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 14px; border-radius:20px;
+  background:var(--soft); color:var(--ink);
+  font-size:11px; font-weight:600; border:1.5px solid var(--line);
+  cursor:pointer; margin-top:4px; transition:all .15s;
+}
+.ap-add-another-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+.ap-form-foot {
+  padding:12px 22px; border-top:1px solid var(--line);
+  background:#fff; flex-shrink:0;
+  display:flex; flex-direction:column; gap:8px;
+}
+.ap-save-msg { font-size:12px; color:var(--muted); text-align:right; }
+.ap-save-msg.ok { color:#2e7d32; font-weight:600; }
+
+/* Paste zone */
+.ap-paste-zone {
+  display:flex; flex-direction:column; gap:8px;
+  padding:12px 22px; border-bottom:1px solid var(--line);
+  background:var(--paper); flex-shrink:0;
+}
+.ap-paste-hint { font-size:11px; color:var(--muted); margin:0; }
+.ap-paste-input {
+  padding:8px 10px; border:1.5px solid var(--line); border-radius:var(--r);
+  font-size:11px; font-family:var(--sans); resize:none; outline:none;
+}
+.ap-paste-input:focus { border-color:var(--accent); }
+
+/* Sheet */
+.ap-sheet-wrap {
+  flex:1; overflow:auto; /* both axes */
+  padding:0; border-top:none;
+}
+.ap-sheet { display:inline-flex; flex-direction:column; min-width:100%; }
+.ap-sheet-row {
+  display:flex; align-items:stretch;
+  border-bottom:1px solid #E8E4DE;
+}
+.ap-sheet-row:last-child { border-bottom:none; }
+.ap-sheet-hdr { background:var(--paper); position:sticky; top:0; z-index:2; border-bottom:2px solid var(--line); }
+.ap-sheet-rownum {
+  width:36px; min-width:36px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:var(--muted);
+  border-right:1px solid #E8E4DE;
+  background:var(--paper); position:sticky; left:0; z-index:3;
+  flex-shrink:0;
+}
+.ap-sheet-hdr .ap-sheet-rownum { z-index:4; }
+.ap-sheet-cell {
+  border-right:1px solid #E8E4DE;
+  display:flex; align-items:stretch;
+  flex-shrink:0;
+}
+.ap-sheet-cell:last-child { border-right:none; }
+.ap-sheet-hdr-cell {
+  padding:6px 8px; font-size:10px; font-weight:700;
+  color:var(--muted); text-transform:uppercase; letter-spacing:.4px;
+  align-items:center; white-space:nowrap; overflow:hidden;
+}
+.ap-sheet-hdr-cell.required { color:var(--accent); background:rgba(193,127,62,.06); }
+.ap-sheet-cell.err { background:#fff5f1; }
+.ap-sheet-input {
+  width:100%; border:none; outline:none; padding:5px 8px;
+  font-size:11.5px; font-family:var(--sans); background:transparent;
+  color:var(--ink);
+}
+.ap-sheet-input:focus { background:rgba(193,127,62,.05); }
+.ap-sheet-input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+
+/* ═════════════════════════════════════════════════════════════════════════
    §7b — ADD INTERVENTIONS MODAL — table layout
    ═════════════════════════════════════════════════════════════════════════ */
 .modal-wide { width:816px; max-width:96vw; max-height:88vh; display:flex; flex-direction:column; }
@@ -2743,6 +2952,13 @@ a:hover { text-decoration:underline; }
     <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
   </nav>
 
+  <!-- Add / Fund a Project button — always visible -->
+  <button class="tb-add-fund-btn"
+    @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : auth.mode==='funder' ? null : openAuthModal('')">
+    <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    {{ auth.mode==='funder' ? 'Fund Projects' : 'Add / Fund a Project' }}
+  </button>
+
   <!-- Admin list toggle — sits between nav and user -->
   <div v-if="auth.mode === 'admin'" class="tb-list-toggle" style="position:relative">
     <button class="tb-list-mode" :class="{active: !activeListName}" @click="clearAdminList(); listPickerOpen=false">All projects</button>
@@ -2832,6 +3048,10 @@ a:hover { text-decoration:underline; }
         <div class="np-name">{{ auth.name }}</div>
         <div class="np-sub">{{ auth.projectCodes.length }} project{{ auth.projectCodes.length !== 1 ? 's' : '' }} assigned to you</div>
       </div>
+      <button class="np-add-btn" @click="addProjectOpen=true; addProjectViewMode='choose'; nomineePopupOpen=false">
+        <svg width="10" height="10" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Add New Project
+      </button>
       <div class="nominee-popup-list">
         <button v-for="code in auth.projectCodes" :key="code"
                 class="nominee-popup-item"
@@ -3804,32 +4024,13 @@ a:hover { text-decoration:underline; }
 <!-- §7 LOGIN MODAL ────────────────────────────────────────────────────── -->
 <div v-if="loginOpen" class="modal-mask" @click.self="loginOpen=false">
   <div class="modal">
-    <div class="modal-tabs">
-      <div class="modal-tab" :class="{active: loginMode==='nominee'}" @click="loginMode='nominee'">Nominee</div>
-      <div class="modal-tab" :class="{active: loginMode==='admin'}" @click="loginMode='admin'">Admin</div>
-    </div>
 
-    <!-- Nominee -->
-    <template v-if="loginMode==='nominee'">
-      <div class="modal-hdr">
-        <h2 class="modal-title">Nominee sign-in</h2>
-        <p class="modal-sub">Enter your first name and email to access your project.</p>
+    <!-- ── EXISTING ADMIN LOGIN (unchanged) ── -->
+    <template v-if="loginMode==='admin' && authScreen===''">
+      <div class="modal-tabs">
+        <div class="modal-tab" :class="{active: loginMode==='nominee'}" @click="loginMode='nominee'; authScreen='choose'">Nominee / Funder</div>
+        <div class="modal-tab" :class="{active: loginMode==='admin'}" @click="loginMode='admin'">Admin</div>
       </div>
-      <div class="modal-body">
-        <label>First name</label>
-        <input v-model="loginForm.firstName" placeholder="Your first name" autocomplete="given-name" @keyup.enter="doNomineeLogin" />
-        <label>Email</label>
-        <input v-model="loginForm.email" type="email" placeholder="you@example.com" autocomplete="email" @keyup.enter="doNomineeLogin" />
-        <div v-if="loginErr" class="modal-err">{{ loginErr }}</div>
-      </div>
-      <div class="modal-foot">
-        <button class="btn btn-secondary" @click="loginOpen=false">Cancel</button>
-        <button class="btn btn-primary" :disabled="loginBusy" @click="doNomineeLogin">{{ loginBusy?'Checking…':'Sign in' }}</button>
-      </div>
-    </template>
-
-    <!-- Admin -->
-    <template v-else>
       <div class="modal-hdr">
         <h2 class="modal-title">Admin sign-in</h2>
         <p class="modal-sub">Enter your email and password to sign in.</p>
@@ -3849,6 +4050,361 @@ a:hover { text-decoration:underline; }
         <button class="btn btn-primary" :disabled="loginBusy" @click="doAdminLogin">{{ loginBusy?'Please wait…':'Sign in' }}</button>
       </div>
     </template>
+
+    <!-- ── CHOOSE ROLE ── -->
+    <template v-else-if="authScreen==='choose'">
+      <div class="modal-tabs">
+        <div class="modal-tab active">Join / Sign in</div>
+        <div class="modal-tab" @click="loginMode='admin'; authScreen=''">Admin</div>
+      </div>
+      <div class="modal-hdr">
+        <h2 class="modal-title">What would you like to do?</h2>
+        <p class="modal-sub">Choose your role to get started.</p>
+      </div>
+      <div class="modal-body">
+        <button class="auth-role-btn" @click="authRole='nominee'; authScreen='signup'">
+          <div class="arb-icon">📍</div>
+          <div class="arb-body">
+            <div class="arb-title">Nominate a Project</div>
+            <div class="arb-sub">Add and manage public space projects</div>
+          </div>
+        </button>
+        <button class="auth-role-btn" @click="authRole='funder'; authScreen='signup'">
+          <div class="arb-icon">💡</div>
+          <div class="arb-body">
+            <div class="arb-title">Fund Projects</div>
+            <div class="arb-sub">Browse and shortlist projects to support</div>
+          </div>
+        </button>
+        <div class="auth-login-link">
+          Already have an account?
+          <span @click="authScreen='login'">Sign in →</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" @click="loginOpen=false">Cancel</button>
+      </div>
+    </template>
+
+    <!-- ── SIGN UP ── -->
+    <template v-else-if="authScreen==='signup'">
+      <div class="modal-hdr">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <button class="auth-back-btn" @click="authScreen='choose'">← Back</button>
+          <h2 class="modal-title" style="margin:0">{{ authRole==='nominee' ? 'Nominate a Project' : 'Fund Projects' }}</h2>
+        </div>
+        <p class="modal-sub">Create your account to get started.</p>
+      </div>
+      <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+        <label>Full name ✱</label>
+        <input v-model="signupForm.name" placeholder="Your name" />
+        <label>Organisation / RWA ✱</label>
+        <input v-model="signupForm.org" placeholder="Your org or RWA name" />
+        <label>Email ✱</label>
+        <input v-model="signupForm.email" type="email" placeholder="you@example.com" />
+        <label>Password ✱</label>
+        <input v-model="signupForm.password" type="password" placeholder="Choose a password" />
+        <label>Confirm password ✱</label>
+        <input v-model="signupForm.confirmPassword" type="password" placeholder="Repeat password" />
+        <label>Security question ✱</label>
+        <select v-model="signupForm.securityQuestion" class="modal-select">
+          <option value="">— Choose a question —</option>
+          <option v-for="q in SECURITY_QUESTIONS" :key="q" :value="q">{{ q }}</option>
+        </select>
+        <label>Your answer ✱</label>
+        <input v-model="signupForm.securityAnswer" placeholder="Answer (case-insensitive)" />
+        <div v-if="newAuthErr" class="modal-err">{{ newAuthErr }}</div>
+      </div>
+      <div class="modal-foot">
+        <div class="auth-login-link" style="font-size:11px">
+          Have an account? <span @click="authScreen='login'">Sign in</span>
+        </div>
+        <button class="btn btn-primary" :disabled="newAuthBusy" @click="doNewSignup">
+          {{ newAuthBusy ? 'Creating…' : 'Create account' }}
+        </button>
+      </div>
+    </template>
+
+    <!-- ── LOGIN ── -->
+    <template v-else-if="authScreen==='login'">
+      <div class="modal-hdr">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <button class="auth-back-btn" @click="authScreen='choose'">← Back</button>
+          <h2 class="modal-title" style="margin:0">Sign in</h2>
+        </div>
+        <p class="modal-sub">Welcome back.</p>
+      </div>
+      <div class="modal-body">
+        <label>Email</label>
+        <input v-model="loginForm.email" type="email" placeholder="you@example.com" @keyup.enter="doNewLogin" />
+        <label>Password</label>
+        <input v-model="loginForm.password" type="password" placeholder="••••••••" @keyup.enter="doNewLogin" />
+        <div class="auth-forgot-link" @click="authScreen='forgot-q'">Forgot password?</div>
+        <div v-if="newAuthErr" class="modal-err">{{ newAuthErr }}</div>
+      </div>
+      <div class="modal-foot">
+        <div class="auth-login-link" style="font-size:11px">
+          New here? <span @click="authScreen='choose'">Create account</span>
+        </div>
+        <button class="btn btn-primary" :disabled="newAuthBusy" @click="doNewLogin">
+          {{ newAuthBusy ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </div>
+    </template>
+
+    <!-- ── FORGOT — enter email ── -->
+    <template v-else-if="authScreen==='forgot-q'">
+      <div class="modal-hdr">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <button class="auth-back-btn" @click="authScreen='login'">← Back</button>
+          <h2 class="modal-title" style="margin:0">Reset password</h2>
+        </div>
+        <p class="modal-sub">Enter your email to retrieve your security question.</p>
+      </div>
+      <div class="modal-body">
+        <label>Email</label>
+        <input v-model="forgotForm.email" type="email" placeholder="you@example.com" @keyup.enter="doForgotStep1" />
+        <div v-if="newAuthErr" class="modal-err">{{ newAuthErr }}</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" @click="authScreen='login'">Cancel</button>
+        <button class="btn btn-primary" :disabled="newAuthBusy" @click="doForgotStep1">
+          {{ newAuthBusy ? 'Checking…' : 'Continue' }}
+        </button>
+      </div>
+    </template>
+
+    <!-- ── FORGOT — answer + new password ── -->
+    <template v-else-if="authScreen==='forgot-reset'">
+      <div class="modal-hdr">
+        <h2 class="modal-title">Reset password</h2>
+        <p class="modal-sub">Answer your security question to set a new password.</p>
+      </div>
+      <div class="modal-body">
+        <label>Security question</label>
+        <div class="auth-q-display">{{ forgotQuestion }}</div>
+        <label>Your answer</label>
+        <input v-model="forgotForm.answer" placeholder="Your answer" />
+        <label>New password</label>
+        <input v-model="forgotForm.newPassword" type="password" placeholder="New password" />
+        <label>Confirm new password</label>
+        <input v-model="forgotForm.confirmPassword" type="password" placeholder="Repeat new password" @keyup.enter="doForgotReset" />
+        <div v-if="newAuthErr" class="modal-err">{{ newAuthErr }}</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" @click="authScreen='login'">Cancel</button>
+        <button class="btn btn-primary" :disabled="newAuthBusy" @click="doForgotReset">
+          {{ newAuthBusy ? 'Saving…' : 'Reset password' }}
+        </button>
+      </div>
+    </template>
+
+    <!-- ── EXISTING NOMINEE LOGIN (kept for backward compat, hidden by default) ── -->
+    <template v-else-if="loginMode==='nominee' && authScreen===''">
+      <div class="modal-tabs">
+        <div class="modal-tab active" @click="loginMode='nominee'; authScreen='choose'">Nominee</div>
+        <div class="modal-tab" @click="loginMode='admin'; authScreen=''">Admin</div>
+      </div>
+      <div class="modal-hdr">
+        <h2 class="modal-title">Nominee sign-in</h2>
+        <p class="modal-sub">Enter your first name and email to access your project.</p>
+      </div>
+      <div class="modal-body">
+        <label>First name</label>
+        <input v-model="loginForm.firstName" placeholder="Your first name" autocomplete="given-name" @keyup.enter="doNomineeLogin" />
+        <label>Email</label>
+        <input v-model="loginForm.email" type="email" placeholder="you@example.com" autocomplete="email" @keyup.enter="doNomineeLogin" />
+        <div v-if="loginErr" class="modal-err">{{ loginErr }}</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-secondary" @click="loginOpen=false">Cancel</button>
+        <button class="btn btn-primary" :disabled="loginBusy" @click="doNomineeLogin">{{ loginBusy?'Checking…':'Sign in' }}</button>
+      </div>
+    </template>
+
+  </div>
+</div>
+
+<!-- §7a ADD PROJECT MODAL ─────────────────────────────────────────────── -->
+<div v-if="addProjectOpen && auth.mode==='nominee'" class="modal-mask ap-modal-mask" @click.self="addProjectOpen=false">
+  <div class="modal ap-modal">
+
+    <div class="modal-hdr ap-hdr">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h2 class="modal-title" style="margin:0">Add New Project</h2>
+        <button class="ap-close-btn" @click="addProjectOpen=false">✕</button>
+      </div>
+      <p class="modal-sub">{{ auth.name }} · {{ auth.email }}</p>
+    </div>
+
+    <!-- CHOOSE -->
+    <template v-if="addProjectViewMode==='choose'">
+      <div class="modal-body ap-choose-body">
+        <p style="font-size:13px;color:var(--ink);margin-bottom:16px">How would you like to add your project(s)?</p>
+        <button class="ap-mode-btn" @click="addProjectViewMode='form'">
+          <div class="ap-mode-icon">📋</div>
+          <div class="ap-mode-body">
+            <div class="ap-mode-title">One at a time — Form</div>
+            <div class="ap-mode-sub">Fill a form per project, add more below</div>
+          </div>
+        </button>
+        <button class="ap-mode-btn" @click="addProjectViewMode='sheet'">
+          <div class="ap-mode-icon">📊</div>
+          <div class="ap-mode-body">
+            <div class="ap-mode-title">Bulk — Sheet view</div>
+            <div class="ap-mode-sub">Paste from Google Sheets or Excel</div>
+          </div>
+        </button>
+      </div>
+      <div class="modal-foot"><button class="btn btn-secondary" @click="addProjectOpen=false">Cancel</button></div>
+    </template>
+
+    <!-- FORM view -->
+    <template v-else-if="addProjectViewMode==='form'">
+      <div class="ap-view-toggle">
+        <button :class="{active: addProjectViewMode==='form'}" @click="addProjectViewMode='form'">Form view</button>
+        <button :class="{active: addProjectViewMode==='sheet'}" @click="addProjectViewMode='sheet'">Sheet view</button>
+      </div>
+      <div class="ap-form-scroll">
+        <div v-for="(form, idx) in projectForms" :key="form._id" class="ap-project-form">
+          <div class="ap-form-hdr">
+            <span class="ap-form-num">Project {{ idx+1 }}</span>
+            <button v-if="projectForms.length > 1" class="ap-remove-btn" @click="removeProjectForm(idx)">Remove</button>
+          </div>
+          <div class="ap-fields">
+            <div class="ap-field ap-field-full">
+              <label>Project name <span class="req">✱</span></label>
+              <input v-model="form.name" placeholder="e.g. Revitalising Sangam Circle Junction" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].name}" />
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].name" class="ap-err">{{ projectFormErrors[idx].name }}</span>
+            </div>
+            <div class="ap-field ap-field-full">
+              <label>Nominee entity / organisation <span class="req">✱</span></label>
+              <input v-model="form.nominee_entity" placeholder="RWA or org name" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].nominee_entity}" />
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].nominee_entity" class="ap-err">{{ projectFormErrors[idx].nominee_entity }}</span>
+            </div>
+            <div class="ap-field ap-field-full">
+              <label>Address <span class="req">✱</span></label>
+              <input v-model="form.address" placeholder="Street / road name" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].address}" />
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].address" class="ap-err">{{ projectFormErrors[idx].address }}</span>
+            </div>
+            <div class="ap-field">
+              <label>Latitude <span class="req">✱</span></label>
+              <input v-model="form.lat" type="number" step="any" placeholder="e.g. 12.9716" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].lat}" />
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].lat" class="ap-err">{{ projectFormErrors[idx].lat }}</span>
+            </div>
+            <div class="ap-field">
+              <label>Longitude <span class="req">✱</span></label>
+              <input v-model="form.lng" type="number" step="any" placeholder="e.g. 77.5946" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].lng}" />
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].lng" class="ap-err">{{ projectFormErrors[idx].lng }}</span>
+            </div>
+            <div class="ap-field">
+              <label>Site type <span class="req">✱</span></label>
+              <input v-model="form.site_type" list="ap-siteTypeList" placeholder="Select or type new"
+                     :class="{err: projectFormErrors[idx] && projectFormErrors[idx].site_type}"
+                     @change="addNewSiteType(form, form.site_type)" />
+              <datalist id="ap-siteTypeList">
+                <option v-for="t in allSiteTypes" :key="t" :value="t" />
+              </datalist>
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].site_type" class="ap-err">{{ projectFormErrors[idx].site_type }}</span>
+            </div>
+            <div class="ap-field">
+              <label>Placeholder budget (₹) <span class="req">✱</span></label>
+              <input v-model="form.placeholder_budget" type="number" placeholder="e.g. 5000000" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].placeholder_budget}" />
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].placeholder_budget" class="ap-err">{{ projectFormErrors[idx].placeholder_budget }}</span>
+            </div>
+            <div class="ap-field ap-field-full">
+              <label>Proposal <span class="req">✱</span></label>
+              <textarea v-model="form.proposal" rows="3" placeholder="Describe your vision for this space…" :class="{err: projectFormErrors[idx] && projectFormErrors[idx].proposal}"></textarea>
+              <span v-if="projectFormErrors[idx] && projectFormErrors[idx].proposal" class="ap-err">{{ projectFormErrors[idx].proposal }}</span>
+            </div>
+            <div class="ap-field"><label>Constituency</label><input v-model="form.constituency" placeholder="e.g. 173 - Jayanagar" /></div>
+            <div class="ap-field"><label>Zone</label><input v-model="form.zone" placeholder="e.g. South Zone 1" /></div>
+            <div class="ap-field"><label>Corporation</label><input v-model="form.corporation" placeholder="e.g. South" /></div>
+            <div class="ap-field">
+              <label>Budget range</label>
+              <select v-model="form.budget_range" class="modal-select">
+                <option value="">— Select —</option>
+                <option v-for="r in BUDGET_RANGES" :key="r" :value="r">{{ r }}</option>
+              </select>
+            </div>
+            <div class="ap-field">
+              <label>Impact</label>
+              <select v-model="form.impact" class="modal-select">
+                <option value="">— Select —</option>
+                <option v-for="i in IMPACT_OPTIONS" :key="i" :value="i">{{ i }}</option>
+              </select>
+            </div>
+            <div class="ap-field"><label>Length (m)</label><input v-model="form.length_m" type="number" placeholder="metres" /></div>
+            <div class="ap-field"><label>Area (sqm)</label><input v-model="form.area_sqm" type="number" placeholder="sq metres" /></div>
+            <div class="ap-field ap-field-full">
+              <label>Site details and surroundings</label>
+              <textarea v-model="form.site_details" rows="2" placeholder="Describe the context…"></textarea>
+            </div>
+            <div class="ap-field ap-field-full">
+              <label>Issues</label>
+              <textarea v-model="form.issues" rows="2" placeholder="What problems need solving?"></textarea>
+            </div>
+          </div>
+        </div>
+        <button class="ap-add-another-btn" @click="addProjectForm">
+          <svg width="10" height="10" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add another project
+        </button>
+      </div>
+      <div class="ap-form-foot">
+        <div v-if="projectSaveMsg" class="ap-save-msg" :class="{ok: projectSaveMsg.includes('added') || projectSaveMsg.includes('submitted')}">{{ projectSaveMsg }}</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-secondary" @click="addProjectOpen=false">Cancel</button>
+          <button class="btn btn-primary" :disabled="projectSaving" @click="saveAllProjects">
+            {{ projectSaving ? 'Saving…' : 'Save all projects' }}
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <!-- SHEET view -->
+    <template v-else-if="addProjectViewMode==='sheet'">
+      <div class="ap-view-toggle">
+        <button :class="{active: addProjectViewMode==='form'}" @click="addProjectViewMode='form'">Form view</button>
+        <button :class="{active: addProjectViewMode==='sheet'}" @click="addProjectViewMode='sheet'">Sheet view</button>
+      </div>
+      <div class="ap-paste-zone">
+        <p class="ap-paste-hint">Paste rows from Google Sheets / Excel (tab-separated), then click Import</p>
+        <textarea v-model="sheetPasteArea" rows="3" placeholder="Copy cells from your spreadsheet and paste here…" class="ap-paste-input"></textarea>
+        <button class="btn btn-secondary" style="align-self:flex-end;font-size:11px" @click="parseSheetPaste" :disabled="!sheetPasteArea.trim()">Import rows</button>
+      </div>
+      <div class="ap-sheet-wrap">
+        <div class="ap-sheet">
+          <div class="ap-sheet-row ap-sheet-hdr">
+            <div class="ap-sheet-rownum">#</div>
+            <div v-for="col in SHEET_COLS" :key="col.key"
+                 class="ap-sheet-cell ap-sheet-hdr-cell"
+                 :class="{required: col.required}"
+                 :style="{minWidth: col.width+'px'}">{{ col.label }}</div>
+          </div>
+          <div v-for="(row, ri) in sheetRows" :key="ri" class="ap-sheet-row" @input="ensureSheetRows">
+            <div class="ap-sheet-rownum">{{ ri+1 }}</div>
+            <div v-for="col in SHEET_COLS" :key="col.key"
+                 class="ap-sheet-cell"
+                 :class="{err: sheetErrors[ri] && sheetErrors[ri][col.key]}"
+                 :style="{minWidth: col.width+'px'}">
+              <input v-model="row[col.key]" :type="col.type==='number'?'number':'text'"
+                     :placeholder="col.required ? '✱' : ''" class="ap-sheet-input" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ap-form-foot">
+        <div v-if="projectSaveMsg" class="ap-save-msg" :class="{ok: projectSaveMsg.includes('added') || projectSaveMsg.includes('submitted')}">{{ projectSaveMsg }}</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn btn-secondary" @click="addProjectOpen=false">Cancel</button>
+          <button class="btn btn-primary" :disabled="projectSaving" @click="saveSheetProjects">
+            {{ projectSaving ? 'Saving…' : 'Save all rows' }}
+          </button>
+        </div>
+      </div>
+    </template>
+
   </div>
 </div>
 
@@ -4477,6 +5033,342 @@ const app = createApp({
     const loginForm = reactive({ firstName:'', name:'', email:'', password:'' });
     const loginErr = ref('');
     const loginBusy = ref(false);
+
+    // ── New auth system state ──────────────────────────────────────────────
+    // authScreen: 'choose' | 'login' | 'signup' | 'forgot-q' | 'forgot-reset'
+    const authScreen = ref('choose');
+    const authRole   = ref('');   // 'nominee' | 'funder'
+    const signupForm = reactive({
+      name:'', org:'', email:'', password:'', confirmPassword:'',
+      securityQuestion:'', securityAnswer:''
+    });
+    const forgotForm = reactive({ email:'', answer:'', newPassword:'', confirmPassword:'' });
+    const forgotQuestion = ref('');
+    const newAuthErr  = ref('');
+    const newAuthBusy = ref(false);
+
+    const SECURITY_QUESTIONS = [
+      'What was the name of your first school?',
+      'What is your mother\'s maiden name?',
+      'What was your first pet\'s name?',
+      'What city were you born in?',
+      'What was the street you grew up on?',
+      'What is your oldest sibling\'s name?'
+    ];
+
+    function openAuthModal(role) {
+      authRole.value = role || '';
+      authScreen.value = role ? 'signup' : 'choose';
+      newAuthErr.value = '';
+      Object.assign(signupForm, { name:'', org:'', email:'', password:'', confirmPassword:'', securityQuestion:'', securityAnswer:'' });
+      Object.assign(forgotForm, { email:'', answer:'', newPassword:'', confirmPassword:'' });
+      forgotQuestion.value = '';
+      loginOpen.value = true;
+    }
+
+    function openNewLogin(role) {
+      authRole.value = role;
+      authScreen.value = 'login';
+      newAuthErr.value = '';
+      loginForm.email = ''; loginForm.password = '';
+    }
+
+    async function doNewSignup() {
+      newAuthErr.value = '';
+      if (!signupForm.name || !signupForm.org || !signupForm.email || !signupForm.password) {
+        newAuthErr.value = 'Please fill in all required fields.'; return;
+      }
+      if (signupForm.password !== signupForm.confirmPassword) {
+        newAuthErr.value = 'Passwords do not match.'; return;
+      }
+      if (!signupForm.securityQuestion || !signupForm.securityAnswer) {
+        newAuthErr.value = 'Please choose a security question and answer.'; return;
+      }
+      newAuthBusy.value = true;
+      try {
+        // In mock mode just sign them in locally
+        if (!USE_LIVE_API) {
+          const role = authRole.value;
+          Object.assign(auth, {
+            mode: role, name: signupForm.name, email: signupForm.email,
+            projectCodes: [], adminUserId: ''
+          });
+          loginOpen.value = false;
+          toast(`Welcome, ${auth.name}!`, 'ok');
+          if (role === 'nominee') { addProjectOpen.value = true; addProjectViewMode.value = 'choose'; }
+          return;
+        }
+        const r = await api.call('signup', {
+          name: signupForm.name, org: signupForm.org,
+          email: signupForm.email, password: signupForm.password,
+          role: authRole.value,
+          securityQuestion: signupForm.securityQuestion,
+          securityAnswer: signupForm.securityAnswer.toLowerCase().trim()
+        }, {});
+        Object.assign(auth, { mode: r.role, name: r.name, email: r.email, projectCodes: r.projectCodes||[], adminUserId:'' });
+        loginOpen.value = false;
+        toast(`Welcome, ${auth.name}!`, 'ok');
+        if (r.role === 'nominee') { addProjectOpen.value = true; addProjectViewMode.value = 'choose'; }
+      } catch(e) { newAuthErr.value = e.message || 'Signup failed.'; }
+      finally { newAuthBusy.value = false; }
+    }
+
+    async function doNewLogin() {
+      newAuthErr.value = '';
+      if (!loginForm.email || !loginForm.password) { newAuthErr.value = 'Please enter email and password.'; return; }
+      newAuthBusy.value = true;
+      try {
+        if (!USE_LIVE_API) {
+          // Mock: accept any credentials, role based on authRole
+          const role = authRole.value || 'nominee';
+          Object.assign(auth, { mode: role, name: loginForm.email.split('@')[0], email: loginForm.email, projectCodes: [], adminUserId:'' });
+          loginOpen.value = false;
+          toast(`Signed in as ${auth.name}`, 'ok');
+          return;
+        }
+        const r = await api.call('login', { email: loginForm.email, password: loginForm.password }, {});
+        Object.assign(auth, { mode: r.role, name: r.name, email: r.email, projectCodes: r.projectCodes||[], adminUserId:'' });
+        loginOpen.value = false;
+        toast(`Signed in as ${auth.name}`, 'ok');
+      } catch(e) { newAuthErr.value = e.message || 'Login failed.'; }
+      finally { newAuthBusy.value = false; }
+    }
+
+    async function doForgotStep1() {
+      newAuthErr.value = '';
+      if (!forgotForm.email) { newAuthErr.value = 'Please enter your email.'; return; }
+      newAuthBusy.value = true;
+      try {
+        if (!USE_LIVE_API) { forgotQuestion.value = SECURITY_QUESTIONS[0]; authScreen.value = 'forgot-reset'; newAuthBusy.value = false; return; }
+        const r = await api.call('get_security_question', { email: forgotForm.email }, {});
+        forgotQuestion.value = r.question;
+        authScreen.value = 'forgot-reset';
+      } catch(e) { newAuthErr.value = e.message || 'Email not found.'; }
+      finally { newAuthBusy.value = false; }
+    }
+
+    async function doForgotReset() {
+      newAuthErr.value = '';
+      if (!forgotForm.answer || !forgotForm.newPassword) { newAuthErr.value = 'Please fill all fields.'; return; }
+      if (forgotForm.newPassword !== forgotForm.confirmPassword) { newAuthErr.value = 'Passwords do not match.'; return; }
+      newAuthBusy.value = true;
+      try {
+        if (!USE_LIVE_API) {
+          toast('Password reset! Please log in.', 'ok');
+          authScreen.value = 'login'; newAuthBusy.value = false; return;
+        }
+        await api.call('reset_password', {
+          email: forgotForm.email,
+          answer: forgotForm.answer.toLowerCase().trim(),
+          newPassword: forgotForm.newPassword
+        }, {});
+        toast('Password reset! Please log in.', 'ok');
+        authScreen.value = 'login';
+      } catch(e) { newAuthErr.value = e.message || 'Reset failed — check your answer.'; }
+      finally { newAuthBusy.value = false; }
+    }
+
+    // ── Add Project state ──────────────────────────────────────────────────
+    const addProjectOpen     = ref(false);
+    // 'choose' | 'form' | 'sheet'
+    const addProjectViewMode = ref('choose');
+
+    // Form view: array of project draft objects
+    const EMPTY_PROJECT_FORM = () => ({
+      _id: Math.random(),
+      name:'', nominee_entity:'', address:'', lat:'', lng:'',
+      site_type:'', placeholder_budget:'', proposal:'',
+      constituency:'', zone:'', corporation:'',
+      budget_range:'', impact:'', length_m:'', area_sqm:'',
+      site_details:'', issues:''
+    });
+    const projectForms = ref([ EMPTY_PROJECT_FORM() ]);
+    const projectFormErrors = ref([{}]);
+    const projectSaving = ref(false);
+    const projectSaveMsg = ref('');
+
+    // Site type list — built from existing projects + user additions
+    const customSiteTypes = ref([]);
+    const allSiteTypes = computed(() => {
+      const fromProjects = new Set();
+      allProjects.value.forEach(p => {
+        (p.site_type||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(t => fromProjects.add(t));
+      });
+      const combined = [...fromProjects, ...customSiteTypes.value];
+      return [...new Set(combined)].sort();
+    });
+
+    const BUDGET_RANGES = ['Under 10 lakhs','10-50 lakhs','50-100 lakhs','1-5 cr','5- 10 cr','More than 10 cr'];
+    const IMPACT_OPTIONS = ['Easy win','High Impact','Others'];
+
+    function addProjectForm() { projectForms.value.push(EMPTY_PROJECT_FORM()); projectFormErrors.value.push({}); }
+    function removeProjectForm(idx) { if (projectForms.value.length > 1) { projectForms.value.splice(idx,1); projectFormErrors.value.splice(idx,1); } }
+
+    function addNewSiteType(form, val) {
+      const t = val.trim();
+      if (t && !allSiteTypes.value.includes(t)) customSiteTypes.value.push(t);
+      if (t) form.site_type = t;
+    }
+
+    function validateForms() {
+      let valid = true;
+      projectFormErrors.value = projectForms.value.map(f => {
+        const e = {};
+        if (!f.name.trim())             { e.name = 'Required'; valid = false; }
+        if (!f.nominee_entity.trim())   { e.nominee_entity = 'Required'; valid = false; }
+        if (!f.address.trim())          { e.address = 'Required'; valid = false; }
+        if (!f.lat || isNaN(Number(f.lat))) { e.lat = 'Valid number required'; valid = false; }
+        if (!f.lng || isNaN(Number(f.lng))) { e.lng = 'Valid number required'; valid = false; }
+        if (!f.site_type.trim())        { e.site_type = 'Required'; valid = false; }
+        if (!f.placeholder_budget || isNaN(Number(f.placeholder_budget))) { e.placeholder_budget = 'Valid number required'; valid = false; }
+        if (!f.proposal.trim())         { e.proposal = 'Required'; valid = false; }
+        return e;
+      });
+      return valid;
+    }
+
+    async function saveAllProjects() {
+      if (!validateForms()) { projectSaveMsg.value = 'Please fix errors above.'; return; }
+      projectSaving.value = true; projectSaveMsg.value = '';
+      try {
+        const projects = projectForms.value.map(f => ({
+          name: f.name.trim(),
+          nominee_entity: f.nominee_entity.trim(),
+          nominee_name: auth.name,
+          nominee_email: auth.email,
+          address: f.address.trim(),
+          lat: Number(f.lat), lng: Number(f.lng),
+          site_type: f.site_type.trim(),
+          placeholder_budget: Number(f.placeholder_budget),
+          proposal: f.proposal.trim(),
+          constituency: f.constituency.trim(),
+          zone: f.zone.trim(),
+          corporation: f.corporation.trim(),
+          budget_range: f.budget_range,
+          impact: f.impact,
+          length_m: f.length_m ? Number(f.length_m) : '',
+          area_sqm: f.area_sqm ? Number(f.area_sqm) : '',
+          'Site details and surroundings': f.site_details.trim(),
+          'Issues': f.issues.trim()
+        }));
+        if (!USE_LIVE_API) {
+          // Mock: add to local list
+          projects.forEach(p => {
+            const code = 'BLR-' + (allProjects.value.length + 1);
+            allProjects.value = [{ ...p, project_code: code, _textLoaded:true,
+              thumbnail_url:'', gallery_urls:'', last_edited:'', last_edited_by:'',
+              budget_range: p.budget_range||'', impact: p.impact||'Others' },
+              ...allProjects.value];
+          });
+          projectSaveMsg.value = `${projects.length} project${projects.length>1?'s':''} added!`;
+          setTimeout(() => { addProjectOpen.value = false; projectForms.value = [EMPTY_PROJECT_FORM()]; projectSaveMsg.value=''; }, 1500);
+          return;
+        }
+        await api.call('add_projects', { projects, nomineeEmail: auth.email, nomineeName: auth.name }, {});
+        projectSaveMsg.value = `${projects.length} project${projects.length>1?'s':''} submitted!`;
+        setTimeout(() => { addProjectOpen.value = false; projectForms.value = [EMPTY_PROJECT_FORM()]; projectSaveMsg.value=''; }, 1500);
+      } catch(e) { projectSaveMsg.value = 'Save failed: ' + (e.message||e); }
+      finally { projectSaving.value = false; }
+    }
+
+    // ── Sheet view state ───────────────────────────────────────────────────
+    const SHEET_COLS = [
+      { key:'name',               label:'Project Name ✱',        required:true,  type:'text',   width:200 },
+      { key:'nominee_entity',     label:'Org / RWA ✱',           required:true,  type:'text',   width:160 },
+      { key:'address',            label:'Address ✱',             required:true,  type:'text',   width:180 },
+      { key:'lat',                label:'Latitude ✱',            required:true,  type:'number', width:110 },
+      { key:'lng',                label:'Longitude ✱',           required:true,  type:'number', width:110 },
+      { key:'site_type',          label:'Site Type ✱',           required:true,  type:'text',   width:150 },
+      { key:'placeholder_budget', label:'Budget (₹) ✱',          required:true,  type:'number', width:110 },
+      { key:'proposal',           label:'Proposal ✱',            required:true,  type:'text',   width:220 },
+      { key:'constituency',       label:'Constituency',          required:false, type:'text',   width:140 },
+      { key:'zone',               label:'Zone',                  required:false, type:'text',   width:120 },
+      { key:'corporation',        label:'Corporation',           required:false, type:'text',   width:110 },
+      { key:'budget_range',       label:'Budget Range',          required:false, type:'text',   width:120 },
+      { key:'impact',             label:'Impact',                required:false, type:'text',   width:100 },
+      { key:'length_m',           label:'Length (m)',            required:false, type:'number', width:100 },
+      { key:'area_sqm',           label:'Area (sqm)',            required:false, type:'number', width:100 },
+    ];
+
+    const SHEET_ROWS_DEFAULT = 5;
+    const sheetRows = ref(Array.from({length: SHEET_ROWS_DEFAULT}, () => ({})));
+    const sheetErrors = ref([]);
+    const sheetPasteArea = ref('');
+
+    function ensureSheetRows() {
+      // auto-add row if last row has any data
+      const last = sheetRows.value[sheetRows.value.length-1];
+      if (last && Object.values(last).some(v => v)) sheetRows.value.push({});
+    }
+
+    function parseSheetPaste() {
+      const text = sheetPasteArea.value.trim();
+      if (!text) return;
+      const lines = text.split('\n').filter(l => l.trim());
+      const parsed = lines.map(line => {
+        const cells = line.split('\t');
+        const row = {};
+        SHEET_COLS.forEach((col, i) => { if (cells[i] !== undefined) row[col.key] = cells[i].trim(); });
+        return row;
+      });
+      // if first row looks like headers, skip it
+      const first = parsed[0];
+      const isHeader = first && SHEET_COLS.some(c => Object.values(first).some(v => v && v.toLowerCase().includes('name')));
+      sheetRows.value = isHeader ? parsed.slice(1) : parsed;
+      if (!sheetRows.value.length) sheetRows.value = [{}];
+      sheetErrors.value = [];
+      sheetPasteArea.value = '';
+    }
+
+    function validateSheet() {
+      sheetErrors.value = sheetRows.value.map(row => {
+        const e = {};
+        SHEET_COLS.filter(c=>c.required).forEach(c => {
+          if (!row[c.key] || !String(row[c.key]).trim()) e[c.key] = true;
+          if ((c.key==='lat'||c.key==='lng') && row[c.key] && isNaN(Number(row[c.key]))) e[c.key] = true;
+        });
+        return e;
+      });
+      return sheetErrors.value.every(e => Object.keys(e).length === 0);
+    }
+
+    async function saveSheetProjects() {
+      // filter blank rows
+      const filled = sheetRows.value.filter(r => Object.values(r).some(v=>v));
+      if (!filled.length) { projectSaveMsg.value = 'No data to save.'; return; }
+      sheetRows.value = filled;
+      if (!validateSheet()) { projectSaveMsg.value = 'Please fix highlighted errors.'; return; }
+      projectSaving.value = true; projectSaveMsg.value = '';
+      try {
+        const projects = filled.map(f => ({
+          name: (f.name||'').trim(), nominee_entity:(f.nominee_entity||'').trim(),
+          nominee_name: auth.name, nominee_email: auth.email,
+          address:(f.address||'').trim(), lat:Number(f.lat), lng:Number(f.lng),
+          site_type:(f.site_type||'').trim(), placeholder_budget:Number(f.placeholder_budget),
+          proposal:(f.proposal||'').trim(), constituency:(f.constituency||'').trim(),
+          zone:(f.zone||'').trim(), corporation:(f.corporation||'').trim(),
+          budget_range:(f.budget_range||''), impact:(f.impact||''),
+          length_m: f.length_m ? Number(f.length_m) : '',
+          area_sqm: f.area_sqm ? Number(f.area_sqm) : '',
+        }));
+        if (!USE_LIVE_API) {
+          projects.forEach(p => {
+            const code = 'BLR-' + (allProjects.value.length + 1);
+            allProjects.value = [{ ...p, project_code: code, _textLoaded:true,
+              thumbnail_url:'', gallery_urls:'', last_edited:'', last_edited_by:'',
+              'Site details and surroundings':'', Issues:'',
+              budget_range: p.budget_range||'', impact: p.impact||'Others' }, ...allProjects.value];
+          });
+          projectSaveMsg.value = `${projects.length} project${projects.length>1?'s':''} added!`;
+          setTimeout(() => { addProjectOpen.value = false; sheetRows.value = Array.from({length:SHEET_ROWS_DEFAULT},()=>({})); projectSaveMsg.value=''; }, 1500);
+          return;
+        }
+        await api.call('add_projects', { projects, nomineeEmail:auth.email, nomineeName:auth.name }, {});
+        projectSaveMsg.value = `${projects.length} project${projects.length>1?'s':''} submitted!`;
+        setTimeout(() => { addProjectOpen.value = false; sheetRows.value = Array.from({length:SHEET_ROWS_DEFAULT},()=>({})); projectSaveMsg.value=''; }, 1500);
+      } catch(e) { projectSaveMsg.value = 'Save failed: '+(e.message||e); }
+      finally { projectSaving.value = false; }
+    }
 
     const auth = reactive({ mode:null, name:'', email:'', projectCodes:[], adminUserId:'' });
 
@@ -5471,7 +6363,12 @@ const app = createApp({
       }
       return { ...payload, nomineeEmail: String(auth.email || ''), nomineeName: String(auth.name || '') };
     }
-    function openLogin(mode='nominee') { loginMode.value = mode; loginOpen.value = true; loginErr.value = ''; }
+    function openLogin(mode='nominee') {
+      loginMode.value = mode;
+      if (mode === 'admin') { authScreen.value = ''; }
+      else { authScreen.value = 'choose'; }
+      loginOpen.value = true; loginErr.value = '';
+    }
     async function doNomineeLogin(retryCount = 0) {
       loginErr.value = ''; loginBusy.value = true;
       try {
@@ -6310,6 +7207,18 @@ const app = createApp({
       setQty, addIntervention, removeIntervention, pendingQtyRows,
       openAddModal, closeAddModal, toggleAddModalIntv, saveAddModal,
       openLogin, doNomineeLogin, doAdminLogin, logout, nomineePopupOpen, openNomineeProject,
+      // new auth
+      authScreen, authRole, signupForm, forgotForm, forgotQuestion,
+      newAuthErr, newAuthBusy, SECURITY_QUESTIONS,
+      openAuthModal, openNewLogin, doNewSignup, doNewLogin,
+      doForgotStep1, doForgotReset,
+      // add project
+      addProjectOpen, addProjectViewMode,
+      projectForms, projectFormErrors, projectSaving, projectSaveMsg,
+      allSiteTypes, customSiteTypes, BUDGET_RANGES, IMPACT_OPTIONS,
+      addProjectForm, removeProjectForm, addNewSiteType, saveAllProjects,
+      SHEET_COLS, sheetRows, sheetErrors, sheetPasteArea,
+      ensureSheetRows, parseSheetPaste, saveSheetProjects,
       adminListsOpen, adminLists, adminListsLoaded, activeListName, adminListActiveCodes,
       openAdminLists, applyAdminList, clearAdminList, openNewList, openEditList, deleteAdminList,
       listPickerOpen, refreshing, refreshData,
