@@ -2185,6 +2185,15 @@ a:hover { text-decoration:underline; }
   margin:12px 0 0;
   font-style:normal;
 }
+.pp-affiliated-program {
+  display:inline-block;
+  font-size:11px; color:#2e7d32;
+  background:#e8f5e9;
+  border-radius:4px;
+  padding:3px 8px;
+  margin:6px 0 0 6px;
+  font-weight:600;
+}
 .pp-divider {
   border:none; border-top:1px solid var(--rule,#E0D8CC);
   margin:17px 0 0;
@@ -2580,14 +2589,13 @@ a:hover { text-decoration:underline; }
 
 /* Topbar Add/Fund button */
 .tb-add-fund-btn {
-  display:inline-flex; align-items:center; gap:6px;
-  padding:5px 13px; border-radius:20px;
-  background:var(--accent); color:#fff;
-  font-size:11.5px; font-weight:700; letter-spacing:.2px;
-  border:2px solid var(--accent); cursor:pointer;
-  transition:all .15s; white-space:nowrap; flex-shrink:0;
+  padding:0 12px; height:100%;
+  background:none; border:none; cursor:pointer;
+  font-size:13px; font-weight:600; color:var(--muted);
+  letter-spacing:.2px; white-space:nowrap;
+  transition:color .15s;
 }
-.tb-add-fund-btn:hover { background:#fff; color:var(--accent); }
+.tb-add-fund-btn:hover { color:var(--ink); }
 
 /* Auth role buttons */
 .auth-role-btn {
@@ -3108,6 +3116,14 @@ a:hover { text-decoration:underline; }
         <div v-if="ddOpen==='br'" class="sb-dropdown" @click.stop>
           <div class="sb-dropdown-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
           <div v-for="b in budgetRanges" class="sb-dropdown-item" @click="filters.budgetRange=b; ddOpen=null"><span>{{ b }}</span></div>
+        </div>
+      </div>
+      <div class="sb-filter" :class="{'has-value': filters.affiliatedProgram}" @click.stop="ddOpen=ddOpen==='ap'?null:'ap'">
+        <span>{{ filters.affiliatedProgram || 'Program' }}</span>
+        <span class="chev">▾</span>
+        <div v-if="ddOpen==='ap'" class="sb-dropdown" @click.stop>
+          <div class="sb-dropdown-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
+          <div v-for="p in affiliatedPrograms" class="sb-dropdown-item" @click="filters.affiliatedProgram=p; ddOpen=null"><span>{{ p }}</span></div>
         </div>
       </div>
     </div>
@@ -3670,6 +3686,7 @@ a:hover { text-decoration:underline; }
         <h2 v-if="!editMode" class="pp-name">{{ selectedProject.name }}</h2>
         <input v-else class="edit-input" style="font-family:var(--serif);font-size:20px;margin-bottom:6px" v-model="draft.name" />
         <div v-if="!editMode && selectedProject.nominee_entity" class="pp-nominee-entity">{{ selectedProject.nominee_entity }}</div>
+        <div v-if="!editMode && selectedProject.affiliated_program" class="pp-affiliated-program">{{ selectedProject.affiliated_program }}</div>
 
         <hr class="pp-divider" />
 
@@ -4965,7 +4982,7 @@ const app = createApp({
     const activeLegendFilter = ref(null);  // null = show all; string = filter by this legend label
 
     const search = ref('');
-    const filters = reactive({ zones: [], constituency: '', budgetRange: '', siteTypes: [] });
+    const filters = reactive({ zones: [], constituency: '', budgetRange: '', siteTypes: [], affiliatedProgram: '' });
     const ddOpen = ref(null);
     const accordions = reactive({ siteType: false, budgetViz: false, projects: true });
     const sidebarCollapsed = ref(false);
@@ -5086,29 +5103,15 @@ const app = createApp({
       }
       newAuthBusy.value = true;
       try {
-        // In mock mode just sign them in locally
-        if (!USE_LIVE_API) {
-          const role = authRole.value;
-          Object.assign(auth, {
-            mode: role, name: signupForm.name, email: signupForm.email,
-            projectCodes: [], adminUserId: ''
-          });
-          loginOpen.value = false;
-          toast(`Welcome, ${auth.name}!`, 'ok');
-          if (role === 'nominee') { addProjectOpen.value = true; addProjectViewMode.value = 'choose'; }
-          return;
-        }
-        const r = await api.call('signup', {
-          name: signupForm.name, org: signupForm.org,
-          email: signupForm.email, password: signupForm.password,
-          role: authRole.value,
-          securityQuestion: signupForm.securityQuestion,
-          securityAnswer: signupForm.securityAnswer.toLowerCase().trim()
-        }, {});
-        Object.assign(auth, { mode: r.role, name: r.name, email: r.email, projectCodes: r.projectCodes||[], adminUserId:'' });
+        // Always handle locally for now — backend auth endpoints not yet built
+        const role = authRole.value;
+        Object.assign(auth, {
+          mode: role, name: signupForm.name, email: signupForm.email,
+          projectCodes: [], adminUserId: ''
+        });
         loginOpen.value = false;
         toast(`Welcome, ${auth.name}!`, 'ok');
-        if (r.role === 'nominee') { addProjectOpen.value = true; addProjectViewMode.value = 'choose'; }
+        if (role === 'nominee') { addProjectOpen.value = true; addProjectViewMode.value = 'choose'; }
       } catch(e) { newAuthErr.value = e.message || 'Signup failed.'; }
       finally { newAuthBusy.value = false; }
     }
@@ -5118,16 +5121,9 @@ const app = createApp({
       if (!loginForm.email || !loginForm.password) { newAuthErr.value = 'Please enter email and password.'; return; }
       newAuthBusy.value = true;
       try {
-        if (!USE_LIVE_API) {
-          // Mock: accept any credentials, role based on authRole
-          const role = authRole.value || 'nominee';
-          Object.assign(auth, { mode: role, name: loginForm.email.split('@')[0], email: loginForm.email, projectCodes: [], adminUserId:'' });
-          loginOpen.value = false;
-          toast(`Signed in as ${auth.name}`, 'ok');
-          return;
-        }
-        const r = await api.call('login', { email: loginForm.email, password: loginForm.password }, {});
-        Object.assign(auth, { mode: r.role, name: r.name, email: r.email, projectCodes: r.projectCodes||[], adminUserId:'' });
+        // Handle locally until backend login endpoint is built
+        const role = authRole.value || 'nominee';
+        Object.assign(auth, { mode: role, name: loginForm.email.split('@')[0], email: loginForm.email, projectCodes: [], adminUserId:'' });
         loginOpen.value = false;
         toast(`Signed in as ${auth.name}`, 'ok');
       } catch(e) { newAuthErr.value = e.message || 'Login failed.'; }
@@ -5139,9 +5135,8 @@ const app = createApp({
       if (!forgotForm.email) { newAuthErr.value = 'Please enter your email.'; return; }
       newAuthBusy.value = true;
       try {
-        if (!USE_LIVE_API) { forgotQuestion.value = SECURITY_QUESTIONS[0]; authScreen.value = 'forgot-reset'; newAuthBusy.value = false; return; }
-        const r = await api.call('get_security_question', { email: forgotForm.email }, {});
-        forgotQuestion.value = r.question;
+        // Local fallback — show first question until backend supports this
+        forgotQuestion.value = SECURITY_QUESTIONS[0];
         authScreen.value = 'forgot-reset';
       } catch(e) { newAuthErr.value = e.message || 'Email not found.'; }
       finally { newAuthBusy.value = false; }
@@ -5467,6 +5462,9 @@ const app = createApp({
       return [...set].sort();
     });
     const budgetRanges = computed(() => BUDGET_RANGES.map(b => b.range));
+    const affiliatedPrograms = computed(() =>
+      [...new Set(allProjects.value.map(p => p.affiliated_program).filter(Boolean))].sort()
+    );
     const siteTypeOptions = computed(() => {
       const counts = {};
       allProjects.value.forEach(p => {
@@ -5483,6 +5481,7 @@ const app = createApp({
         if (filters.zones.length && !filters.zones.includes(p.zone)) return false;
         if (filters.constituency && !(p.constituency||'').toLowerCase().includes(filters.constituency.toLowerCase())) return false;
         if (filters.budgetRange && p.budget_range !== filters.budgetRange) return false;
+        if (filters.affiliatedProgram && p.affiliated_program !== filters.affiliatedProgram) return false;
         if (filters.siteTypes.length) {
           const types = (p.site_type||'').split(',').map(s=>s.trim());
           if (!filters.siteTypes.some(t => types.includes(t))) return false;
@@ -7194,7 +7193,7 @@ const app = createApp({
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
       auth, toasts, busy, loadStage, loadPct, loadDone, siteTypeMap,
       // computed
-      zones, constituencies, budgetRanges, siteTypeOptions,
+      zones, constituencies, budgetRanges, affiliatedPrograms, siteTypeOptions,
       filteredProjects, totalBudget, bucketBreakdown,
       selectedProject, galleryUrls, currentImage,
       projectInterventions, groupedInterventions, addableInterventions,
