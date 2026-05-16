@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>BLR Public Space Revival</title>
+<title>Forge : Transforming Ideas into Projects</title>
 
 <!--
   ===========================================================================
@@ -767,8 +767,8 @@ a:hover { text-decoration:underline; }
   display:flex; align-items:center; padding:0 16px; gap:8px;
   border-bottom:1px solid var(--ink-2);
 }
-.tb-brand { font-family:var(--serif); font-size:18px; line-height:1; flex-shrink:0; }
-.tb-brand em { font-style:italic; color:var(--accent); }
+.tb-brand { font-family:var(--serif); font-size:18px; line-height:1; flex-shrink:0; display:flex; align-items:center; }
+.tb-brand strong { font-weight:900; }
 .tb-sub { font-size:12px; color:rgba(241,236,226,.55); margin-left:2px; letter-spacing:.4px; }
 .tb-lists-badge {
   display:inline-flex; align-items:center; justify-content:center;
@@ -790,13 +790,13 @@ a:hover { text-decoration:underline; }
 
 /* ── Unified load/refresh indicator ── */
 .tb-sync {
-  display:flex; align-items:center; gap:10px;
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  display:flex; align-items:center; gap:6px;
   pointer-events:none;
 }
+.tb-sync-inline { margin-left:10px; }
 .tb-sync.clickable { pointer-events:all; cursor:pointer; }
 .tb-sync-track {
-  width:140px; height:3px; background:rgba(255,255,255,.15);
+  width:60px; height:3px; background:rgba(255,255,255,.15);
   border-radius:4px; overflow:hidden;
 }
 .tb-sync-fill {
@@ -808,8 +808,8 @@ a:hover { text-decoration:underline; }
   letter-spacing:.3px; white-space:nowrap;
 }
 .tb-sync-pct {
-  font-size:11px; font-weight:700; color:rgba(241,236,226,.6);
-  white-space:nowrap; min-width:30px; text-align:right;
+  font-size:10px; font-weight:700; color:rgba(241,236,226,.5);
+  white-space:nowrap; min-width:26px;
 }
 /* After load: just the refresh icon */
 .tb-sync-icon {
@@ -2927,19 +2927,17 @@ a:hover { text-decoration:underline; }
 
 <!-- §2 TOPBAR ─────────────────────────────────────────────────────────── -->
 <header id="topbar">
-  <!-- Unified sync indicator: progress on load, refresh icon after -->
+  <div class="tb-brand"><strong>Forge</strong> : Transforming Ideas into Projects</div>
+  <!-- Compact progress: just bar + % inline after brand -->
   <transition name="tb-sync-fade" mode="out-in">
-    <!-- Loading / refreshing: progress bar + label + % -->
-    <div v-if="!loadDone || refreshing" key="progress" class="tb-sync">
-      <span class="tb-sync-label">{{ loadStage }}</span>
+    <div v-if="!loadDone || refreshing" key="progress" class="tb-sync tb-sync-inline">
       <div class="tb-sync-track">
         <div class="tb-sync-fill" :style="{width: loadPct + '%'}"></div>
       </div>
       <span class="tb-sync-pct">{{ loadPct }}%</span>
     </div>
-    <!-- Idle (admin only): just the refresh icon -->
     <div v-else-if="auth.mode === 'admin'" key="idle"
-         class="tb-sync clickable" @click="refreshData" title="Refresh data from Sheets">
+         class="tb-sync tb-sync-inline clickable" @click="refreshData" title="Refresh data from Sheets">
       <div class="tb-sync-icon" :class="{spinning: refreshing}">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2951,7 +2949,6 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
   </transition>
-  <div class="tb-brand">BLR <em>Public Space</em> Revival</div>
   <div class="tb-spacer"></div>
   <nav class="tb-nav">
     <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
