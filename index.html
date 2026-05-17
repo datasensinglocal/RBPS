@@ -1226,7 +1226,8 @@ a:hover { text-decoration:underline; }
 .pl-img-empty { display:none; }
 .pl-body { padding:10px 12px 12px; }
 .pl-row1 { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:4px; }
-.pl-code { font-size:14px; font-weight:400; color:var(--ink); letter-spacing:.4px; flex-shrink:0; }
+.pl-code { font-size:11px; font-weight:400; color:var(--ink); letter-spacing:.4px; flex-shrink:0; }
+.pl-code-tag { font-weight:400; color:#fff; background:#1C3B2F; border-radius:3px; padding:1px 5px; }
 .pl-name { font-size:16px; font-weight:600; line-height:1.25; flex:1; min-width:0; }
 .pl-cost { font-size:11px; font-weight:700; color:var(--ink); white-space:nowrap; flex-shrink:0; }
 .pl-tags { display:flex; flex-wrap:wrap; gap:3px; }
@@ -2088,34 +2089,26 @@ a:hover { text-decoration:underline; }
   border:1px solid rgba(255,255,255,.6);
   box-shadow:0 1px 6px rgba(0,0,0,.25);
   font-size:13px; font-weight:700; color:var(--ink); letter-spacing:.5px;
+  margin-left:44px;
 }
 
-/* Sticky close — always fixed to top-left of the panel, never scrolls */
-.pp-fixed-top {
+/* Floating ✕ — fixed to top of panel, never scrolls */
+.pp-close-sticky {
   position:fixed;
   top:calc(var(--tb-h) + 10px);
-  right:calc(var(--panel-w) - 16px - 34px);
+  right:calc(var(--panel-w) - 14px - 32px);
   z-index:310;
-  display:flex; align-items:center; gap:10px;
-  pointer-events:none;
-}
-.pp-fixed-top > * { pointer-events:all; }
-.pp-close-sticky {
-  width:34px; height:34px; border-radius:50%;
+  width:32px; height:32px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   background:rgba(255,255,255,.92);
   border:1.5px solid rgba(0,0,0,.10);
   box-shadow:0 2px 8px rgba(0,0,0,.15);
   cursor:pointer;
   transition:box-shadow .15s, background .15s;
-  flex-shrink:0;
 }
 .pp-close-sticky:hover {
   background:#fff;
   box-shadow:0 3px 14px rgba(0,0,0,.22);
-}
-.pp-code-fixed {
-  /* inherits .pp-code-bubble styles */
 }
 
 /* Prev/next arrows — stay overlaid on main image */
@@ -2185,7 +2178,84 @@ a:hover { text-decoration:underline; }
 }
 .pp-infobar-cost-wrap .pp-infobar-lbl { color:var(--muted); }
 .pp-infobar-cost-wrap .pp-infobar-cost { color:var(--ink); }
-.pp-nominee-entity {
+.cost-mode-toggle {
+  display:flex; gap:0; margin:12px 0 0;
+  border:1px solid var(--line); border-radius:6px; overflow:hidden;
+  width:100%;
+}
+.cost-mode-btn {
+  flex:1; padding:7px 10px; font-size:12px; font-weight:600;
+  color:var(--muted); background:var(--paper);
+  border:none; border-right:1px solid var(--line);
+  cursor:pointer; transition:background .15s, color .15s;
+  text-align:center;
+}
+.cost-mode-btn:last-child { border-right:none; }
+.cost-mode-btn:hover { background:var(--soft); color:var(--ink); }
+.cost-mode-btn.active { background:var(--ink); color:#fff; }
+.cost-placeholder-summary {
+  margin:16px 0 0;
+  padding:16px;
+  background:var(--soft);
+  border-radius:8px;
+  text-align:center;
+}
+.cost-placeholder-amount {
+  font-size:22px; font-weight:700; color:var(--ink);
+  font-family:var(--serif);
+}
+.cost-placeholder-note {
+  font-size:11px; color:var(--muted); margin-top:6px; line-height:1.5;
+}
+  position:relative;
+  display:inline-block;
+  font-size:11px; font-weight:700;
+  color:var(--accent);
+  cursor:default;
+  margin-left:1px;
+  vertical-align:super;
+}
+.cost-placeholder-tip {
+  display:none;
+  position:absolute;
+  bottom:calc(100% + 6px);
+  right:0;
+  width:220px;
+  background:var(--ink);
+  color:#fff;
+  font-size:11px !important; font-weight:400;
+  line-height:1.4;
+  padding:7px 10px;
+  border-radius:6px;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+  white-space:normal;
+  z-index:400;
+  pointer-events:none;
+  font-family:var(--sans);
+  letter-spacing:0;
+}
+.cost-placeholder-tip::after {
+  content:'';
+  position:absolute;
+  top:100%; right:8px;
+  border:5px solid transparent;
+  border-top-color:var(--ink);
+}
+.cost-placeholder-marker:hover .cost-placeholder-tip { display:block; }
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  margin-top:8px;
+}
+.pp-tag {
+  display:inline-block; padding:3px 8px; border-radius:4px;
+  font-size:11px; font-weight:600; color:var(--ink);
+  background:var(--soft); border:1px solid var(--line);
+}
+.pp-code-inline {
+  display:inline-block; padding:3px 8px; border-radius:4px;
+  font-size:11px; font-weight:700; color:var(--ink);
+  background:rgba(255,255,255,.85); border:1px solid var(--line);
+  letter-spacing:.4px;
+}
   display:inline-block;
   font-size:11px; color:var(--text);
   background:var(--soft);
@@ -3251,11 +3321,14 @@ a:hover { text-decoration:underline; }
           <div v-for="p in filteredProjects" :key="p.project_code" class="pl-card" :class="{sel: selectedCode===p.project_code}" @click="openProject(p.project_code)" @mouseenter="prefetchProjectText(p.project_code)">
             <div class="pl-body">
               <div class="pl-row1">
-                <div class="pl-code">{{ p.project_code }}</div>
                 <div class="pl-name">{{ p.name }}</div>
-                <div class="pl-cost">{{ fmtCost(projectTotal(p.project_code)) }}</div>
+                <div class="pl-cost" style="display:flex;align-items:baseline;gap:2px">
+                  <span>{{ fmtCost(projectTotal(p.project_code)) }}</span>
+                  <span v-if="isPlaceholderCost(p.project_code) && projectTotal(p.project_code)" class="cost-placeholder-marker">*<span class="cost-placeholder-tip">Placeholder budget — for an accurate estimate, add specific interventions.</span></span>
+                </div>
               </div>
               <div class="pl-tags">
+                <span class="pl-code pl-code-tag">{{ p.project_code }}</span>
                 <span v-for="t in projectSiteTypes(p)" class="pl-tag">{{ t }}</span>
               </div>
             </div>
@@ -3714,22 +3787,21 @@ a:hover { text-decoration:underline; }
 <!-- §5 PROJECT PANEL ─────────────────────────────────────────────────── -->
 <aside id="panel" :class="{open: !!selectedCode}">
   <template v-if="selectedProject">
-    <!-- Floating close + code bubble — both fixed, stay while scrolling -->
-    <div class="pp-fixed-top">
-      <button class="pp-close-sticky" @click="closeProject" title="Close panel">
-        <svg width="13" height="13" viewBox="0 0 14 14"><path d="M3 3 L11 11 M11 3 L3 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-      <span class="pp-code-bubble pp-code-fixed">{{ selectedProject.project_code }}</span>
-    </div>
+    <!-- ✕ floats fixed — always visible while scrolling -->
+    <button class="pp-close-sticky" @click="closeProject" title="Close panel">
+      <svg width="13" height="13" viewBox="0 0 14 14"><path d="M3 3 L11 11 M11 3 L3 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
     <div class="pp-body scroll">
       <!-- Image — full bleed to the top edge of the panel -->
       <div class="pp-img">
         <img v-if="currentImage" :src="currentImage" :alt="selectedProject.name" loading="eager" class="pp-main-img" :key="currentImage" />
         <div v-else class="pp-img-empty">◦</div>
 
-        <!-- Controls overlaid on image -->
+        <!-- Project code — in-flow, overlaid on image top-left, scrolls away -->
         <div class="pp-overlay">
           <div class="pp-overlay-left">
+            <span class="pp-code-bubble">{{ selectedProject.project_code }}</span>
           </div>
           <button v-if="canEdit(selectedProject)" class="pp-edit" :class="{active: editMode}" @click="toggleEdit" :title="editMode?'Exit edit mode':'Edit'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -3781,7 +3853,12 @@ a:hover { text-decoration:underline; }
           </div>
           <div class="pp-infobar-item pp-infobar-cost-wrap">
             <span class="pp-infobar-lbl">Est. Cost</span>
-            <span class="pp-infobar-val pp-infobar-cost">{{ fmtCost(projectTotal(selectedProject.project_code)) || '—' }}</span>
+            <div style="display:flex;align-items:baseline;gap:3px">
+              <span class="pp-infobar-val pp-infobar-cost">{{ fmtCost(projectTotal(selectedProject.project_code)) || '—' }}</span>
+              <span v-if="isPlaceholderCost(selectedProject.project_code) && projectTotal(selectedProject.project_code)" class="cost-placeholder-marker">
+                *<span class="cost-placeholder-tip">Placeholder budget — for an accurate estimate, add specific interventions.</span>
+              </span>
+            </div>
           </div>
           <!-- Add to list — admin only, sits after Est. Cost -->
           <div v-if="auth.mode === 'admin'" style="position:relative;margin-left:auto;flex-shrink:0;">
@@ -3873,20 +3950,24 @@ a:hover { text-decoration:underline; }
           </button>
         </div>
 
+        <!-- Cost mode toggle -->
+        <div class="cost-mode-toggle">
+          <button class="cost-mode-btn" :class="{active: costMode==='placeholder'}" @click="costMode='placeholder'">
+            Placeholder budget
+          </button>
+          <button class="cost-mode-btn" :class="{active: costMode==='detail'}" @click="costMode='detail'">
+            Detail by interventions
+          </button>
+        </div>
 
 
-        <div v-if="!projectInterventions.length && !editMode" class="pp-empty">
+
+        <div v-if="costMode==='detail' && !projectInterventions.length && !editMode" class="pp-empty">
           No interventions added yet.
         </div>
 
-        <!-- Collapsible intervention table
-             Closed cat  → cat row with total cost
-             Open cat    → cat header (no cost) + sub rows
-               Closed sub → sub row with total cost
-               Open sub   → sub header (no cost) + individual rows
-             Always: project TOTAL at bottom
-        -->
-        <div v-if="groupedInterventions.length" class="iv-table">
+        <!-- Collapsible intervention table -->
+        <div v-if="costMode==='detail' && groupedInterventions.length" class="iv-table">
           <!-- Table header -->
           <div class="iv-table-hdr" :class="editMode ? 'with-edit' : ''">
             <div class="iv-hdr-cell iv-hdr-name">Infrastructure elements</div>
@@ -4406,13 +4487,6 @@ a:hover { text-decoration:underline; }
             <div class="ap-field"><label>Constituency</label><input v-model="form.constituency" placeholder="e.g. 173 - Jayanagar" /></div>
             <div class="ap-field"><label>Zone</label><input v-model="form.zone" placeholder="e.g. South Zone 1" /></div>
             <div class="ap-field"><label>Corporation</label><input v-model="form.corporation" placeholder="e.g. South" /></div>
-            <div class="ap-field">
-              <label>Budget range</label>
-              <select v-model="form.budget_range" class="modal-select">
-                <option value="">— Select —</option>
-                <option v-for="r in BUDGET_RANGES_LIST" :key="r" :value="r">{{ r }}</option>
-              </select>
-            </div>
             <div class="ap-field">
               <label>Impact</label>
               <select v-model="form.impact" class="modal-select">
@@ -5064,6 +5138,7 @@ const app = createApp({
 
     const selectedCode = ref(null);
     const editMode = ref(false);
+    const costMode = ref('placeholder'); // 'placeholder' | 'detail'
     const nomineePopupOpen = ref(false);
     // ── Admin Lists state ────────────────────────────────────────────────
     const adminListsOpen    = ref(false);   // My Lists dropdown open
@@ -5315,7 +5390,7 @@ const app = createApp({
           constituency: f.constituency.trim(),
           zone: f.zone.trim(),
           corporation: f.corporation.trim(),
-          budget_range: f.budget_range,
+          budget_range: budgetRangeFromAmount(Number(f.placeholder_budget)),
           impact: f.impact,
           length_m: f.length_m ? Number(f.length_m) : '',
           area_sqm: f.area_sqm ? Number(f.area_sqm) : '',
@@ -5355,7 +5430,6 @@ const app = createApp({
       { key:'constituency',       label:'Constituency',          required:false, type:'text',   width:140 },
       { key:'zone',               label:'Zone',                  required:false, type:'text',   width:120 },
       { key:'corporation',        label:'Corporation',           required:false, type:'text',   width:110 },
-      { key:'budget_range',       label:'Budget Range',          required:false, type:'text',   width:120 },
       { key:'impact',             label:'Impact',                required:false, type:'text',   width:100 },
       { key:'length_m',           label:'Length (m)',            required:false, type:'number', width:100 },
       { key:'area_sqm',           label:'Area (sqm)',            required:false, type:'number', width:100 },
@@ -5418,7 +5492,7 @@ const app = createApp({
           site_type:(f.site_type||'').trim(), placeholder_budget:Number(f.placeholder_budget),
           proposal:(f.proposal||'').trim(), constituency:(f.constituency||'').trim(),
           zone:(f.zone||'').trim(), corporation:(f.corporation||'').trim(),
-          budget_range:(f.budget_range||''), impact:(f.impact||''),
+          budget_range: budgetRangeFromAmount(Number(f.placeholder_budget)), impact:(f.impact||''),
           length_m: f.length_m ? Number(f.length_m) : '',
           area_sqm: f.area_sqm ? Number(f.area_sqm) : '',
         }));
@@ -5681,8 +5755,26 @@ const app = createApp({
       return result;
     });
 
+    function isPlaceholderCost(code) {
+      return !(projectTotalMap.value[code] > 0);
+    }
+
+    function budgetRangeFromAmount(rupees) {
+      if (!rupees || rupees <= 0) return '';
+      const lakhs = rupees / 100000;
+      for (const b of BUDGET_RANGES) {
+        if (lakhs <= b.max) return b.range;
+      }
+      return 'More than 10 cr';
+    }
+
     function projectTotal(code) {
-      return projectTotalMap.value[code] || 0;
+      const computed = projectTotalMap.value[code] || 0;
+      const p = allProjects.value.find(p => p.project_code === code);
+      const amount = computed > 0 ? computed : (Number(p && p.placeholder_budget) || 0);
+      // Auto-sync budget_range on the fly from whichever cost is active
+      if (p && amount > 0) p.budget_range = budgetRangeFromAmount(amount);
+      return amount;
     }
     function projectSiteTypes(p) {
       return (p.site_type||'').split(',').map(s=>s.trim()).filter(Boolean).slice(0,3);
@@ -6788,6 +6880,8 @@ const app = createApp({
       selectedCode.value = code; galleryIdx.value = 0; editMode.value = false;
       openCats.clear();
       openSubs.clear();
+      // Auto-switch to detail if project already has interventions, else placeholder
+      costMode.value = (projectTotalMap.value[code] > 0) ? 'detail' : 'placeholder';
       // Expand immediately (groupedInterventions is already computed for this code)
       expandAllSubs();
       try { mapCtrl.flyTo(code); } catch(e) { /* map not ready or not visible */ }
@@ -7276,7 +7370,7 @@ const app = createApp({
       // state
       view, allProjects, framework, projectIntvs, typology,
       search, filters, ddOpen, accordions, sidebarCollapsed,
-      selectedCode, editMode, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
+      costMode, selectedCode, editMode, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
       addModalOpen, addModalSelected, addModalQtys, setModalQty, colorMode, activeLegendFilter,
       rateCardOpen, rcSearch, openBuckets, menuOpen,
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
@@ -7327,7 +7421,7 @@ const app = createApp({
       smQ, smZone, smConstituency, smBucket, smDonutBy, smDonutHover, smSelected, smFiltered,
       smBuckets, smDonutSegs, smDonutTotal, smSubCatBars, smToggle, smSelectAll, smDeselectAll, smRefresh,
       openRateCard, toggleBucket, updateFw, deactivateFw, addFwRow, recomputeAllTotals,
-      projectTotal, projectSiteTypes, canEdit, toggleLegendFilter,
+      projectTotal, isPlaceholderCost, projectSiteTypes, canEdit, toggleLegendFilter,
       fmtCost: costEngine.fmtCost, fmtCr: costEngine.fmtCr, fmtLakh: costEngine.fmtLakh,
       fmtRate: costEngine.fmtRate, fmtDate, wixResize,
     };
