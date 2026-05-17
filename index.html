@@ -20,7 +20,7 @@
     §8   Edit-mode controls
     §9   Bottom-sheet (mobile)
   ---------------------------------------------------------------------------
-  All app logic lives at the bottom in <script>. Sections inside the script
+  All app logic lives at the bottom in the app script block. Sections inside the script
   use the same banner style — search "// §" to jump.
   ===========================================================================
 -->
@@ -31,7 +31,7 @@
 
 <!--
   All vendor JS/CSS is INLINED below at build time. This is required because
-  Wix's HTML embed sandbox blocks <script src="…"> to external CDNs (CSP).
+  Wix's HTML embed sandbox blocks external script tags to external CDNs (CSP).
   Files inlined: leaflet.css, MarkerCluster.css, MarkerCluster.Default.css,
   vue.global.prod.js, leaflet.js, leaflet.markercluster.js.
   See build-index.py to update versions or add libraries.
@@ -2375,6 +2375,7 @@ a:hover { text-decoration:underline; }
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+.iv-cost-value {
   text-align:right;
   padding:6px 12px;
   font-size:14px;
@@ -4407,7 +4408,7 @@ a:hover { text-decoration:underline; }
               <label>Budget range</label>
               <select v-model="form.budget_range" class="modal-select">
                 <option value="">— Select —</option>
-                <option v-for="r in BUDGET_RANGES" :key="r" :value="r">{{ r }}</option>
+                <option v-for="r in BUDGET_RANGES_LIST" :key="r" :value="r">{{ r }}</option>
               </select>
             </div>
             <div class="ap-field">
@@ -4809,7 +4810,7 @@ const COLOR_MODES = {
 // That's it — no other file needs to change.
 //
 const api = (() => {
-  // JSONP: bypasses CORS by injecting <script> tags.
+  // JSONP: bypasses CORS by injecting script tags.
   // Works from Netlify-hosted pages (no CSP restrictions).
   // Doesn't work from Wix iframes (CSP blocks dynamic scripts).
 
@@ -5266,7 +5267,7 @@ const app = createApp({
       return [...new Set(combined)].sort();
     });
 
-    const BUDGET_RANGES = ['Under 10 lakhs','10-50 lakhs','50-100 lakhs','1-5 cr','5- 10 cr','More than 10 cr'];
+    const BUDGET_RANGES_LIST = BUDGET_RANGES.map(b => b.range);
     const IMPACT_OPTIONS = ['Easy win','High Impact','Others'];
 
     function addProjectForm() { projectForms.value.push(EMPTY_PROJECT_FORM()); projectFormErrors.value.push({}); }
@@ -7300,7 +7301,7 @@ const app = createApp({
       // add project
       addProjectOpen, addProjectViewMode,
       projectForms, projectFormErrors, projectSaving, projectSaveMsg,
-      allSiteTypes, customSiteTypes, BUDGET_RANGES, IMPACT_OPTIONS,
+      allSiteTypes, customSiteTypes, BUDGET_RANGES_LIST, IMPACT_OPTIONS,
       addProjectForm, removeProjectForm, addNewSiteType, saveAllProjects,
       SHEET_COLS, sheetRows, sheetErrors, sheetPasteArea,
       ensureSheetRows, parseSheetPaste, saveSheetProjects,
