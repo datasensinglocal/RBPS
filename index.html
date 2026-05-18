@@ -3050,7 +3050,7 @@ a:hover { text-decoration:underline; }
   position:absolute; top:calc(100% + 4px); left:0;
   background:#fff; border:1px solid var(--line);
   border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.12);
-  z-index:500; min-width:180px; max-height:260px; overflow-y:auto;
+  z-index:9999; min-width:180px; max-height:260px; overflow-y:auto;
   padding:4px 0;
 }
 .fb-dropdown-wide { min-width:240px; }
@@ -3093,6 +3093,7 @@ a:hover { text-decoration:underline; }
   width:260px;
   max-height:70vh;
   overflow-y:auto;
+  z-index:9999;
 }
 .fb-allfilters-section {
   padding:4px 0;
@@ -3415,7 +3416,7 @@ a:hover { text-decoration:underline; }
 </header>
 
 <!-- §2b UNIFIED FILTER BAR ─────────────────────────────────────────────── -->
-<div id="filter-bar" @click.self="ddOpen=null">
+<div id="filter-bar">
   <!-- Search — always visible -->
   <div class="fb-search-wrap">
     <svg width="13" height="13" viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M9.5 9.5 L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
@@ -3468,6 +3469,14 @@ a:hover { text-decoration:underline; }
         <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; ddOpen=null"><span>{{ p }}</span></div>
       </div>
     </div>
+    <!-- Impact -->
+    <div class="fb-filter" :class="{'has-value': filters.impact}" @click.stop="ddOpen=ddOpen==='impact'?null:'impact'">
+      <span>{{ filters.impact || 'Impact' }}</span><span class="chev">▾</span>
+      <div v-if="ddOpen==='impact'" class="fb-dropdown" @click.stop>
+        <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
+        <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; ddOpen=null"><span>{{ i }}</span></div>
+      </div>
+    </div>
   </div>
 
   <!-- Collapsed "Filters" button — shown only on narrow screens -->
@@ -3509,6 +3518,20 @@ a:hover { text-decoration:underline; }
         <div class="fb-dd-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
         <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; ddOpen=null">
           <input type="radio" :checked="filters.affiliatedProgram===p" @click.stop /><span>{{ p }}</span>
+        </div>
+      </div>
+      <div class="fb-allfilters-section">
+        <div class="fb-allfilters-label">Impact</div>
+        <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
+        <div v-for="i in IMPACT_OPTIONS" class="fb-dd-item" @click="filters.impact=i; ddOpen=null">
+          <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
+        </div>
+      </div>
+      <div class="fb-allfilters-section">
+        <div class="fb-allfilters-label">Impact</div>
+        <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
+        <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; ddOpen=null">
+          <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
         </div>
       </div>
       <div class="fb-dd-clear" @click="resetFiltersAndSelection(); ddOpen=null">Clear all filters</div>
@@ -5370,7 +5393,7 @@ const app = createApp({
     const activeLegendFilter = ref(null);  // null = show all; string = filter by this legend label
 
     const search = ref('');
-    const filters = reactive({ zones: [], constituency: '', budgetRange: '', siteTypes: [], affiliatedProgram: '' });
+    const filters = reactive({ zones: [], constituency: '', budgetRange: '', siteTypes: [], affiliatedProgram: '', impact: '' });
     const ddOpen = ref(null);
     const accordions = reactive({ siteType: false, budgetViz: false, projects: true });
     const sidebarCollapsed = ref(false);
@@ -5789,6 +5812,7 @@ const app = createApp({
       initMap();
 
       document.addEventListener('click', (e) => {
+        if (!e.target.closest('.fb-filter') && !e.target.closest('.fb-filter-collapse')) { ddOpen.value = null; }
         if (!e.target.closest('.tb-user')) { nomineePopupOpen.value = false; adminListsOpen.value = false; }
         if (!e.target.closest('.tb-list-toggle')) { listPickerOpen.value = false; }
         if (!e.target.closest('.pp-list-band')) panelListDropdownOpen.value = false;
@@ -5867,7 +5891,8 @@ const app = createApp({
       (filters.constituency ? 1 : 0) +
       (filters.budgetRange ? 1 : 0) +
       filters.siteTypes.length +
-      (filters.affiliatedProgram ? 1 : 0)
+      (filters.affiliatedProgram ? 1 : 0) +
+      (filters.impact ? 1 : 0)
     );
 
     const affiliatedPrograms = computed(() =>
@@ -5890,6 +5915,7 @@ const app = createApp({
         if (filters.constituency && !(p.constituency||'').toLowerCase().includes(filters.constituency.toLowerCase())) return false;
         if (filters.budgetRange && p.budget_range !== filters.budgetRange) return false;
         if (filters.affiliatedProgram && p.affiliated_program !== filters.affiliatedProgram) return false;
+        if (filters.impact && p.impact !== filters.impact) return false;
         if (filters.siteTypes.length) {
           const types = (p.site_type||'').split(',').map(s=>s.trim());
           if (!filters.siteTypes.some(t => types.includes(t))) return false;
@@ -6033,6 +6059,7 @@ const app = createApp({
       filters.budgetRange = '';
       filters.siteTypes = [];
       filters.affiliatedProgram = '';
+      filters.impact = '';
       search.value = '';
       selectedCodes.value = new Set();
       selectMode.value = false;
