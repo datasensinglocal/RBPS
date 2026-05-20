@@ -3007,22 +3007,20 @@ a:hover { text-decoration:underline; }
 #filter-bar {
   position:fixed;
   top:var(--tb-h); left:0; right:0;
-  z-index:200;
+  z-index:310;
   background:#fff;
   border-bottom:1px solid var(--line);
   display:flex; align-items:center; gap:6px;
   padding:0 16px;
   height:44px;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  box-shadow:0 2px 8px rgba(0,0,0,.10);
   overflow:visible;
 }
 .fb-filters {
   display:flex; align-items:center; gap:5px;
   flex:1; min-width:0;
-  overflow-x:auto; overflow-y:visible;
-  scrollbar-width:none;
+  overflow:visible;
 }
-.fb-filters::-webkit-scrollbar { display:none; }
 .fb-search-wrap {
   display:flex; align-items:center; gap:5px;
   padding:3px 9px; border:1px solid var(--line);
@@ -3105,6 +3103,11 @@ a:hover { text-decoration:underline; }
   font-size:10px; font-weight:700;
   text-transform:uppercase; letter-spacing:.5px;
   color:var(--muted);
+}
+.fb-allfilters-items {
+  max-height:150px;
+  overflow-y:auto;
+  scrollbar-width:thin;
 }
 @media (max-width: 860px) {
   .fb-filters { display:none; }
@@ -3199,12 +3202,11 @@ a:hover { text-decoration:underline; }
 }
 .selection-tray-cancel:hover { color:#fff; }
 
-/* Push content down to account for filter bar */
-#sidebar, #map, #overview-page { top:calc(var(--tb-h) + 44px) !important; }
+/* Push ALL fixed content below topbar + filter bar */
+#sidebar, #map, #overview-page, #summary-page, #panel, #rateCard { top:calc(var(--tb-h) + 44px) !important; }
 .pp-close-sticky { top:calc(var(--tb-h) + 44px + 10px) !important; }
 .map-color-ctrl { top:calc(var(--tb-h) + 44px + 10px) !important; }
-
-/* On mobile bottom-sheet, sidebar anchors to bottom not top */
+/* Mobile: sidebar is bottom-sheet, ignore top */
 @media (max-width: 720px) {
   #sidebar { top:auto !important; }
 }
@@ -3426,7 +3428,7 @@ a:hover { text-decoration:underline; }
   <!-- Individual filter pills — hidden on narrow screens -->
   <div class="fb-filters">
     <!-- Zone -->
-    <div class="fb-filter" :class="{'has-value': filters.zones.length}" @click.stop="ddOpen=ddOpen==='zone'?null:'zone'">
+    <div class="fb-filter" :class="{'has-value': filters.zones.length}" @click.stop="toggleDd('zone')">
       <span>Zone<span v-if="filters.zones.length" class="fb-badge">{{ filters.zones.length }}</span></span><span class="chev">▾</span>
       <div v-if="ddOpen==='zone'" class="fb-dropdown" @click.stop>
         <div v-for="z in zones" class="fb-dd-item" @click="toggleZone(z)">
@@ -3436,7 +3438,7 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
     <!-- Constituency -->
-    <div class="fb-filter" :class="{'has-value': filters.constituency}" @click.stop="ddOpen=ddOpen==='cnst'?null:'cnst'">
+    <div class="fb-filter" :class="{'has-value': filters.constituency}" @click.stop="toggleDd('cnst')">
       <span>{{ filters.constituency || 'Constituency' }}</span><span class="chev">▾</span>
       <div v-if="ddOpen==='cnst'" class="fb-dropdown" @click.stop>
         <div class="fb-dd-item" @click="filters.constituency=''; ddOpen=null"><span>All</span></div>
@@ -3444,7 +3446,7 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
     <!-- Budget -->
-    <div class="fb-filter" :class="{'has-value': filters.budgetRange}" @click.stop="ddOpen=ddOpen==='br'?null:'br'">
+    <div class="fb-filter" :class="{'has-value': filters.budgetRange}" @click.stop="toggleDd('br')">
       <span>{{ filters.budgetRange || 'Budget' }}</span><span class="chev">▾</span>
       <div v-if="ddOpen==='br'" class="fb-dropdown" @click.stop>
         <div class="fb-dd-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
@@ -3452,7 +3454,7 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
     <!-- Site Type -->
-    <div class="fb-filter" :class="{'has-value': filters.siteTypes.length}" @click.stop="ddOpen=ddOpen==='st'?null:'st'">
+    <div class="fb-filter" :class="{'has-value': filters.siteTypes.length}" @click.stop="toggleDd('st')">
       <span>Site Type<span v-if="filters.siteTypes.length" class="fb-badge">{{ filters.siteTypes.length }}</span></span><span class="chev">▾</span>
       <div v-if="ddOpen==='st'" class="fb-dropdown fb-dropdown-wide" @click.stop>
         <div v-for="t in siteTypeOptions" class="fb-dd-item" @click="toggleSiteType(t.name)">
@@ -3462,7 +3464,7 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
     <!-- Program -->
-    <div class="fb-filter" :class="{'has-value': filters.affiliatedProgram}" @click.stop="ddOpen=ddOpen==='ap'?null:'ap'">
+    <div class="fb-filter" :class="{'has-value': filters.affiliatedProgram}" @click.stop="toggleDd('ap')">
       <span>{{ filters.affiliatedProgram || 'Program' }}</span><span class="chev">▾</span>
       <div v-if="ddOpen==='ap'" class="fb-dropdown" @click.stop>
         <div class="fb-dd-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
@@ -3470,7 +3472,7 @@ a:hover { text-decoration:underline; }
       </div>
     </div>
     <!-- Impact -->
-    <div class="fb-filter" :class="{'has-value': filters.impact}" @click.stop="ddOpen=ddOpen==='impact'?null:'impact'">
+    <div class="fb-filter" :class="{'has-value': filters.impact}" @click.stop="toggleDd('impact')">
       <span>{{ filters.impact || 'Impact' }}</span><span class="chev">▾</span>
       <div v-if="ddOpen==='impact'" class="fb-dropdown" @click.stop>
         <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
@@ -3480,7 +3482,7 @@ a:hover { text-decoration:underline; }
   </div>
 
   <!-- Collapsed "Filters" button — shown only on narrow screens -->
-  <div class="fb-filter-collapse" @click.stop="ddOpen=ddOpen==='allfilters'?null:'allfilters'">
+  <div class="fb-filter-collapse" @click.stop="toggleDd('allfilters')">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="6" y1="12" x2="10" y2="12"/></svg>
     Filters
     <span v-if="activeFilterCount" class="fb-badge">{{ activeFilterCount }}</span>
@@ -3489,49 +3491,54 @@ a:hover { text-decoration:underline; }
     <div v-if="ddOpen==='allfilters'" class="fb-dropdown fb-dropdown-allfilters" @click.stop>
       <div class="fb-allfilters-section">
         <div class="fb-allfilters-label">Zone</div>
-        <div v-for="z in zones" class="fb-dd-item" @click="toggleZone(z)">
-          <input type="checkbox" :checked="filters.zones.includes(z)" @click.stop /><span>{{ z }}</span>
+        <div class="fb-allfilters-items">
+          <div v-for="z in zones" class="fb-dd-item" @click="toggleZone(z)">
+            <input type="checkbox" :checked="filters.zones.includes(z)" @click.stop /><span>{{ z }}</span>
+          </div>
         </div>
       </div>
       <div class="fb-allfilters-section">
         <div class="fb-allfilters-label">Constituency</div>
-        <div class="fb-dd-item" @click="filters.constituency=''; ddOpen=null"><span>All</span></div>
-        <div v-for="c in constituencies" class="fb-dd-item" @click="filters.constituency=c; ddOpen=null">
-          <input type="radio" :checked="filters.constituency===c" @click.stop /><span>{{ c }}</span>
+        <div class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.constituency=''; ddOpen=null"><span>All</span></div>
+          <div v-for="c in constituencies" class="fb-dd-item" @click="filters.constituency=c; ddOpen=null">
+            <input type="radio" :checked="filters.constituency===c" @click.stop /><span>{{ c }}</span>
+          </div>
         </div>
       </div>
       <div class="fb-allfilters-section">
         <div class="fb-allfilters-label">Budget</div>
-        <div class="fb-dd-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
-        <div v-for="b in budgetRanges" class="fb-dd-item" @click="filters.budgetRange=b; ddOpen=null">
-          <input type="radio" :checked="filters.budgetRange===b" @click.stop /><span>{{ b }}</span>
+        <div class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
+          <div v-for="b in budgetRanges" class="fb-dd-item" @click="filters.budgetRange=b; ddOpen=null">
+            <input type="radio" :checked="filters.budgetRange===b" @click.stop /><span>{{ b }}</span>
+          </div>
         </div>
       </div>
       <div class="fb-allfilters-section">
         <div class="fb-allfilters-label">Site Type</div>
-        <div v-for="t in siteTypeOptions" class="fb-dd-item" @click="toggleSiteType(t.name)">
-          <input type="checkbox" :checked="filters.siteTypes.includes(t.name)" @click.stop /><span>{{ t.name }}</span>
+        <div class="fb-allfilters-items">
+          <div v-for="t in siteTypeOptions" class="fb-dd-item" @click="toggleSiteType(t.name)">
+            <input type="checkbox" :checked="filters.siteTypes.includes(t.name)" @click.stop /><span>{{ t.name }}</span>
+          </div>
         </div>
       </div>
       <div class="fb-allfilters-section">
         <div class="fb-allfilters-label">Program</div>
-        <div class="fb-dd-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
-        <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; ddOpen=null">
-          <input type="radio" :checked="filters.affiliatedProgram===p" @click.stop /><span>{{ p }}</span>
+        <div class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
+          <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; ddOpen=null">
+            <input type="radio" :checked="filters.affiliatedProgram===p" @click.stop /><span>{{ p }}</span>
+          </div>
         </div>
       </div>
       <div class="fb-allfilters-section">
         <div class="fb-allfilters-label">Impact</div>
-        <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
-        <div v-for="i in IMPACT_OPTIONS" class="fb-dd-item" @click="filters.impact=i; ddOpen=null">
-          <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
-        </div>
-      </div>
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Impact</div>
-        <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
-        <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; ddOpen=null">
-          <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
+        <div class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
+          <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; ddOpen=null">
+            <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
+          </div>
         </div>
       </div>
       <div class="fb-dd-clear" @click="resetFiltersAndSelection(); ddOpen=null">Clear all filters</div>
@@ -6065,8 +6072,11 @@ const app = createApp({
       selectMode.value = false;
     }
 
+    function toggleDd(key) {
+      ddOpen.value = ddOpen.value === key ? null : key;
+    }
+
     function isPlaceholderCost(code) {
-      return !(projectTotalMap.value[code] > 0);
     }
 
     function budgetRangeFromAmount(rupees) {
@@ -7686,7 +7696,7 @@ const app = createApp({
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
       auth, toasts, busy, loadStage, loadPct, loadDone, siteTypeMap,
       // computed
-      zones, constituencies, budgetRanges, affiliatedPrograms, activeFilterCount, siteTypeOptions,
+      toggleDd, zones, constituencies, budgetRanges, affiliatedPrograms, activeFilterCount, siteTypeOptions,
       filteredProjects, totalBudget, bucketBreakdown,
       selectedProject, galleryUrls, currentImage,
       projectInterventions, groupedInterventions, addableInterventions,
