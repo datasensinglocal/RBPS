@@ -1215,6 +1215,11 @@ a:hover { text-decoration:underline; }
 /* Project list */
 .pl-count { font-size:10.5px; color:var(--muted); font-weight:500; }
 .pl-list { display:flex; flex-direction:column; gap:6px; padding:0 16px 14px; }
+.sb-list-label {
+  font-size:11px; font-weight:600; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.5px;
+  padding:20px 16px 4px;
+}
 .pl-card {
   border:1.5px solid transparent; background:var(--card); border-radius:var(--r-lg);
   cursor:pointer; overflow:hidden; transition:all .15s;
@@ -2979,7 +2984,7 @@ a:hover { text-decoration:underline; }
   /* Sidebar → bottom sheet */
   #sidebar {
     top:auto; bottom:0; left:0; right:0; width:100%;
-    height:60vh; max-height:60vh;
+    height:35vh; max-height:35vh;
     border-right:none; border-top:1px solid var(--line);
     border-radius:14px 14px 0 0;
     transform:translateY(calc(100% - 56px));
@@ -3007,7 +3012,7 @@ a:hover { text-decoration:underline; }
 #filter-bar {
   position:fixed;
   top:var(--tb-h); left:0; right:0;
-  z-index:310;
+  z-index:300;
   background:#fff;
   border-bottom:1px solid var(--line);
   display:flex; align-items:center; gap:6px;
@@ -3088,9 +3093,10 @@ a:hover { text-decoration:underline; }
 .fb-filter-collapse:hover { background:var(--paper); }
 .fb-dropdown-allfilters {
   left:0; right:auto;
-  width:260px;
-  max-height:70vh;
+  width:280px;
+  max-height:80vh;
   overflow-y:auto;
+  overflow-x:hidden;
   z-index:9999;
 }
 .fb-allfilters-section {
@@ -3098,16 +3104,28 @@ a:hover { text-decoration:underline; }
   border-bottom:1px solid var(--line);
 }
 .fb-allfilters-section:last-of-type { border-bottom:none; }
-.fb-allfilters-label {
-  padding:6px 12px 4px;
-  font-size:10px; font-weight:700;
-  text-transform:uppercase; letter-spacing:.5px;
-  color:var(--muted);
+.fb-allfilters-hdr {
+  display:flex; align-items:center;
+  padding:8px 12px; cursor:pointer;
+  transition:background .1s;
 }
+.fb-allfilters-hdr:hover { background:var(--soft); }
+.fb-allfilters-label {
+  font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px;
+  color:var(--ink); flex:1;
+}
+.fb-allfilters-val {
+  font-size:11px; color:var(--accent); font-weight:600;
+  margin-right:6px; max-width:100px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.fb-allfilters-chev { font-size:9px; color:var(--muted); }
 .fb-allfilters-items {
-  max-height:150px;
+  max-height:180px;
   overflow-y:auto;
   scrollbar-width:thin;
+  scrollbar-color:var(--line) transparent;
 }
 @media (max-width: 860px) {
   .fb-filters { display:none; }
@@ -3231,11 +3249,13 @@ a:hover { text-decoration:underline; }
 .tb-nav-dropdown {
   display:none;
   position:fixed;
-  top:var(--tb-h); right:0; left:0;
-  background:var(--forest);
-  border-top:1px solid rgba(255,255,255,.08);
+  top:var(--tb-h); right:0; left:auto;
+  width:220px;
+  background:#1C3B2F;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:0 0 10px 10px;
   box-shadow:0 8px 24px rgba(0,0,0,.3);
-  z-index:250;
+  z-index:9999;
   flex-direction:column;
   padding:8px 0;
 }
@@ -3301,16 +3321,6 @@ a:hover { text-decoration:underline; }
   <button class="tb-hamburger" :class="{open: menuOpen}" @click="menuOpen=!menuOpen" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
-
-  <!-- Dropdown nav for narrow screens -->
-  <div class="tb-nav-dropdown" :class="{open: menuOpen}" @click="menuOpen=false">
-    <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
-    <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
-    <button @click="openRateCard">Rate Card</button>
-    <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
-    <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : openAuthModal('')">+ Add a Project</button>
-    <button @click="selectMode=!selectMode">{{ selectMode ? 'Cancel Selection' : 'Make List' }}</button>
-  </div>
 
   <!-- Admin list toggle — sits between nav and user -->
   <div v-if="auth.mode === 'admin'" class="tb-list-toggle" style="position:relative">
@@ -3417,6 +3427,16 @@ a:hover { text-decoration:underline; }
   </div>
 </header>
 
+<!-- Hamburger dropdown — outside header so z-index works correctly -->
+<div class="tb-nav-dropdown" :class="{open: menuOpen}" @click="menuOpen=false">
+  <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
+  <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
+  <button @click="openRateCard">Rate Card</button>
+  <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
+  <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : openAuthModal('')">+ Add a Project</button>
+  <button @click="selectMode=!selectMode">{{ selectMode ? 'Cancel Selection' : 'Make List' }}</button>
+</div>
+
 <!-- §2b UNIFIED FILTER BAR ─────────────────────────────────────────────── -->
 <div id="filter-bar">
   <!-- Search — always visible -->
@@ -3489,58 +3509,95 @@ a:hover { text-decoration:underline; }
     <span class="chev">▾</span>
     <!-- All filters in one panel -->
     <div v-if="ddOpen==='allfilters'" class="fb-dropdown fb-dropdown-allfilters" @click.stop>
+
+      <!-- Zone -->
       <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Zone</div>
-        <div class="fb-allfilters-items">
+        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='zone'?null:'zone'">
+          <span class="fb-allfilters-label">Zone</span>
+          <span v-if="filters.zones.length" class="fb-allfilters-val">{{ filters.zones.length }} selected</span>
+          <span class="fb-allfilters-chev">{{ afOpen==='zone' ? '▴' : '▾' }}</span>
+        </div>
+        <div v-if="afOpen==='zone'" class="fb-allfilters-items">
           <div v-for="z in zones" class="fb-dd-item" @click="toggleZone(z)">
             <input type="checkbox" :checked="filters.zones.includes(z)" @click.stop /><span>{{ z }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Constituency -->
       <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Constituency</div>
-        <div class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.constituency=''; ddOpen=null"><span>All</span></div>
-          <div v-for="c in constituencies" class="fb-dd-item" @click="filters.constituency=c; ddOpen=null">
+        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='cnst'?null:'cnst'">
+          <span class="fb-allfilters-label">Constituency</span>
+          <span v-if="filters.constituency" class="fb-allfilters-val">{{ filters.constituency }}</span>
+          <span class="fb-allfilters-chev">{{ afOpen==='cnst' ? '▴' : '▾' }}</span>
+        </div>
+        <div v-if="afOpen==='cnst'" class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.constituency=''; afOpen=null"><span>All</span></div>
+          <div v-for="c in constituencies" class="fb-dd-item" @click="filters.constituency=c; afOpen=null">
             <input type="radio" :checked="filters.constituency===c" @click.stop /><span>{{ c }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Budget -->
       <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Budget</div>
-        <div class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
-          <div v-for="b in budgetRanges" class="fb-dd-item" @click="filters.budgetRange=b; ddOpen=null">
+        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='br'?null:'br'">
+          <span class="fb-allfilters-label">Budget</span>
+          <span v-if="filters.budgetRange" class="fb-allfilters-val">{{ filters.budgetRange }}</span>
+          <span class="fb-allfilters-chev">{{ afOpen==='br' ? '▴' : '▾' }}</span>
+        </div>
+        <div v-if="afOpen==='br'" class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.budgetRange=''; afOpen=null"><span>All</span></div>
+          <div v-for="b in budgetRanges" class="fb-dd-item" @click="filters.budgetRange=b; afOpen=null">
             <input type="radio" :checked="filters.budgetRange===b" @click.stop /><span>{{ b }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Site Type -->
       <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Site Type</div>
-        <div class="fb-allfilters-items">
+        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='st'?null:'st'">
+          <span class="fb-allfilters-label">Site Type</span>
+          <span v-if="filters.siteTypes.length" class="fb-allfilters-val">{{ filters.siteTypes.length }} selected</span>
+          <span class="fb-allfilters-chev">{{ afOpen==='st' ? '▴' : '▾' }}</span>
+        </div>
+        <div v-if="afOpen==='st'" class="fb-allfilters-items">
           <div v-for="t in siteTypeOptions" class="fb-dd-item" @click="toggleSiteType(t.name)">
             <input type="checkbox" :checked="filters.siteTypes.includes(t.name)" @click.stop /><span>{{ t.name }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Program -->
       <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Program</div>
-        <div class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
-          <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; ddOpen=null">
+        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='prog'?null:'prog'">
+          <span class="fb-allfilters-label">Program</span>
+          <span v-if="filters.affiliatedProgram" class="fb-allfilters-val">{{ filters.affiliatedProgram }}</span>
+          <span class="fb-allfilters-chev">{{ afOpen==='prog' ? '▴' : '▾' }}</span>
+        </div>
+        <div v-if="afOpen==='prog'" class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.affiliatedProgram=''; afOpen=null"><span>All</span></div>
+          <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; afOpen=null">
             <input type="radio" :checked="filters.affiliatedProgram===p" @click.stop /><span>{{ p }}</span>
           </div>
         </div>
       </div>
+
+      <!-- Impact -->
       <div class="fb-allfilters-section">
-        <div class="fb-allfilters-label">Impact</div>
-        <div class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
-          <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; ddOpen=null">
+        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='impact'?null:'impact'">
+          <span class="fb-allfilters-label">Impact</span>
+          <span v-if="filters.impact" class="fb-allfilters-val">{{ filters.impact }}</span>
+          <span class="fb-allfilters-chev">{{ afOpen==='impact' ? '▴' : '▾' }}</span>
+        </div>
+        <div v-if="afOpen==='impact'" class="fb-allfilters-items">
+          <div class="fb-dd-item" @click="filters.impact=''; afOpen=null"><span>All</span></div>
+          <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; afOpen=null">
             <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
           </div>
         </div>
       </div>
+
       <div class="fb-dd-clear" @click="resetFiltersAndSelection(); ddOpen=null">Clear all filters</div>
     </div>
   </div>
@@ -3570,6 +3627,7 @@ a:hover { text-decoration:underline; }
 
   <!-- Project list -->
   <div class="sb-body scroll" @click.stop>
+    <div class="sb-list-label">Projects</div>
     <div class="pl-list">
       <div v-for="p in filteredProjects" :key="p.project_code"
            class="pl-card"
@@ -5410,7 +5468,8 @@ const app = createApp({
     const costMode = ref('placeholder');
     const selectMode = ref(false);
     const selectedCodes = ref(new Set());
-    const colorByOpen = ref(true); // 'placeholder' | 'detail'
+    const colorByOpen = ref(true);
+    const afOpen = ref(null); // which section is open in allfilters panel // 'placeholder' | 'detail'
     const nomineePopupOpen = ref(false);
     // ── Admin Lists state ────────────────────────────────────────────────
     const adminListsOpen    = ref(false);   // My Lists dropdown open
@@ -7690,7 +7749,7 @@ const app = createApp({
       // state
       view, allProjects, framework, projectIntvs, typology,
       search, filters, ddOpen, accordions, sidebarCollapsed,
-      costMode, selectedCode, editMode, selectMode, selectedCodes, colorByOpen, toggleSelectProject, resetFiltersAndSelection, saveSelectionAsList, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
+      costMode, selectedCode, editMode, selectMode, selectedCodes, colorByOpen, afOpen, toggleSelectProject, resetFiltersAndSelection, saveSelectionAsList, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
       addModalOpen, addModalSelected, addModalQtys, setModalQty, colorMode, activeLegendFilter,
       rateCardOpen, rcSearch, openBuckets, menuOpen,
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
