@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Revitalising Bengaluru's Public Spaces</title>
+<title>Forge : Transforming Ideas into Projects</title>
 
 <!--
   ===========================================================================
@@ -1040,14 +1040,14 @@ a:hover { text-decoration:underline; }
 /* ── Color-by control — overlaid top-right of the map ────────────────── */
 .map-color-ctrl {
   position:fixed;
-  top:calc(var(--tb-h) + 44px + 10px);
-  right:10px;
-  z-index:190;
+  top:calc(var(--tb-h) + 10px);
+  right:48px;
+  z-index:200;   /* below panel (250) and modals (300+) */
   background:rgba(255,255,255,.96);
   backdrop-filter:blur(4px);
   border-radius:var(--r);
   box-shadow:0 2px 12px rgba(0,0,0,.18);
-  padding:10px 12px;
+  padding:10px 12px 10px;
   min-width:148px;
   font-family:var(--sans);
 }
@@ -1215,29 +1215,6 @@ a:hover { text-decoration:underline; }
 /* Project list */
 .pl-count { font-size:10.5px; color:var(--muted); font-weight:500; }
 .pl-list { display:flex; flex-direction:column; gap:6px; padding:0 16px 14px; }
-.sb-list-label {
-  font-size:11px; font-weight:600; color:var(--muted);
-  text-transform:uppercase; letter-spacing:.5px;
-  padding:10px 16px 4px;
-  display:flex; align-items:center; gap:8px;
-}
-.sb-select-controls {
-  display:flex; align-items:center; gap:4px; margin-left:auto;
-}
-.sb-sel-btn {
-  font-size:10px; color:var(--ink); background:none; border:none;
-  cursor:pointer; padding:2px 4px; border-radius:3px;
-  font-weight:600; text-transform:uppercase; letter-spacing:.3px;
-  transition:background .1s;
-}
-.sb-sel-btn:hover { background:var(--soft); }
-.sb-sel-toggle {
-  border:1px solid var(--line) !important;
-  padding:2px 8px !important;
-  border-radius:4px !important;
-  background:var(--soft) !important;
-}
-.sb-sel-sep { color:var(--muted); font-size:10px; }
 .pl-card {
   border:1.5px solid transparent; background:var(--card); border-radius:var(--r-lg);
   cursor:pointer; overflow:hidden; transition:all .15s;
@@ -1251,7 +1228,7 @@ a:hover { text-decoration:underline; }
 .pl-row1 { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin-bottom:4px; }
 .pl-code { font-size:11px; font-weight:400; color:var(--ink); letter-spacing:.4px; flex-shrink:0; }
 .pl-code-tag { font-weight:400; color:#fff; background:#1C3B2F; border-radius:3px; padding:1px 5px; }
-.pl-name { font-size:14px; font-weight:600; line-height:1.25; flex:1; min-width:0; }
+.pl-name { font-size:16px; font-weight:600; line-height:1.25; flex:1; min-width:0; }
 .pl-cost { font-size:11px; font-weight:700; color:var(--ink); white-space:nowrap; flex-shrink:0; }
 .pl-tags { display:flex; flex-wrap:wrap; gap:3px; }
 .pl-tag {
@@ -1566,36 +1543,21 @@ a:hover { text-decoration:underline; }
   display:flex; gap:14px; align-items:stretch;
   flex:1; min-height:0;
 }
-/* Panel 2: charts (left, collapsible) */
+/* Panel 2: charts (left) */
 .ov-left {
   width:480px; flex-shrink:0;
   display:flex; flex-direction:column;
   min-height:0;
-  overflow:hidden;
-  position:relative;
-  order:2;
-  transition:width .25s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+  overflow-x:visible;
 }
-/* Panel 3: project table (takes remaining space) */
-.ov-table-panel {
+/* Panel 3: project table (right) */
+.ov-right {
   flex:1; min-width:0;
   display:flex; flex-direction:column;
   min-height:0;
   overflow:hidden;
-  order:1;
 }
-/* Charts toggle button */
-.ov-charts-toggle {
-  position:absolute; left:-14px; top:50%;
-  transform:translateY(-50%);
-  z-index:10;
-  width:28px; height:28px; border-radius:50%;
-  background:#fff; border:1px solid var(--line);
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:box-shadow .15s;
-}
-.ov-charts-toggle:hover { box-shadow:0 3px 12px rgba(0,0,0,.2); }
 
 /* ── Responsive: stack panels on smaller screens ── */
 @media (max-width: 900px) {
@@ -2133,7 +2095,7 @@ a:hover { text-decoration:underline; }
 /* Floating ✕ — fixed to top of panel, never scrolls */
 .pp-close-sticky {
   position:fixed;
-  top:calc(var(--tb-h) + 44px + 10px);
+  top:calc(var(--tb-h) + 10px);
   right:calc(var(--panel-w) - 14px - 32px);
   z-index:310;
   width:32px; height:32px; border-radius:50%;
@@ -3017,7 +2979,7 @@ a:hover { text-decoration:underline; }
   /* Sidebar → bottom sheet */
   #sidebar {
     top:auto; bottom:0; left:0; right:0; width:100%;
-    height:35vh; max-height:35vh;
+    height:60vh; max-height:60vh;
     border-right:none; border-top:1px solid var(--line);
     border-radius:14px 14px 0 0;
     transform:translateY(calc(100% - 56px));
@@ -3041,236 +3003,7 @@ a:hover { text-decoration:underline; }
   .tb-brand .tb-sub { display:none; }
 }
 
-/* ── Filter bar ──────────────────────────────────────────────────────── */
-#filter-bar {
-  position:fixed;
-  top:var(--tb-h); left:0; right:0;
-  z-index:300;
-  background:#fff;
-  border-bottom:1px solid var(--line);
-  display:flex; align-items:center; gap:6px;
-  padding:0 16px;
-  height:44px;
-  box-shadow:0 2px 8px rgba(0,0,0,.10);
-  overflow:visible;
-}
-.fb-filters {
-  display:flex; align-items:center; gap:8px;
-  flex:1; min-width:0;
-  overflow:visible;
-}
-.fb-search-wrap {
-  display:flex; align-items:center; gap:5px;
-  padding:4px 12px; border:1px solid var(--line);
-  border-radius:20px; background:var(--soft);
-  min-width:120px; max-width:160px; flex-shrink:0;
-}
-.fb-search { border:none; outline:none; background:transparent; font-size:12px; width:100%; }
-.fb-filter {
-  position:relative;
-  display:flex; align-items:center; gap:4px;
-  padding:4px 12px; border:1px solid var(--line);
-  border-radius:20px; background:var(--soft);
-  font-size:12px; cursor:pointer; white-space:nowrap;
-  user-select:none; flex-shrink:0;
-  transition:background .12s, border-color .12s;
-}
-.fb-filter:hover { background:var(--paper); }
-.fb-filter.has-value { border-color:var(--accent); background:rgba(193,127,62,.08); color:var(--accent); font-weight:600; }
-.fb-badge {
-  display:inline-flex; align-items:center; justify-content:center;
-  background:var(--accent); color:#fff; border-radius:10px;
-  font-size:10px; font-weight:700; padding:0 5px; margin-left:2px;
-}
-.fb-dropdown {
-  position:absolute; top:calc(100% + 4px); left:0;
-  background:#fff; border:1px solid var(--line);
-  border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,.12);
-  z-index:9999; min-width:180px; max-height:260px; overflow-y:auto;
-  padding:4px 0;
-}
-.fb-dropdown-wide { min-width:240px; }
-.fb-dd-item {
-  display:flex; align-items:center; gap:8px;
-  padding:7px 12px; font-size:12px; cursor:pointer;
-  transition:background .1s;
-}
-.fb-dd-item:hover { background:var(--soft); }
-.fb-dd-item em { margin-left:auto; font-style:normal; color:var(--muted); font-size:11px; }
-.fb-dd-clear {
-  padding:6px 12px; font-size:11px; color:var(--accent);
-  cursor:pointer; border-top:1px solid var(--line); margin-top:4px;
-}
-.fb-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
-.fb-metrics { display:flex; align-items:center; gap:6px; font-size:12px; }
-.fb-metric-count { font-weight:700; color:var(--ink); font-size:15px; }
-.fb-metric-sep { color:var(--muted); }
-.fb-metric-budget { font-weight:600; color:var(--accent); font-size:15px; }
-.fb-reset {
-  padding:4px 10px; border-radius:6px; border:1px solid var(--line);
-  font-size:11px; font-weight:600; color:var(--muted);
-  background:none; cursor:pointer; transition:background .12s;
-}
-.fb-reset:hover { background:var(--soft); color:var(--ink); }
-
-/* Collapsed filter button — narrow screens only */
-.fb-filter-collapse {
-  display:none;
-  position:relative;
-  align-items:center; gap:5px;
-  padding:3px 9px; border:1px solid var(--line);
-  border-radius:6px; background:var(--soft);
-  font-size:12px; cursor:pointer; white-space:nowrap;
-  user-select:none; flex-shrink:0;
-}
-.fb-filter-collapse:hover { background:var(--paper); }
-.fb-dropdown-allfilters {
-  left:0; right:auto;
-  width:280px;
-  max-height:80vh;
-  overflow-y:auto;
-  overflow-x:hidden;
-  z-index:9999;
-}
-.fb-allfilters-section {
-  padding:4px 0;
-  border-bottom:1px solid var(--line);
-}
-.fb-allfilters-section:last-of-type { border-bottom:none; }
-.fb-allfilters-hdr {
-  display:flex; align-items:center;
-  padding:8px 12px; cursor:pointer;
-  transition:background .1s;
-}
-.fb-allfilters-hdr:hover { background:var(--soft); }
-.fb-allfilters-label {
-  font-size:11px; font-weight:700;
-  text-transform:uppercase; letter-spacing:.5px;
-  color:var(--ink); flex:1;
-}
-.fb-allfilters-val {
-  font-size:11px; color:var(--accent); font-weight:600;
-  margin-right:6px; max-width:100px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.fb-allfilters-chev { font-size:9px; color:var(--muted); }
-.fb-allfilters-items {
-  max-height:180px;
-  overflow-y:auto;
-  scrollbar-width:thin;
-  scrollbar-color:var(--line) transparent;
-}
-@media (max-width: 860px) {
-  .fb-filters { display:none; }
-  .fb-filter-collapse { display:flex; }
-}
-.fb-colorby { position:relative; }
-.fb-colorby-btn {
-  display:flex; align-items:center; gap:5px;
-  padding:4px 10px; border-radius:6px; border:1px solid var(--line);
-  font-size:12px; background:var(--soft); cursor:pointer;
-  white-space:nowrap; transition:background .12s;
-}
-.fb-colorby-btn:hover { background:var(--paper); }
-.fb-colorby-dot {
-  width:8px; height:8px; border-radius:50%; flex-shrink:0;
-}
-.fb-colorby-panel {
-  position:absolute; top:calc(100% + 6px); right:0;
-  background:#fff; border:1px solid var(--line);
-  border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,.12);
-  z-index:500; min-width:180px; padding:10px 0;
-}
-.fb-colorby-modes {
-  display:flex; flex-direction:column; gap:0;
-  border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:8px;
-}
-.fb-colorby-opt {
-  display:flex; align-items:center; gap:8px;
-  padding:6px 14px; font-size:12px; cursor:pointer;
-  transition:background .1s;
-}
-.fb-colorby-opt:hover { background:var(--soft); }
-.fb-colorby-opt.active { font-weight:700; color:var(--accent); }
-.fb-colorby-opt input { accent-color:var(--accent); }
-.fb-legend { padding:0 4px; }
-.fb-legend-row {
-  display:flex; align-items:center; gap:8px;
-  padding:5px 10px; border-radius:6px; cursor:pointer;
-  font-size:11px; transition:background .1s;
-}
-.fb-legend-row:hover { background:var(--soft); }
-.fb-legend-row.active { background:rgba(193,127,62,.08); font-weight:600; }
-.fb-legend-swatch { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-.fb-legend-label { flex:1; }
-.fb-legend-check { color:var(--accent); font-size:10px; }
-.tb-make-list-btn {
-  border:1.5px solid rgba(255,255,255,.3) !important;
-  border-radius:6px !important;
-}
-.tb-make-list-btn.active {
-  background:var(--accent) !important;
-  color:var(--ink) !important;
-  border-color:var(--accent) !important;
-}
-
-/* Select mode sidebar */
-.sb-select-header {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 14px; background:rgba(193,127,62,.08);
-  border-bottom:1px solid var(--line);
-}
-.sb-select-title { font-size:12px; font-weight:700; color:var(--accent); }
-.sb-select-reset {
-  font-size:11px; color:var(--muted); background:none; border:none;
-  cursor:pointer; padding:2px 6px; border-radius:4px;
-}
-.sb-select-reset:hover { background:var(--soft); }
-.pl-card-wrap {
-  display:flex; align-items:center; gap:8px;
-}
-.pl-card-wrap .pl-card { flex:1; min-width:0; }
-.pl-checkbox {
-  width:13px; height:13px; flex-shrink:0;
-  accent-color:var(--accent);
-  opacity:.45;
-  cursor:pointer;
-}
-.pl-checkbox:checked { opacity:1; }
-.pl-dimmed { opacity:.4; }
-.pl-selected { background:rgba(193,127,62,.06) !important; }
-
-/* Selection tray */
-.selection-tray {
-  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  background:var(--ink); color:#fff;
-  display:flex; align-items:center; gap:12px;
-  padding:10px 20px; border-radius:30px;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);
-  z-index:400; font-size:13px;
-}
-.selection-tray-count { font-weight:600; }
-.selection-tray-save {
-  background:var(--accent); color:var(--ink);
-  border:none; border-radius:20px; padding:6px 16px;
-  font-size:12px; font-weight:700; cursor:pointer;
-  transition:opacity .15s;
-}
-.selection-tray-save:hover { opacity:.85; }
-.selection-tray-cancel {
-  background:none; border:none; color:rgba(255,255,255,.6);
-  font-size:12px; cursor:pointer; padding:4px;
-}
-.selection-tray-cancel:hover { color:#fff; }
-
-/* Push ALL fixed content below topbar + filter bar */
-#sidebar, #map, #overview-page, #summary-page, #panel, #rateCard { top:calc(var(--tb-h) + 44px) !important; }
-.pp-close-sticky { top:calc(var(--tb-h) + 44px + 10px) !important; }
-.map-color-ctrl { top:calc(var(--tb-h) + 44px + 10px) !important; }
-/* Mobile: sidebar is bottom-sheet, ignore top */
-@media (max-width: 720px) {
-  #sidebar { top:auto !important; }
-}
+/* ── Hamburger menu ── */
 .tb-hamburger {
   display:none;
   flex-direction:column; justify-content:center; gap:5px;
@@ -3292,13 +3025,11 @@ a:hover { text-decoration:underline; }
 .tb-nav-dropdown {
   display:none;
   position:fixed;
-  top:var(--tb-h); right:0; left:auto;
-  width:220px;
-  background:#1C3B2F;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:0 0 10px 10px;
+  top:var(--tb-h); right:0; left:0;
+  background:var(--forest);
+  border-top:1px solid rgba(255,255,255,.08);
   box-shadow:0 8px 24px rgba(0,0,0,.3);
-  z-index:9999;
+  z-index:250;
   flex-direction:column;
   padding:8px 0;
 }
@@ -3312,7 +3043,7 @@ a:hover { text-decoration:underline; }
 .tb-nav-dropdown button:hover,
 .tb-nav-dropdown button.active { color:#fff; background:rgba(255,255,255,.08); }
 
-@media (max-width: 1080px) {
+@media (max-width: 860px) {
   .tb-nav { display:none; }
   .tb-hamburger { display:flex; }
 }
@@ -3324,7 +3055,7 @@ a:hover { text-decoration:underline; }
 
 <!-- §2 TOPBAR ─────────────────────────────────────────────────────────── -->
 <header id="topbar">
-  <div class="tb-brand">Revitalising Bengaluru's Public Spaces</div>
+  <div class="tb-brand"><strong>Forge</strong> : Transforming Ideas into Projects</div>
   <!-- Compact progress: just bar + % inline after brand -->
   <transition name="tb-sync-fade" mode="out-in">
     <div v-if="!loadDone || refreshing" key="progress" class="tb-sync tb-sync-inline">
@@ -3352,11 +3083,8 @@ a:hover { text-decoration:underline; }
     <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
     <button :class="{active: view==='ratecard'}" @click="openRateCard">Rate Card</button>
     <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
-    <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : openAuthModal('')">
-      + Add a Project
-    </button>
-    <button class="tb-make-list-btn" :class="{active: selectMode}" @click="selectMode=!selectMode">
-      {{ selectMode ? (activeListName ? 'Edit List' : 'Make List') : (activeListName ? 'Edit List' : 'Make List') }}
+    <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : auth.mode==='funder' ? null : openAuthModal('')">
+      + {{ auth.mode==='funder' ? 'Fund Projects' : 'Add / Fund a Project' }}
     </button>
   </nav>
 
@@ -3364,6 +3092,17 @@ a:hover { text-decoration:underline; }
   <button class="tb-hamburger" :class="{open: menuOpen}" @click="menuOpen=!menuOpen" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
+
+  <!-- Dropdown nav for narrow screens -->
+  <div class="tb-nav-dropdown" :class="{open: menuOpen}" @click="menuOpen=false">
+    <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
+    <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
+    <button @click="openRateCard">Rate Card</button>
+    <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
+    <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : auth.mode==='funder' ? null : openAuthModal('')">
+      + {{ auth.mode==='funder' ? 'Fund Projects' : 'Add / Fund a Project' }}
+    </button>
+  </div>
 
   <!-- Admin list toggle — sits between nav and user -->
   <div v-if="auth.mode === 'admin'" class="tb-list-toggle" style="position:relative">
@@ -3470,282 +3209,160 @@ a:hover { text-decoration:underline; }
   </div>
 </header>
 
-<!-- Hamburger dropdown — outside header so z-index works correctly -->
-<div class="tb-nav-dropdown" :class="{open: menuOpen}" @click="menuOpen=false">
-  <button :class="{active: view==='projects'}" @click="view='projects'">Projects</button>
-  <button :class="{active: view==='overview'}" @click="view='overview'">Overview</button>
-  <button @click="openRateCard">Rate Card</button>
-  <button v-if="!auth.mode" @click="openLogin('nominee')">Login</button>
-  <button @click="auth.mode==='nominee' ? (addProjectOpen=true, addProjectViewMode='choose') : openAuthModal('')">+ Add a Project</button>
-  <button @click="selectMode=!selectMode">{{ selectMode ? 'Cancel Selection' : 'Make List' }}</button>
-</div>
-
-<!-- §2b UNIFIED FILTER BAR ─────────────────────────────────────────────── -->
-<div id="filter-bar">
-  <!-- Search — always visible -->
-  <div class="fb-search-wrap">
-    <svg width="13" height="13" viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M9.5 9.5 L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-    <input class="fb-search" v-model="search" placeholder="Search…" />
-  </div>
-
-  <!-- Individual filter pills — hidden on narrow screens -->
-  <div class="fb-filters">
-    <!-- Zone -->
-    <div class="fb-filter" :class="{'has-value': filters.zones.length}" @click.stop="toggleDd('zone')">
-      <span>Zone<span v-if="filters.zones.length" class="fb-badge">{{ filters.zones.length }}</span></span><span class="chev">▾</span>
-      <div v-if="ddOpen==='zone'" class="fb-dropdown" @click.stop>
-        <div v-for="z in zones" class="fb-dd-item" @click="toggleZone(z)">
-          <input type="checkbox" :checked="filters.zones.includes(z)" @click.stop /><span>{{ z }}</span>
-        </div>
-        <div v-if="filters.zones.length" class="fb-dd-clear" @click="filters.zones=[]">Clear</div>
-      </div>
-    </div>
-    <!-- Constituency -->
-    <div class="fb-filter" :class="{'has-value': filters.constituency}" @click.stop="toggleDd('cnst')">
-      <span>{{ filters.constituency || 'Constituency' }}</span><span class="chev">▾</span>
-      <div v-if="ddOpen==='cnst'" class="fb-dropdown" @click.stop>
-        <div class="fb-dd-item" @click="filters.constituency=''; ddOpen=null"><span>All</span></div>
-        <div v-for="c in constituencies" class="fb-dd-item" @click="filters.constituency=c; ddOpen=null"><span>{{ c }}</span></div>
-      </div>
-    </div>
-    <!-- Budget -->
-    <div class="fb-filter" :class="{'has-value': filters.budgetRange}" @click.stop="toggleDd('br')">
-      <span>{{ filters.budgetRange || 'Budget' }}</span><span class="chev">▾</span>
-      <div v-if="ddOpen==='br'" class="fb-dropdown" @click.stop>
-        <div class="fb-dd-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
-        <div v-for="b in budgetRanges" class="fb-dd-item" @click="filters.budgetRange=b; ddOpen=null"><span>{{ b }}</span></div>
-      </div>
-    </div>
-    <!-- Site Type -->
-    <div class="fb-filter" :class="{'has-value': filters.siteTypes.length}" @click.stop="toggleDd('st')">
-      <span>Site Type<span v-if="filters.siteTypes.length" class="fb-badge">{{ filters.siteTypes.length }}</span></span><span class="chev">▾</span>
-      <div v-if="ddOpen==='st'" class="fb-dropdown fb-dropdown-wide" @click.stop>
-        <div v-for="t in siteTypeOptions" class="fb-dd-item" @click="toggleSiteType(t.name)">
-          <input type="checkbox" :checked="filters.siteTypes.includes(t.name)" @click.stop /><span>{{ t.name }} <em>{{ t.count }}</em></span>
-        </div>
-        <div v-if="filters.siteTypes.length" class="fb-dd-clear" @click="filters.siteTypes=[]">Clear</div>
-      </div>
-    </div>
-    <!-- Program -->
-    <div class="fb-filter" :class="{'has-value': filters.affiliatedProgram}" @click.stop="toggleDd('ap')">
-      <span>{{ filters.affiliatedProgram || 'Program' }}</span><span class="chev">▾</span>
-      <div v-if="ddOpen==='ap'" class="fb-dropdown" @click.stop>
-        <div class="fb-dd-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
-        <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; ddOpen=null"><span>{{ p }}</span></div>
-      </div>
-    </div>
-    <!-- Impact -->
-    <div class="fb-filter" :class="{'has-value': filters.impact}" @click.stop="toggleDd('impact')">
-      <span>{{ filters.impact || 'Impact' }}</span><span class="chev">▾</span>
-      <div v-if="ddOpen==='impact'" class="fb-dropdown" @click.stop>
-        <div class="fb-dd-item" @click="filters.impact=''; ddOpen=null"><span>All</span></div>
-        <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; ddOpen=null"><span>{{ i }}</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Collapsed "Filters" button — shown only on narrow screens -->
-  <div class="fb-filter-collapse" @click.stop="toggleDd('allfilters')">
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="4" y1="8" x2="12" y2="8"/><line x1="6" y1="12" x2="10" y2="12"/></svg>
-    Filters
-    <span v-if="activeFilterCount" class="fb-badge">{{ activeFilterCount }}</span>
-    <span class="chev">▾</span>
-    <!-- All filters in one panel -->
-    <div v-if="ddOpen==='allfilters'" class="fb-dropdown fb-dropdown-allfilters" @click.stop>
-
-      <!-- Zone -->
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='zone'?null:'zone'">
-          <span class="fb-allfilters-label">Zone</span>
-          <span v-if="filters.zones.length" class="fb-allfilters-val">{{ filters.zones.length }} selected</span>
-          <span class="fb-allfilters-chev">{{ afOpen==='zone' ? '▴' : '▾' }}</span>
-        </div>
-        <div v-if="afOpen==='zone'" class="fb-allfilters-items">
-          <div v-for="z in zones" class="fb-dd-item" @click="toggleZone(z)">
-            <input type="checkbox" :checked="filters.zones.includes(z)" @click.stop /><span>{{ z }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Constituency -->
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='cnst'?null:'cnst'">
-          <span class="fb-allfilters-label">Constituency</span>
-          <span v-if="filters.constituency" class="fb-allfilters-val">{{ filters.constituency }}</span>
-          <span class="fb-allfilters-chev">{{ afOpen==='cnst' ? '▴' : '▾' }}</span>
-        </div>
-        <div v-if="afOpen==='cnst'" class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.constituency=''; afOpen=null"><span>All</span></div>
-          <div v-for="c in constituencies" class="fb-dd-item" @click="filters.constituency=c; afOpen=null">
-            <input type="radio" :checked="filters.constituency===c" @click.stop /><span>{{ c }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Budget -->
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='br'?null:'br'">
-          <span class="fb-allfilters-label">Budget</span>
-          <span v-if="filters.budgetRange" class="fb-allfilters-val">{{ filters.budgetRange }}</span>
-          <span class="fb-allfilters-chev">{{ afOpen==='br' ? '▴' : '▾' }}</span>
-        </div>
-        <div v-if="afOpen==='br'" class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.budgetRange=''; afOpen=null"><span>All</span></div>
-          <div v-for="b in budgetRanges" class="fb-dd-item" @click="filters.budgetRange=b; afOpen=null">
-            <input type="radio" :checked="filters.budgetRange===b" @click.stop /><span>{{ b }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Site Type -->
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='st'?null:'st'">
-          <span class="fb-allfilters-label">Site Type</span>
-          <span v-if="filters.siteTypes.length" class="fb-allfilters-val">{{ filters.siteTypes.length }} selected</span>
-          <span class="fb-allfilters-chev">{{ afOpen==='st' ? '▴' : '▾' }}</span>
-        </div>
-        <div v-if="afOpen==='st'" class="fb-allfilters-items">
-          <div v-for="t in siteTypeOptions" class="fb-dd-item" @click="toggleSiteType(t.name)">
-            <input type="checkbox" :checked="filters.siteTypes.includes(t.name)" @click.stop /><span>{{ t.name }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Program -->
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='prog'?null:'prog'">
-          <span class="fb-allfilters-label">Program</span>
-          <span v-if="filters.affiliatedProgram" class="fb-allfilters-val">{{ filters.affiliatedProgram }}</span>
-          <span class="fb-allfilters-chev">{{ afOpen==='prog' ? '▴' : '▾' }}</span>
-        </div>
-        <div v-if="afOpen==='prog'" class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.affiliatedProgram=''; afOpen=null"><span>All</span></div>
-          <div v-for="p in affiliatedPrograms" class="fb-dd-item" @click="filters.affiliatedProgram=p; afOpen=null">
-            <input type="radio" :checked="filters.affiliatedProgram===p" @click.stop /><span>{{ p }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Impact -->
-      <div class="fb-allfilters-section">
-        <div class="fb-allfilters-hdr" @click="afOpen=afOpen==='impact'?null:'impact'">
-          <span class="fb-allfilters-label">Impact</span>
-          <span v-if="filters.impact" class="fb-allfilters-val">{{ filters.impact }}</span>
-          <span class="fb-allfilters-chev">{{ afOpen==='impact' ? '▴' : '▾' }}</span>
-        </div>
-        <div v-if="afOpen==='impact'" class="fb-allfilters-items">
-          <div class="fb-dd-item" @click="filters.impact=''; afOpen=null"><span>All</span></div>
-          <div v-for="i in ['Easy win','High Impact','Others']" class="fb-dd-item" @click="filters.impact=i; afOpen=null">
-            <input type="radio" :checked="filters.impact===i" @click.stop /><span>{{ i }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="fb-dd-clear" @click="resetFiltersAndSelection(); ddOpen=null">Clear all filters</div>
-    </div>
-  </div>
-
-  <!-- Metrics + actions -->
-  <div class="fb-right">
-    <div class="fb-metrics">
-      <span class="fb-metric-count">{{ filteredProjects.length }} projects</span>
-      <span class="fb-metric-sep">·</span>
-      <span class="fb-metric-budget">{{ fmtCr(totalBudget) }}</span>
-    </div>
-    <button class="fb-reset" @click="resetFiltersAndSelection" title="Reset filters and selection">Reset</button>
-  </div>
-</div>
-
 <!-- §3 SIDEBAR ────────────────────────────────────────────────────────── -->
 <aside id="sidebar" :class="{collapsed: sidebarCollapsed}">
   <button class="sb-handle" @click="sidebarCollapsed = !sidebarCollapsed" :title="sidebarCollapsed?'Show sidebar':'Hide sidebar'">
     <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
-  <!-- Select mode header - hidden, controls moved to label row -->
+  <!-- Search -->
+  <div class="sb-search-wrap">
+    <svg class="sb-search-icon" width="14" height="14" viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M9.5 9.5 L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <input class="sb-search" v-model="search" placeholder="Search code, name, address, intervention…" />
+  </div>
 
-  <!-- Project list -->
-  <div class="sb-body scroll" @click.stop>
-    <div class="sb-list-label">
-      <span>Projects</span>
-      <div class="sb-select-controls">
-        <template v-if="!selectMode">
-          <button class="sb-sel-btn sb-sel-toggle" @click="selectMode=true">Select</button>
-        </template>
-        <template v-else>
-          <button class="sb-sel-btn" @click="selectedCodes = new Set(filteredProjects.map(p => p.project_code))">All</button>
-          <span class="sb-sel-sep">·</span>
-          <button class="sb-sel-btn" @click="selectedCodes = new Set()">None</button>
-          <span class="sb-sel-sep">·</span>
-          <button class="sb-sel-btn sb-sel-toggle" @click="selectMode=false; selectedCodes = new Set()">Done</button>
-        </template>
+  <!-- Filters: Zone (multi), Constituency, Budget bucket -->
+  <div class="sb-filters">
+    <div class="sb-filter-row">
+      <!-- Zone multi -->
+      <div class="sb-filter" :class="{'has-value': filters.zones.length}" @click.stop="ddOpen=ddOpen==='zone'?null:'zone'">
+        <span>Zone <span v-if="filters.zones.length" class="badge">{{ filters.zones.length }}</span></span>
+        <span class="chev">▾</span>
+        <div v-if="ddOpen==='zone'" class="sb-dropdown" @click.stop>
+          <div v-for="z in zones" class="sb-dropdown-item" @click="toggleZone(z)">
+            <input type="checkbox" :checked="filters.zones.includes(z)" @click.stop />
+            <span>{{ z }}</span>
+          </div>
+          <div v-if="filters.zones.length" class="sb-dropdown-clear" @click="filters.zones=[]">Clear all</div>
+        </div>
+      </div>
+      <!-- Constituency single -->
+      <div class="sb-filter" :class="{'has-value': filters.constituency}" @click.stop="ddOpen=ddOpen==='cnst'?null:'cnst'">
+        <span>{{ filters.constituency || 'Constituency' }}</span>
+        <span class="chev">▾</span>
+        <div v-if="ddOpen==='cnst'" class="sb-dropdown" @click.stop>
+          <div class="sb-dropdown-item" @click="filters.constituency=''; ddOpen=null"><span>All</span></div>
+          <div v-for="c in constituencies" class="sb-dropdown-item" @click="filters.constituency=c; ddOpen=null"><span>{{ c }}</span></div>
+        </div>
       </div>
     </div>
-    <div class="pl-list">
-      <div v-for="p in filteredProjects" :key="p.project_code" class="pl-card-wrap">
-        <!-- Checkbox sits outside the card, only visible in selectMode -->
-        <input v-if="selectMode" type="checkbox" class="pl-checkbox"
-               :checked="selectedCodes.has(p.project_code)"
-               @click.stop="toggleSelectProject(p.project_code)" />
-        <div class="pl-card"
-             :class="{sel: selectedCode===p.project_code, 'pl-selected': selectedCodes.has(p.project_code)}"
-             @click="openProject(p.project_code)"
-             @mouseenter="prefetchProjectText(p.project_code)">
-          <div class="pl-body">
-            <div class="pl-row1">
-              <div class="pl-name">{{ p.name }}</div>
-              <div class="pl-cost" style="display:flex;align-items:baseline;gap:2px">
-                <span>{{ fmtCost(projectTotal(p.project_code)) }}</span>
-                <span v-if="isPlaceholderCost(p.project_code) && projectTotal(p.project_code)" class="cost-placeholder-marker">*<span class="cost-placeholder-tip">Placeholder budget — for an accurate estimate, add specific interventions.</span></span>
-              </div>
-            </div>
-            <div class="pl-tags">
-              <span class="pl-code pl-code-tag">{{ p.project_code }}</span>
-              <span v-for="t in projectSiteTypes(p)" class="pl-tag">{{ t }}</span>
+    <div class="sb-filter-row">
+      <div class="sb-filter" :class="{'has-value': filters.budgetRange}" @click.stop="ddOpen=ddOpen==='br'?null:'br'">
+        <span>{{ filters.budgetRange || 'Budget bucket' }}</span>
+        <span class="chev">▾</span>
+        <div v-if="ddOpen==='br'" class="sb-dropdown" @click.stop>
+          <div class="sb-dropdown-item" @click="filters.budgetRange=''; ddOpen=null"><span>All</span></div>
+          <div v-for="b in budgetRanges" class="sb-dropdown-item" @click="filters.budgetRange=b; ddOpen=null"><span>{{ b }}</span></div>
+        </div>
+      </div>
+      <div class="sb-filter" :class="{'has-value': filters.affiliatedProgram}" @click.stop="ddOpen=ddOpen==='ap'?null:'ap'">
+        <span>{{ filters.affiliatedProgram || 'Program' }}</span>
+        <span class="chev">▾</span>
+        <div v-if="ddOpen==='ap'" class="sb-dropdown" @click.stop>
+          <div class="sb-dropdown-item" @click="filters.affiliatedProgram=''; ddOpen=null"><span>All</span></div>
+          <div v-for="p in affiliatedPrograms" class="sb-dropdown-item" @click="filters.affiliatedProgram=p; ddOpen=null"><span>{{ p }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accordions -->
+  <div class="sb-body scroll" @click="ddOpen=null">
+
+    <!-- Site Type pills -->
+    <div class="acc" :class="{open: accordions.siteType}">
+      <div class="acc-hdr" @click="accordions.siteType = !accordions.siteType">
+        <div><span class="acc-title">Site Type</span><span v-if="filters.siteTypes.length" class="acc-summ">{{ filters.siteTypes.length }} selected</span></div>
+        <span class="acc-arrow">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="tp-pills">
+          <button v-for="t in siteTypeOptions" class="tp-pill" :class="{on: filters.siteTypes.includes(t.name)}" @click="toggleSiteType(t.name)">
+            {{ t.name }}<span class="n">{{ t.count }}</span>
+          </button>
+        </div>
+        <div v-if="filters.siteTypes.length" style="margin-top:8px;text-align:right">
+          <button class="btn btn-secondary" style="font-size:10px;padding:3px 8px" @click="filters.siteTypes=[]">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Budget visualisation -->
+    <div class="acc" :class="{open: accordions.budgetViz}">
+      <div class="acc-hdr" @click="accordions.budgetViz = !accordions.budgetViz">
+        <div><span class="acc-title">Budget Visualisation</span></div>
+        <span class="acc-arrow">▾</span>
+      </div>
+      <div class="acc-body">
+        <div class="bv-total">{{ fmtCr(totalBudget) }}</div>
+        <div class="bv-total-lbl">across {{ filteredProjects.length }} projects</div>
+        <div class="bv-list">
+          <div v-for="b in bucketBreakdown" class="bv-item" :class="{off: filters.budgetRange && filters.budgetRange!==b.range}" @click="toggleBudgetFilter(b.range)">
+            <input type="checkbox" :checked="!filters.budgetRange || filters.budgetRange===b.range" @click.stop="toggleBudgetFilter(b.range)" />
+            <div class="bv-dot" :style="{background: b.color}"></div>
+            <div class="bv-name">{{ b.range }}</div>
+            <div class="bv-right" style="text-align:right">
+              <div class="bv-val">{{ b.count }}</div>
+              <div class="bv-pct">{{ fmtLakh(b.total) }}</div>
             </div>
           </div>
         </div>
       </div>
-      <div v-if="!filteredProjects.length" style="padding:30px;text-align:center;color:var(--muted);font-size:12px">
-        No projects match these filters.
+    </div>
+
+    <!-- Project list -->
+    <div class="acc" :class="{open: accordions.projects}">
+      <div class="acc-hdr" @click="accordions.projects = !accordions.projects">
+        <div><span class="acc-title">Projects</span></div>
+        <span class="pl-count">{{ filteredProjects.length }} of {{ allProjects.length }}</span>
+      </div>
+      <div class="acc-body" style="padding:0">
+        <div class="pl-list">
+          <div v-for="p in filteredProjects" :key="p.project_code" class="pl-card" :class="{sel: selectedCode===p.project_code}" @click="openProject(p.project_code)" @mouseenter="prefetchProjectText(p.project_code)">
+            <div class="pl-body">
+              <div class="pl-row1">
+                <div class="pl-name">{{ p.name }}</div>
+                <div class="pl-cost" style="display:flex;align-items:baseline;gap:2px">
+                  <span>{{ fmtCost(projectTotal(p.project_code)) }}</span>
+                  <span v-if="isPlaceholderCost(p.project_code) && projectTotal(p.project_code)" class="cost-placeholder-marker">*<span class="cost-placeholder-tip">Placeholder budget — for an accurate estimate, add specific interventions.</span></span>
+                </div>
+              </div>
+              <div class="pl-tags">
+                <span class="pl-code pl-code-tag">{{ p.project_code }}</span>
+                <span v-for="t in projectSiteTypes(p)" class="pl-tag">{{ t }}</span>
+              </div>
+            </div>
+          </div>
+          <div v-if="!filteredProjects.length" style="padding:30px;text-align:center;color:var(--muted);font-size:12px">
+            No projects match these filters.
+          </div>
+        </div>
       </div>
     </div>
+
   </div>
 </aside>
-
-<!-- §3b SELECTION TRAY ──────────────────────────────────────────────────── -->
-<div class="selection-tray" v-if="selectMode && selectedCodes.size > 0">
-  <span class="selection-tray-count">{{ selectedCodes.size }} project{{ selectedCodes.size === 1 ? '' : 's' }} selected</span>
-  <button class="selection-tray-save" @click="saveSelectionAsList">Save as List</button>
-  <button class="selection-tray-cancel" @click="selectMode=false; selectedCodes = new Set()">Cancel</button>
-</div>
 
 <!-- §4 MAP ────────────────────────────────────────────────────────────── -->
 <div id="map"></div>
 
-
-<!-- §4c OVERVIEW PAGE ──────────────────────────────────────────────────── -->
-<!-- Color-by — floating on map, below filter bar, collapsible -->
-<div v-if="view==='projects'" class="map-color-ctrl" :class="{filtered: activeLegendFilter}">
-  <div class="map-color-hdr" @click="colorByOpen=!colorByOpen" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-    <span>Color by: <strong>{{ {'budget':'Budget','corporation':'Corp','zone':'Zone','impact':'Impact'}[colorMode] }}</strong></span>
-    <span style="font-size:10px">{{ colorByOpen ? '▴' : '▾' }}</span>
-  </div>
-  <div v-if="colorByOpen">
-    <label v-for="(mode, key) in {'budget':'Budget range','corporation':'Corporation','zone':'Zone','impact':'Impact'}"
-           :key="key" class="map-color-opt" :class="{active: colorMode === key}">
-      <input type="radio" name="colorMode" :value="key" v-model="colorMode" />
-      {{ mode }}
-    </label>
-    <div class="map-legend">
-      <div v-for="item in mapLegend" :key="item.label"
-           class="map-legend-row" :class="{active: activeLegendFilter === item.label}"
-           @click="toggleLegendFilter(item.label)"
-           :title="activeLegendFilter === item.label ? 'Click to show all' : 'Click to filter'">
-        <span class="map-legend-swatch" :style="{background: item.color}"></span>
-        <span class="map-legend-label">{{ item.label }}</span>
-        <span v-if="activeLegendFilter === item.label" class="map-legend-check">✓</span>
-      </div>
+<!-- Color-by filter control — top-right corner of the map -->
+<div class="map-color-ctrl" :class="{filtered: activeLegendFilter}">
+  <div class="map-color-hdr">Color by</div>
+  <label v-for="(mode, key) in {'budget':'Budget range','corporation':'Corporation','zone':'Zone','impact':'Impact'}"
+         :key="key" class="map-color-opt" :class="{active: colorMode === key}">
+    <input type="radio" name="colorMode" :value="key" v-model="colorMode" />
+    {{ mode }}
+  </label>
+  <!-- Legend -->
+  <div class="map-legend">
+    <div v-for="item in mapLegend" :key="item.label"
+         class="map-legend-row" :class="{active: activeLegendFilter === item.label}"
+         @click="toggleLegendFilter(item.label)"
+         :title="activeLegendFilter === item.label ? 'Click to show all' : 'Click to filter'">
+      <span class="map-legend-swatch" :style="{background: item.color}"></span>
+      <span class="map-legend-label">{{ item.label }}</span>
+      <span v-if="activeLegendFilter === item.label" class="map-legend-check">✓</span>
     </div>
   </div>
 </div>
@@ -3755,23 +3372,78 @@ a:hover { text-decoration:underline; }
 
   <!-- Panel 1: Filters + Metrics (unified bar) -->
   <div class="ov-panel-card ov-panel1-wrap">
+  <div class="ov-topbar">
+
+    <!-- Left: filters -->
+    <div class="ov-topbar-filters">
+      <input class="ov-search" v-model="ovQ" placeholder="Search project, code, intervention…" />
+
+      <!-- Zone multi-select -->
+      <div class="ov-multi" style="position:relative">
+        <button class="ov-multi-btn" @click.stop="ovZoneOpen=!ovZoneOpen; ovCnstOpen=false">
+          <span>{{ ovZone.length ? ovZone.join(', ') : 'All zones' }}</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="1,1 5,5 9,1"/></svg>
+        </button>
+        <div v-if="ovZoneOpen" class="ov-multi-drop" @click.stop>
+          <label v-if="ovZone.length" class="ov-multi-clear" @click="ovZone=[]">Clear all</label>
+          <label v-for="z in zones" :key="z" class="ov-multi-item" :class="{checked: ovZone.includes(z)}">
+            <input type="checkbox" :checked="ovZone.includes(z)" @change="ovToggleZone(z)" />
+            {{ z }}
+          </label>
+        </div>
+      </div>
+
+      <!-- Constituency multi-select -->
+      <div class="ov-multi" style="position:relative">
+        <button class="ov-multi-btn" @click.stop="ovCnstOpen=!ovCnstOpen; ovZoneOpen=false">
+          <span>{{ ovConstituency.length ? ovConstituency.length + ' selected' : 'All constituencies' }}</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="1,1 5,5 9,1"/></svg>
+        </button>
+        <div v-if="ovCnstOpen" class="ov-multi-drop" @click.stop>
+          <label v-if="ovConstituency.length" class="ov-multi-clear" @click="ovConstituency=[]">Clear all</label>
+          <label v-for="c in constituencies" :key="c" class="ov-multi-item" :class="{checked: ovConstituency.includes(c)}">
+            <input type="checkbox" :checked="ovConstituency.includes(c)" @change="ovToggleCnst(c)" />
+            {{ c }}
+          </label>
+        </div>
+      </div>
+
+      <select class="ov-select" v-model="ovImpact">
+        <option value="">All impact types</option>
+        <option v-for="i in ovImpacts" :key="i" :value="i">{{ i }}</option>
+      </select>
+    </div>
+
+    <!-- Vertical separator -->
+    <div class="ov-topbar-sep"></div>
+
+    <!-- Right: stats -->
+    <div class="ov-topbar-stats">
+      <div class="ov-stat">
+        <div class="ov-stat-val">{{ fmtCost(ovTotalBudget) }}</div>
+        <div class="ov-stat-lbl">Total budget</div>
+      </div>
+      <div class="ov-stat-divider"></div>
+      <div class="ov-stat">
+        <div class="ov-stat-val">{{ ovFiltered.length }}</div>
+        <div class="ov-stat-lbl">Projects</div>
+      </div>
+      <div class="ov-stat-divider"></div>
+      <div class="ov-stat">
+        <div class="ov-stat-val">{{ ovFundedCount }}</div>
+        <div class="ov-stat-lbl">With budget</div>
+      </div>
+
+    </div>
+
+  </div>
   </div><!-- /Panel 1 -->
 
   <!-- Panels 2 + 3 row -->
   <div class="ov-body">
 
-    <!-- Panel 2: Project table (left, always visible) -->
+    <!-- Panel 2: Charts -->
     <div class="ov-panel-card ov-left">
-
-      <!-- Charts toggle arrow — sits at right edge of table panel -->
-      <button class="ov-charts-toggle" @click="ovChartsOpen = !ovChartsOpen" :title="ovChartsOpen ? 'Hide charts' : 'Show charts'">
-        <svg width="10" height="10" viewBox="0 0 10 10">
-          <path :d="ovChartsOpen ? 'M3 1 L7 5 L3 9' : 'M7 1 L3 5 L7 9'" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <!-- Charts content — hidden when collapsed -->
-      <div v-show="ovChartsOpen" style="flex:1;display:flex;flex-direction:column;min-height:0;overflow-y:auto;">
 
       <!-- Budget Analysis — horizontal bar chart with toggles -->
       <div class="ov-chart-card bars" style="flex:1;display:flex;flex-direction:column;">
@@ -3909,12 +3581,10 @@ a:hover { text-decoration:underline; }
         </div>
       </teleport>
 
-      </div><!-- /charts v-show wrapper -->
+    </div><!-- /ov-left -->
 
-    </div><!-- /ov-left (charts panel) -->
-
-    <!-- Panel 3: Project table (left, takes full width when charts closed) -->
-    <div class="ov-panel-card ov-table-panel">
+    <!-- Panel 3: Project table -->
+    <div class="ov-panel-card ov-right">
       <div class="ov-panel2">
       <div class="ov-list-body">
       <table class="ov-table">
@@ -3937,8 +3607,8 @@ a:hover { text-decoration:underline; }
           </tr>
         </thead>
         <tbody>
-          <tr v-for="p in filteredProjects" :key="p.project_code"
-              :class="{'ov-deselected': selectedCodes.size > 0 && !selectedCodes.has(p.project_code)}">
+          <tr v-for="p in ovFiltered" :key="p.project_code"
+              :class="{'ov-deselected': !ovSelected.has(p.project_code)}">
             <td><span class="ov-t-code ov-t-link" @click="openProject(p.project_code); view='projects'">{{ p.project_code }}</span></td>
             <td><span class="ov-t-name ov-t-link" @click="openProject(p.project_code); view='projects'">{{ p.name }}</span></td>
             <td class="ov-t-budget">{{ fmtCost(ovProjectTotal(p.project_code)) }}</td>
@@ -3951,7 +3621,7 @@ a:hover { text-decoration:underline; }
             <td class="ov-t-funded">{{ p.funded_under || '—' }}</td>
             <td class="ov-t-check" @click.stop>
               <input type="checkbox"
-                     :checked="selectedCodes.has(p.project_code)"
+                     :checked="ovSelected.has(p.project_code)"
                      @change="ovToggle(p.project_code)" />
             </td>
           </tr>
@@ -3961,12 +3631,12 @@ a:hover { text-decoration:underline; }
       <!-- Table footer -->
       <div class="ov-table-foot">
         <div class="ov-foot-stat">
-          <div class="ov-foot-lbl">{{ selectedCodes.size > 0 ? 'Selected' : 'Showing' }}</div>
-          <div class="ov-foot-val">{{ selectedCodes.size > 0 ? selectedCodes.size : filteredProjects.length }} projects</div>
+          <div class="ov-foot-lbl">Selected</div>
+          <div class="ov-foot-val">{{ ovSelectedCount }} projects</div>
         </div>
         <div class="ov-foot-stat">
-          <div class="ov-foot-lbl">Budget</div>
-          <div class="ov-foot-val">{{ fmtCost(selectedCodes.size > 0 ? ovSelectedBudget : totalBudget) }}</div>
+          <div class="ov-foot-lbl">Selected Budget</div>
+          <div class="ov-foot-val">{{ fmtCost(ovSelectedBudget) }}</div>
         </div>
         <div class="ov-foot-actions">
           <button class="ov-btn-sm" @click="ovSelectAll">Select all</button>
@@ -3974,7 +3644,7 @@ a:hover { text-decoration:underline; }
         </div>
       </div>
       </div><!-- /ov-panel2 -->
-    </div><!-- /ov-table-panel -->
+    </div><!-- /ov-right -->
 
   </div><!-- /ov-body -->
 </div>
@@ -5029,6 +4699,7 @@ const USE_LIVE_API = true;   // baked-in for Sensing Local's deployment
 // instant the page loads so the server is warm by the time anyone logs in.
 // This is fire-and-forget — we don't need or wait for the response.
 if (USE_LIVE_API) {
+  // Define the warmup callback before injecting the script tag
   window.__rbps_warmup = function() {};
   (function warmUp() {
     try {
@@ -5460,19 +5131,14 @@ const app = createApp({
     const activeLegendFilter = ref(null);  // null = show all; string = filter by this legend label
 
     const search = ref('');
-    const filters = reactive({ zones: [], constituency: '', budgetRange: '', siteTypes: [], affiliatedProgram: '', impact: '' });
+    const filters = reactive({ zones: [], constituency: '', budgetRange: '', siteTypes: [], affiliatedProgram: '' });
     const ddOpen = ref(null);
     const accordions = reactive({ siteType: false, budgetViz: false, projects: true });
     const sidebarCollapsed = ref(false);
 
     const selectedCode = ref(null);
     const editMode = ref(false);
-    const costMode = ref('placeholder');
-    const selectMode = ref(false);
-    const selectedCodes = ref(new Set());
-    const colorByOpen = ref(true);
-    const afOpen = ref(null);
-    const ovChartsOpen = ref(true); // charts drawer in overview // 'placeholder' | 'detail'
+    const costMode = ref('placeholder'); // 'placeholder' | 'detail'
     const nomineePopupOpen = ref(false);
     // ── Admin Lists state ────────────────────────────────────────────────
     const adminListsOpen    = ref(false);   // My Lists dropdown open
@@ -5881,13 +5547,11 @@ const app = createApp({
       initMap();
 
       document.addEventListener('click', (e) => {
-        if (!e.target.closest('.fb-filter') && !e.target.closest('.fb-filter-collapse')) { ddOpen.value = null; }
         if (!e.target.closest('.tb-user')) { nomineePopupOpen.value = false; adminListsOpen.value = false; }
         if (!e.target.closest('.tb-list-toggle')) { listPickerOpen.value = false; }
         if (!e.target.closest('.pp-list-band')) panelListDropdownOpen.value = false;
         if (!e.target.closest('.ov-multi')) { ovZoneOpen.value = false; ovCnstOpen.value = false; }
         if (!e.target.closest('.tb-hamburger') && !e.target.closest('.tb-nav-dropdown')) { menuOpen.value = false; }
-        if (!e.target.closest('.fb-colorby')) { colorByOpen.value = false; }
       });
 
       if (!USE_LIVE_API) {
@@ -5955,15 +5619,6 @@ const app = createApp({
       return [...set].sort();
     });
     const budgetRanges = computed(() => BUDGET_RANGES.map(b => b.range));
-    const activeFilterCount = computed(() =>
-      filters.zones.length +
-      (filters.constituency ? 1 : 0) +
-      (filters.budgetRange ? 1 : 0) +
-      filters.siteTypes.length +
-      (filters.affiliatedProgram ? 1 : 0) +
-      (filters.impact ? 1 : 0)
-    );
-
     const affiliatedPrograms = computed(() =>
       [...new Set(allProjects.value.map(p => p.affiliated_program).filter(Boolean))].sort()
     );
@@ -5984,7 +5639,6 @@ const app = createApp({
         if (filters.constituency && !(p.constituency||'').toLowerCase().includes(filters.constituency.toLowerCase())) return false;
         if (filters.budgetRange && p.budget_range !== filters.budgetRange) return false;
         if (filters.affiliatedProgram && p.affiliated_program !== filters.affiliatedProgram) return false;
-        if (filters.impact && p.impact !== filters.impact) return false;
         if (filters.siteTypes.length) {
           const types = (p.site_type||'').split(',').map(s=>s.trim());
           if (!filters.siteTypes.some(t => types.includes(t))) return false;
@@ -6101,44 +5755,8 @@ const app = createApp({
       return result;
     });
 
-    function saveSelectionAsList() {
-      const name = prompt('Name this list:');
-      if (!name || !name.trim()) return;
-      const codes = [...selectedCodes.value];
-      if (auth.mode === 'admin') {
-        api.saveAdminList({ list_name: name.trim(), project_codes: codes, adminEmail: auth.email }, {})
-          .then(() => { toast('List saved!', 'ok'); })
-          .catch(e => { toast('Save failed: ' + e.message, 'err'); });
-      } else {
-        toast('Sign in as admin to save lists.', 'err');
-      }
-      selectMode.value = false;
-      selectedCodes.value = new Set();
-    }
-
-    function toggleSelectProject(code) {
-      const s = new Set(selectedCodes.value);
-      if (s.has(code)) s.delete(code); else s.add(code);
-      selectedCodes.value = s;
-    }
-
-    function resetFiltersAndSelection() {
-      filters.zones = [];
-      filters.constituency = '';
-      filters.budgetRange = '';
-      filters.siteTypes = [];
-      filters.affiliatedProgram = '';
-      filters.impact = '';
-      search.value = '';
-      selectedCodes.value = new Set();
-      selectMode.value = false;
-    }
-
-    function toggleDd(key) {
-      ddOpen.value = ddOpen.value === key ? null : key;
-    }
-
     function isPlaceholderCost(code) {
+      return !(projectTotalMap.value[code] > 0);
     }
 
     function budgetRangeFromAmount(rupees) {
@@ -6151,9 +5769,10 @@ const app = createApp({
     }
 
     function projectTotal(code) {
+      const computed = projectTotalMap.value[code] || 0;
       const p = allProjects.value.find(p => p.project_code === code);
-      const amount = Number(p && p.placeholder_budget) || 0;
-      // Auto-sync budget_range on the fly
+      const amount = computed > 0 ? computed : (Number(p && p.placeholder_budget) || 0);
+      // Auto-sync budget_range on the fly from whichever cost is active
       if (p && amount > 0) p.budget_range = budgetRangeFromAmount(amount);
       return amount;
     }
@@ -6401,21 +6020,21 @@ const app = createApp({
     const ovImpact       = ref('');
     const ovDonutBy      = ref('corporation');
     const ovDonutHover   = ref(null);
-    // selectedCodes shared with map sidebar — declared above
+    const ovSelected     = ref(new Set());
     const ovInitialized  = ref(false);
     const OV_COLORS      = ['#C6613F','#5C6B48','#4A7C8E','#9B6B3A','#7A5C8E','#3A7A5C','#8E4A6B','#6B8E3A','#4A6B8E','#8E7A3A','#3A4A8E','#8E5C3A','#5C8E6B','#8E3A5C'];
 
     // Initialize selection when overview opens
     watch(() => view.value, (v) => {
       if (v === 'overview' && !ovInitialized.value) {
-        selectedCodes.value = new Set(allProjects.value.map(p => p.project_code));
+        ovSelected.value = new Set(allProjects.value.map(p => p.project_code));
         ovInitialized.value = true;
       }
     });
     // Also initialize once projects load
     watch(() => allProjects.value.length, (len) => {
       if (len && !ovInitialized.value) {
-        selectedCodes.value = new Set(allProjects.value.map(p => p.project_code));
+        ovSelected.value = new Set(allProjects.value.map(p => p.project_code));
       }
     });
 
@@ -6427,42 +6046,60 @@ const app = createApp({
     );
 
     const ovFiltered = computed(() => {
+      const q    = ovQ.value.toLowerCase();
+      const zones = ovZone.value;
+      const cnsts = ovConstituency.value;
+      const bkt  = ovBucket.value;
       const fwMap = fwById.value;
-      const bkt   = ovBucket.value;
-      return filteredProjects.value.filter(p => {
-        // Budget bucket filter (intervention-level, overview-specific)
+      return allProjects.value.filter(p => {
+        if (zones.length && !zones.includes(p.zone)) return false;
+        if (cnsts.length && !cnsts.some(c => (p.constituency || '').includes(c))) return false;
+        // Budget bucket filters by intervention framework bucket
+        if (ovImpact.value && p.impact !== ovImpact.value) return false;
         if (bkt) {
           const hasBucket = projectIntvs.value
             .filter(r => r.project_code === p.project_code)
             .some(r => (fwMap[r.intervention_id]?.budget_bucket || '') === bkt);
           if (!hasBucket) return false;
         }
-        // Drill-down intervention filter
+        if (q) {
+          const intvMatch = projectIntvs.value
+            .filter(r => r.project_code === p.project_code)
+            .some(r => (fwMap[r.intervention_id]?.intervention || '').toLowerCase().includes(q));
+          if (!(
+            (p.name || '').toLowerCase().includes(q) ||
+            (p.project_code || '').toLowerCase().includes(q) ||
+            intvMatch
+          )) return false;
+        }
+        // Drill-down intervention filter — show only projects with this intervention
         if (ovDrillIntv.value) {
           const hasIntv = projectIntvs.value
             .filter(r => r.project_code === p.project_code)
             .some(r => (fwMap[r.intervention_id]?.intervention || '') === ovDrillIntv.value);
           if (!hasIntv) return false;
         }
+        // Admin list filter
+        if (adminListActiveCodes.value && !adminListActiveCodes.value.has(p.project_code)) return false;
         return true;
       });
     });
 
     // Project total — sum of cost rows for this project
     function ovProjectTotal(code) {
-      // Use placeholder_budget as the authoritative cost — intervention list shown for reference only
-      const p = allProjects.value.find(p => p.project_code === code);
-      return Number(p && p.placeholder_budget) || 0;
+      return projectIntvs.value
+        .filter(r => r.project_code === code)
+        .reduce((s, r) => s + (Number(r.cost) || 0), 0);
     }
 
     const ovTotalBudget = computed(() =>
-      filteredProjects.value
-        .filter(p => selectedCodes.value.has(p.project_code))
+      ovFiltered.value
+        .filter(p => ovSelected.value.has(p.project_code))
         .reduce((s, p) => s + ovProjectTotal(p.project_code), 0)
     );
 
     const ovFundedCount = computed(() =>
-      ovAnalysed.value.filter(p => p.budget_range && p.budget_range.trim()).length
+      ovFiltered.value.filter(p => p.budget_range && p.budget_range.trim()).length
     );
 
     // ── Intervention Analysis: count of projects per intervention ──
@@ -6470,7 +6107,7 @@ const app = createApp({
 
     const ovIntvCountBars = computed(() => {
       const fwMap = fwById.value;
-      const filteredCodes = new Set(filteredProjects.value.map(p => p.project_code));
+      const filteredCodes = new Set(ovFiltered.value.map(p => p.project_code));
 
       const countMap  = {};
       const qtyMap    = {};
@@ -6546,23 +6183,18 @@ const app = createApp({
       const totals = {};
 
       if (field === 'budget_bucket') {
-        // Group projects by their framework budget_bucket (count, not cost)
-        const projectsPerBucket = {};
+        // Group intervention costs by their framework budget_bucket
         for (const r of projectIntvs.value) {
-          if (!selectedCodes.value.has(r.project_code)) continue;
-          if (!filteredCodes.has(r.project_code)) continue;
+          if (!ovSelected.value.has(r.project_code)) continue;
+          if (!ovFiltered.value.find(p => p.project_code === r.project_code)) continue;
           const fw = fwMap[r.intervention_id];
           const key = (fw && fw.budget_bucket) || 'Other';
-          if (!projectsPerBucket[key]) projectsPerBucket[key] = new Set();
-          projectsPerBucket[key].add(r.project_code);
-        }
-        for (const [key, set] of Object.entries(projectsPerBucket)) {
-          totals[key] = set.size;
+          totals[key] = (totals[key] || 0) + (Number(r.cost) || 0);
         }
       } else {
         // Group project totals by project field (corporation or zone)
-        for (const p of filteredProjects.value) {
-          if (!selectedCodes.value.has(p.project_code)) continue;
+        for (const p of ovFiltered.value) {
+          if (!ovSelected.value.has(p.project_code)) continue;
           const key  = p[field] || 'Other';
           const cost = ovProjectTotal(p.project_code);
           totals[key] = (totals[key] || 0) + cost;
@@ -6595,34 +6227,28 @@ const app = createApp({
 
     // Helper: get filtered intv rows for selected+filtered projects
     function ovIntvRows() {
-      const filtered = new Set(filteredProjects.value.map(p => p.project_code));
+      const filtered = new Set(ovFiltered.value.map(p => p.project_code));
       return projectIntvs.value.filter(r =>
-        selectedCodes.value.has(r.project_code) && filtered.has(r.project_code)
+        ovSelected.value.has(r.project_code) && filtered.has(r.project_code)
       );
     }
 
-    // Build bar data from a grouping function — counts projects per group
+    // Build bar data from a grouping function
     function ovBuildBars(rows, keyFn) {
-      const counts = {};
+      const totals = {};
       const fwMap = fwById.value;
-      // Count distinct projects per group
-      const projectsPerGroup = {};
       for (const r of rows) {
         const fw = fwMap[r.intervention_id];
         if (!fw) continue;
         const key = keyFn(fw) || 'Other';
-        if (!projectsPerGroup[key]) projectsPerGroup[key] = new Set();
-        projectsPerGroup[key].add(r.project_code);
+        totals[key] = (totals[key] || 0) + (Number(r.cost) || 0);
       }
-      const entries = Object.entries(projectsPerGroup)
-        .map(([name, set]) => [name, set.size])
-        .sort((a, b) => b[1] - a[1]);
+      const entries = Object.entries(totals).sort((a, b) => b[1] - a[1]);
       const max = entries[0]?.[1] || 1;
       return entries.map(([name, value]) => ({
         name, value,
         pct: Math.round((value / max) * 100),
         color: '#C6613F',
-        label: value + ' projects',
       }));
     }
 
@@ -6659,22 +6285,17 @@ const app = createApp({
       const field = ovBudgetToggle.value;
 
       if (field === 'intervention') {
-        // Count projects per intervention name
+        // Aggregate cost per intervention name; track sub-category
         const rows  = ovIntvRows();
         const totals = {};
         const subcats = {};
         const fwMap  = fwById.value;
-        const projectsPerIntv = {};
         for (const r of rows) {
           const fw = fwMap[r.intervention_id];
           if (!fw) continue;
           const key = fw.intervention || 'Other';
-          if (!projectsPerIntv[key]) projectsPerIntv[key] = new Set();
-          projectsPerIntv[key].add(r.project_code);
+          totals[key]  = (totals[key]  || 0) + (Number(r.cost) || 0);
           subcats[key] = fw.sub_category || 'Other';
-        }
-        for (const [key, set] of Object.entries(projectsPerIntv)) {
-          totals[key] = set.size;
         }
 
         // Assign one colour per sub-category (sorted alphabetically for stability)
@@ -6710,8 +6331,8 @@ const app = createApp({
 
       // Corporation / Zone: sum ovProjectTotal per project, grouped by field
       const totals = {};
-      for (const p of filteredProjects.value) {
-        if (!selectedCodes.value.has(p.project_code)) continue;
+      for (const p of ovFiltered.value) {
+        if (!ovSelected.value.has(p.project_code)) continue;
         const key = p[field] || 'Other';
         const cost = ovProjectTotal(p.project_code);
         totals[key] = (totals[key] || 0) + cost;
@@ -6819,15 +6440,16 @@ const app = createApp({
     const ovGridGroups = computed(() => {
       const rows = ovIntvRows();
       const fwMap = fwById.value;
-      // Aggregate count per intervention_id (cost from placeholder, not intervention rows)
+      // Aggregate cost + count per intervention_id
       const agg = {};
       for (const r of rows) {
         const fw = fwMap[r.intervention_id];
         if (!fw) continue;
         if (!agg[r.intervention_id]) {
-          agg[r.intervention_id] = { ...fw, count: 0 };
+          agg[r.intervention_id] = { ...fw, count: 0, cost: 0 };
         }
         agg[r.intervention_id].count += 1;
+        agg[r.intervention_id].cost  += Number(r.cost) || 0;
       }
       // Group by sub_category preserving framework order
       const grouped = {};
@@ -6876,29 +6498,22 @@ const app = createApp({
     // Keep ovSubCatBars for summary page compatibility (unchanged)
     const ovSubCatBars = computed(() => ovDrillBars.value);
 
-    const selectedCodesCount = computed(() =>
-      filteredProjects.value.filter(p => selectedCodes.value.has(p.project_code)).length
+    const ovSelectedCount = computed(() =>
+      ovFiltered.value.filter(p => ovSelected.value.has(p.project_code)).length
     );
-    const selectedCodesBudget = computed(() =>
-      filteredProjects.value
-        .filter(p => selectedCodes.value.has(p.project_code))
+    const ovSelectedBudget = computed(() =>
+      ovFiltered.value
+        .filter(p => ovSelected.value.has(p.project_code))
         .reduce((s, p) => s + ovProjectTotal(p.project_code), 0)
     );
 
     function ovToggle(code) {
-      const s = new Set(selectedCodes.value);
+      const s = new Set(ovSelected.value);
       if (s.has(code)) s.delete(code); else s.add(code);
-      selectedCodes.value = s;
+      ovSelected.value = s;
     }
-    function ovSelectAll()   { selectedCodes.value = new Set(filteredProjects.value.map(p => p.project_code)); }
-    function ovDeselectAll() { selectedCodes.value = new Set(); }
-
-    // Projects to analyse in overview charts: selected subset if any, else all filtered
-    const ovAnalysed = computed(() =>
-      selectedCodes.value.size > 0
-        ? filteredProjects.value.filter(p => selectedCodes.value.has(p.project_code))
-        : filteredProjects.value
-    );
+    function ovSelectAll()   { ovSelected.value = new Set(ovFiltered.value.map(p => p.project_code)); }
+    function ovDeselectAll() { ovSelected.value = new Set(); }
 
     const isAdmin = computed(() => auth.mode === 'admin');
     function canEdit(project) {
@@ -7056,8 +6671,8 @@ const app = createApp({
 
     async function openSaveAsListModal() {
       if (!auth.email || auth.mode !== 'admin') { toast('Please log in as admin', 'err'); return; }
-      const codes = filteredProjects.value
-        .filter(p => selectedCodes.value.has(p.project_code))
+      const codes = ovFiltered.value
+        .filter(p => ovSelected.value.has(p.project_code))
         .map(p => p.project_code);
       if (!codes.length) { toast('No projects selected', 'err'); return; }
       if (!adminListsLoaded.value) await loadAdminLists();
@@ -7755,13 +7370,13 @@ const app = createApp({
       // state
       view, allProjects, framework, projectIntvs, typology,
       search, filters, ddOpen, accordions, sidebarCollapsed,
-      costMode, selectedCode, editMode, selectMode, selectedCodes, colorByOpen, afOpen, ovChartsOpen, toggleSelectProject, resetFiltersAndSelection, saveSelectionAsList, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
+      costMode, selectedCode, editMode, draft, galleryIdx, openCats, openSubs, openCatsV, addIvId, saving,
       addModalOpen, addModalSelected, addModalQtys, setModalQty, colorMode, activeLegendFilter,
       rateCardOpen, rcSearch, openBuckets, menuOpen,
       loginOpen, loginMode, loginForm, loginErr, loginBusy,
       auth, toasts, busy, loadStage, loadPct, loadDone, siteTypeMap,
       // computed
-      toggleDd, zones, constituencies, budgetRanges, affiliatedPrograms, activeFilterCount, siteTypeOptions,
+      zones, constituencies, budgetRanges, affiliatedPrograms, siteTypeOptions,
       filteredProjects, totalBudget, bucketBreakdown,
       selectedProject, galleryUrls, currentImage,
       projectInterventions, groupedInterventions, addableInterventions,
@@ -7796,8 +7411,8 @@ const app = createApp({
       listModalSaving, listModalProjects, saveListModal,
       ovQ, ovZone, ovConstituency, ovBucket, ovDonutBy, ovDonutHover,
       ovZoneOpen, ovCnstOpen, ovToggleZone, ovToggleCnst,
-      selectedCodes, filteredProjects, ovBuckets, ovDonutSegs, ovSubCatBars,
-      ovFiltered, ovAnalysed, ovTotalBudget, ovFundedCount, selectedCodesCount, selectedCodesBudget,
+      ovSelected, ovFiltered, ovBuckets, ovDonutSegs, ovSubCatBars,
+      ovTotalBudget, ovFundedCount, ovSelectedCount, ovSelectedBudget,
       ovProjectTotal, ovToggle, ovSelectAll, ovDeselectAll, ovImpact, ovImpacts,
       ovDrillLevel, ovDrillBucket, ovDrillCategory, ovDrillSubCat, ovDrillIntv, ovDrillToIntv,
       ovDrillBars, ovDrillClick, ovDrillReset, ovDrillToCat, ovDrillToSub,
@@ -7855,11 +7470,48 @@ function _initMap() {
   ctrl.refresh = () => updateMarkers();
 
   // Highlight a set of project codes on the map (dim others)
+  // Pass null to clear the highlight
   let _highlightSet = null;
   ctrl.setHighlight = (codeSet) => {
     _highlightSet = codeSet;
     updateMarkers();
   };
+
+  // Patch updateMarkers to apply highlight dimming
+  // We'll store original and wrap it
+  const _origUpdateMarkers = updateMarkers;
+  function updateMarkers() {
+    _origUpdateMarkers && _origUpdateMarkers();
+    if (!_highlightSet) return;
+    // After markers are drawn, dim non-matching ones
+    Object.entries(markerLayer._layers || {}).forEach(([, layer]) => {
+      const el = layer.getElement && layer.getElement();
+      if (!el) return;
+      const code = el.dataset && el.dataset.code;
+      if (code) el.style.opacity = _highlightSet.has(code) ? '1' : '0.15';
+    });
+  }
+
+  function boot() {
+    map = L.map('map', {
+      center: [12.9716, 77.5946],   // Bengaluru
+      zoom: 11,
+      zoomControl: false,
+    });
+    L.control.zoom({ position: 'topright' }).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors',
+    }).addTo(map);
+
+    layerGroup = L.layerGroup().addTo(map);
+
+    // Defer marker rendering so the map tile layer loads first
+    setTimeout(() => {
+      map.invalidateSize();
+      updateMarkers();
+    }, 150);
+  }
 
   function updateMarkers() {
     if (!layerGroup) return;
@@ -7911,36 +7563,6 @@ function _initMap() {
     }
     // Re-apply selected state (DOM was wiped above)
     if (lastSelectedCode) setSelected(lastSelectedCode);
-    // Apply highlight dimming if a highlight set is active
-    if (_highlightSet) {
-      requestAnimationFrame(() => {
-        document.querySelectorAll('.mp-pin').forEach(el => {
-          const code = el.dataset && el.dataset.code;
-          if (code) el.style.opacity = _highlightSet.has(code) ? '1' : '0.15';
-        });
-      });
-    }
-  }
-
-  function boot() {
-    map = L.map('map', {
-      center: [12.9716, 77.5946],   // Bengaluru
-      zoom: 11,
-      zoomControl: false,
-    });
-    L.control.zoom({ position: 'topright' }).addTo(map);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(map);
-
-    layerGroup = L.layerGroup().addTo(map);
-
-    // Defer marker rendering so the map tile layer loads first
-    setTimeout(() => {
-      map.invalidateSize();
-      updateMarkers();
-    }, 150);
   }
 
   /** Highlight the pin for a given code, clear previous selection. */
